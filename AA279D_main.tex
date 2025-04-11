@@ -1,0 +1,116 @@
+\documentclass[11pt,letterpaper]{article}
+
+% Use the custom AA279D template style
+\usepackage{AA279D_template}
+\usepackage[hidelinks]{hyperref}
+\bibliography{references.bib}
+
+\allowdisplaybreaks % Can be useful if you are using the align operator, allows equations in an align operator to span multiple pages
+\setcounter{section}{-1} % start Scope at 0
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
+
+% User inputs: change as needed for project
+\newcommand{\workingDate}{\textsc{2025 $|$ April $|$ 9}}
+\newcommand{\userName}{Anshuk Chigullapalli, Tycho Bogdanowitsch}
+\newcommand{\userNameShort}{Anshuk C, Tycho B}
+\newcommand{\institution}{Stanford University}
+\newcommand{\theTitle}{AA 279D}
+
+\begin{document}
+
+% Set up the title page
+\begin{titlepage}
+    \begin{center}
+        \vspace*{1cm}
+        
+        \Huge
+        \textbf{SOSS}\\
+        
+        \Huge \textit{Servicing and Observing Satellite Swarm} \\ 
+        \vspace{0.5cm}
+        
+        
+        \vspace{0.5cm}
+        \LARGE
+        \ 
+        
+        \vspace{1.00cm}
+        \textbf{\userName}
+        \vspace{1.00cm}
+        
+        \vfill
+        \begin{figure}[H]
+		\centering 
+		\includegraphics[width = 5.5in]{Figures/mev_ng.jpg}
+		\label{Figure: Title Graphic}
+		\end{figure}
+        \        
+        
+        \Large
+        AA 279D - Spacecraft Formation-Flying and Rendezvous\\
+        Stanford University\\
+        
+    \end{center}
+\end{titlepage}
+
+% Update the revision history with each assignment
+\section*{Revision History}
+
+\begin{table}[ht]
+    \centering
+    % \caption{Summary of project revisions.}
+    \begin{tabular}{ll}
+        \toprule
+        \textbf{Rev} & \textbf{Changes} \\
+        \hline
+        PS1 & \tabitem Created document \\
+            & \tabitem Added problem set 1 material  \\
+        \hline
+        % PS2 & \tabitem Added problem set 2 material  \\
+        %     & \tabitem Example revision statement 1  \\
+        %     & \tabitem Example revision statement 2  \\
+        % \hline
+        % PS3 & \tabitem Added problem set 3 material  \\
+        % \bottomrule
+    \end{tabular}
+    \label{table:revision history}
+\end{table}
+
+\newpage
+\tableofcontents
+
+\newpage
+\listoffigures
+
+\newpage
+\listoftables
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SCOPE 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Scope}
+This report covers the requirements for AA279D Spacecraft Formation Flying and Rendezvous project.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PROBLEM SETS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{PS1/ps1}
+\newpage
+%\input{PS2/ps2}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% REFERENCES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{References}
+\printbibliography[heading=none]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% APPENDIX 1: CODE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\input{Appendix/code}
+
+\end{document}
