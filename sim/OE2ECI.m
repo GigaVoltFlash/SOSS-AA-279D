@@ -1,12 +1,3 @@
-%% AA279D Master Simulation
-% Tycho Bogdanowitsch
-% Anshuk Chigullapalli 
-
-
-
-% Initial absolute orbit parameters
-% Converting SV1 elements
-
 function [r_ECI,v_ECI] = OE2ECI(a,e,i,RAAN,omega,nu)
     global mu_earth;
     i = deg2rad(i);
