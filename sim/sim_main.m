@@ -33,6 +33,14 @@ v_ECI_with_j2 = state2(:,4:6);
 r_ECI_no_j2 = state1(:,1:3);
 v_ECI_no_j2 = state1(:,4:6);
 
+%%%%%% RUN SIM OF RELATIVE MOTION %%%%%%%%
+[t_3, state3] = rk4_eom_rel_RTN(tstart:tint:tend, state_rel_SV2_init);
+[t_4, state4] = rk4_eom_rel_RTN(tstart:tint:tend, state_rel_SV3_init);
+r_ECI_no_j2_2 = state3(:,1:3); % This is to check that the propagation gives the same results as the previous propagation
+v_ECI_no_j2_2 = state3(:,4:6);
+SV2_rel_pos = [state3(:, 7), state3(:, 8), state3(:, 9)];
+SV3_rel_pos = [state4(:, 7), state4(:, 8), state4(:, 9)];
+
 %%%%%%% KEPLERIAN PROPAGATION %%%%%%% 
 % Propagates over the same times t_1 as the sim without J2 
 [r_ECI_keplerian, v_ECI_keplerian] = keplerian_propagator(a_init, e_init, i_init, RAAN_init, w_init, t_1, M_init);
