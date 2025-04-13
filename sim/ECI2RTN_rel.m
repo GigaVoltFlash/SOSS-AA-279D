@@ -33,4 +33,3 @@ function [rho_RTN, rho_RTN_dot] = ECI2RTN_rel(r_ECI_0, v_ECI_0, r_ECI_1, v_ECI_1
         rho_RTN_dot(i,:) = Q * rho_dot_corrected;
     end
 end
-

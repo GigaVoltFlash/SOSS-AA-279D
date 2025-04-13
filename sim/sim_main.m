@@ -33,14 +33,6 @@ v_ECI_with_j2 = state2(:,4:6);
 r_ECI_no_j2 = state1(:,1:3);
 v_ECI_no_j2 = state1(:,4:6);
 
-%%%%%% RUN SIM OF RELATIVE MOTION %%%%%%%%
-[t_3, state3] = rk4_eom_rel_RTN(tstart:tint:tend, state_rel_SV2_init);
-[t_4, state4] = rk4_eom_rel_RTN(tstart:tint:tend, state_rel_SV3_init);
-r_ECI_no_j2_2 = state3(:,1:3); % This is to check that the propagation gives the same results as the previous propagation
-v_ECI_no_j2_2 = state3(:,4:6);
-SV2_rel_pos = [state3(:, 7), state3(:, 8), state3(:, 9)];
-SV3_rel_pos = [state4(:, 7), state4(:, 8), state4(:, 9)];
-
 %%%%%%% KEPLERIAN PROPAGATION %%%%%%% 
 % Propagates over the same times t_1 as the sim without J2 
 [r_ECI_keplerian, v_ECI_keplerian] = keplerian_propagator(a_init, e_init, i_init, RAAN_init, w_init, t_1, M_init);
@@ -65,6 +57,29 @@ d_a_2_init,d_lambda_2_init,d_e_x_2_init,d_e_y_2_init,d_i_x_2_init,d_i_y_2_init);
 quasi_nonsing2OE(a_2_init, e_x_2_init, e_y_2_init, i_2_init, RAAN_2_init, u_2_init);
 
 [r_2_init, v_2_init] = OE2ECI(a_2_init, e_2_init, i_2_init, RAAN_2_init, w_2_init, nu_2_init);
+% Converting initial swarm ECI coordinates to initial relative co-ordinates in
+% chief's RTN frame.
+
+% THERE IS AN ERROR IN THIS FUNCTION
+[r_2_rtn_init, v_2_rtn_init] = ECI2RTN_rel_init(r_init, v_init, r_2_init, v_2_init);
+
+% This is currently ERRORING so commenting this out
+% state_rel_SV2_init = [r_init; v_init; r_2_rtn_init, v_2_rtn_init];
+% 
+% %%%%%% RUN SIM OF RELATIVE MOTION %%%%%%%%
+% [t_3, state3] = rk4_eom_rel_RTN(tstart:tint:tend, state_rel_SV2_init);
+% % [t_4, state4] = rk4_eom_rel_RTN(tstart:tint:tend, state_rel_SV3_init);
+% r_ECI_no_j2_2 = state3(:,1:3); % This is to check that the propagation gives the same results as the previous propagation
+% v_ECI_no_j2_2 = state3(:,4:6);
+% SV2_rel_pos = [state3(:, 7), state3(:, 8), state3(:, 9)];
+% % SV3_rel_pos = [state4(:, 7), state4(:, 8), state4(:, 9)];
+
+%%%%% RUN ABSOLUTE POSITION SIM WITH SV2 %%%%%%
+% Tycho you can add this here.
+% You can then pass those into ECI2RTN_rel function, that should take the
+% difference and convert them to the chief's RTN frame. Pass in the whole
+% vectors of shape nx3.
+% Use plot_rel_sat_pos with the RTN position (ChatGPT function, I haven't tested it yet).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLOTTING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 %%
@@ -81,4 +96,8 @@ plot_rtn_compare(t_1, r_RTN_no_j2, r_RTN_keplerian, v_RTN_no_j2, v_RTN_keplerian
 %%%%%%%% COMPUTE AND PLOT OSCULATING VERSUS MEAN %%%%%%%%%%%%
 [a_3,e_3,i_3,RAAN_3,omega_3,nu_3,t_3] = compute_mean_oe(a_init,ex_init,ey_init,i_init,RAAN_init,u_init,tstart,tint,tend);
 plot_osc_mean_oe(a_2,e_2,i_2,RAAN_2,omega_2,nu_2,t_2,a_3,e_3,i_3,RAAN_3,omega_3,nu_3,t_3);
+
+
+%%%%%%%% PLOT RELATIVE POSITIONS (IN CHIEF'S RTN FRAME) %%%%%%%
+% USE THIS FUNCTION: plot_rel_sat_pos()
 
