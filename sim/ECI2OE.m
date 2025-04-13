@@ -1,8 +1,3 @@
-%% AA279D Master Simulation
-% Tycho Bogdanowitsch
-% Anshuk Chigullapalli 
-
-
 % Converting ECI to Orbital Elements
 function [a,e,i,RAAN,omega,nu] = ECI2OE(r_IJK,v_IJK)
     mu_earth = 3.986e5; % km^3/s^2

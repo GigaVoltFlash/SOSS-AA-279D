@@ -49,15 +49,12 @@ d_e_y_2_init = 202; % m
 d_i_x_2_init = 79; % m
 d_i_y_2_init = 1005; % m
 
-[a_2_init,e_x_2_init,e_y_2_init,i_2_init,RAAN_2_init,u_2_init] = ...
-ROE2quasi_nonsing(a_init,ex_init,ey_init,i_init,RAAN_init,u_init, ...
-d_a_2_init,d_lambda_2_init,d_e_x_2_init,d_e_y_2_init,d_i_x_2_init,d_i_y_2_init);
+[r_2_init, v_2_init] = ROE2ECI(a_init,ex_init,ey_init,i_init,RAAN_init,u_init, ...
+d_a_2_init,d_lambda_2_init,d_e_x_2_init,d_e_y_2_init,d_i_x_2_init,d_i_y_2_init)
 
-[a_2_init, e_2_init, i_2_init, RAAN_2_init, w_2_init, nu_2_init, M_2_init] = ...
-quasi_nonsing2OE(a_2_init, e_x_2_init, e_y_2_init, i_2_init, RAAN_2_init, u_2_init);
+state_abs_SV2_init = [r_2_init;v_2_init];
 
-[r_2_init, v_2_init] = OE2ECI(a_2_init, e_2_init, i_2_init, RAAN_2_init, w_2_init, nu_2_init);
-% Converting initial swarm ECI coordinates to initial relative co-ordinates in
+% Converting initial swarm ECI coordinates to initial relative coordinates in
 % chief's RTN frame.
 
 % THERE IS AN ERROR IN THIS FUNCTION
@@ -80,6 +77,46 @@ quasi_nonsing2OE(a_2_init, e_x_2_init, e_y_2_init, i_2_init, RAAN_2_init, u_2_in
 % difference and convert them to the chief's RTN frame. Pass in the whole
 % vectors of shape nx3.
 % Use plot_rel_sat_pos with the RTN position (ChatGPT function, I haven't tested it yet).
+
+[t_5, state5] = rk4_eom_ECI(tstart:tint:tend, state_abs_SV2_init, false);
+r_SV2_ECI_no_j2 = state5(:,1:3);
+v_SV2_ECI_no_j2 = state5(:,4:6);
+
+plot_3D_orbits(r_ECI_no_j2, r_SV2_ECI_no_j2, 'Chief', 'Deputy')
+
+[rho_SV2_RTN, rho_SV2_RTN_dot] = ECI2RTN_rel(r_ECI_no_j2, v_ECI_no_j2, r_SV2_ECI_no_j2, v_SV2_ECI_no_j2);
+plot_rel_sat_pos(rho_SV2_RTN)
+
+% Do again for SV3, state 6
+
+%%%%% NEW INITIAL RELATIVE ORBIT ELEMENTS %%%%%
+d_a_2_init_new = 1000; % m
+
+% redo b and c: states 7,8,9,10
+
+
+
+%%%%% APPLY SEMI-MAJOR AXIS MANEUVER %%%%%
+desired_delta_a = 12; % km
+maneuver_time = tend/2;
+
+[t_11, state11] = rk4_eom_ECI(tstart:tint:maneuver_time, state_abs_SV2_init, false);
+r_SV2_ECI_no_j2_inter = state11(end,1:3);
+v_SV2_ECI_no_j2_inter = state11(end,4:6);
+[a_SV2_inter,e_SV2_inter] = ECI2OE(r_SV2_ECI_no_j2_inter,v_SV2_ECI_no_j2_inter);
+
+delta_v_t_RTN = sma_maneuver(a_SV2_inter,e_SV2_inter,r_SV2_ECI_no_j2_inter,desired_delta_a);
+
+delta_v_ECI = dv_RTN2ECI(r_SV2_ECI_no_j2_inter, v_SV2_ECI_no_j2_inter, delta_v_t_RTN);
+% do for SV3, state 12
+v_SV2_ECI_no_j2_new = v_SV2_ECI_no_j2_inter+delta_v_ECI;
+state_abs_SV2_inter_new = [r_SV2_ECI_no_j2_inter;v_SV2_ECI_no_j2_inter_new];
+
+[t_13, state13] = rk4_eom_ECI(maneuver_time:tint:tend, state_abs_SV2_inter_new, false);
+% do for SV3, state 12
+
+% Plot result showing bounded relative motion
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLOTTING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 %%

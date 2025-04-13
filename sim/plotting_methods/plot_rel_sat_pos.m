@@ -18,7 +18,7 @@ function plot_rel_sat_pos(SV2_rel_pos)
 
     % Plot trajectories
     plot3(x1, y1, z1, 'b', 'LineWidth', 1.5);
-    plot3(x2, y2, z2, 'r', 'LineWidth', 1.5);
+    %plot3(x2, y2, z2, 'r', 'LineWidth', 1.5);
 
     % Final point labels
     text(x1(end), y1(end), z1(end), ' SV2/Watcher', 'Color', 'b', 'FontSize', 10);
