@@ -37,13 +37,29 @@ v_ECI_no_j2 = state1(:,4:6);
 % Propagates over the same times t_1 as the sim without J2 
 [r_ECI_keplerian, v_ECI_keplerian] = keplerian_propagator(a_init, e_init, i_init, RAAN_init, w_init, t_1, M_init);
 
-%%%%%% CONVERTING TO RTN %%%%%%%%
+%%%%%% CONVERT TO RTN %%%%%%%%
 [r_RTN_no_j2, v_RTN_no_j2] = ECI2RTN(r_ECI_no_j2,v_ECI_no_j2);
 [r_RTN_keplerian, v_RTN_keplerian] = ECI2RTN(r_ECI_keplerian,v_ECI_keplerian);
 
+%%%%% INITIAL RELATIVE ORBITAL ELEMENTS %%%%%%%
+d_a_2_init = 21; % m
+d_lambda_2_init = -124350; % m
+d_e_x_2_init = 110; % m
+d_e_y_2_init = 202; % m
+d_i_x_2_init = 79; % m
+d_i_y_2_init = 1005; % m
+
+[a_2_init,e_x_2_init,e_y_2_init,i_2_init,RAAN_2_init,u_2_init] = ...
+ROE2quasi_nonsing(a_init,ex_init,ey_init,i_init,RAAN_init,u_init, ...
+d_a_2_init,d_lambda_2_init,d_e_x_2_init,d_e_y_2_init,d_i_x_2_init,d_i_y_2_init);
+
+[a_2_init, e_2_init, i_2_init, RAAN_2_init, w_2_init, nu_2_init, M_2_init] = ...
+quasi_nonsing2OE(a_2_init, e_x_2_init, e_y_2_init, i_2_init, RAAN_2_init, u_2_init);
+
+[r_2_init, v_2_init] = OE2ECI(a_2_init, e_2_init, i_2_init, RAAN_2_init, w_2_init, nu_2_init);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLOTTING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-
+%%
 %%%%%% PLOT 3D COMPARISON PLOTS %%%%%% 
 plot_3D_orbit_aoe_compare(r_ECI_no_j2, r_ECI_with_j2, 'Orbit without J2', 'Orbit with J2')
 plot_3D_orbit_aoe_compare(r_ECI_no_j2, r_ECI_keplerian, 'Orbit without J2', 'Keplerian Propagator')
@@ -51,9 +67,10 @@ plot_3D_orbit_aoe_compare(r_ECI_no_j2, r_ECI_keplerian, 'Orbit without J2', 'Kep
 %%%%%% COMPARE RTN VALUES %%%%%% 
 plot_rtn_compare(t_1, r_RTN_no_j2, r_RTN_keplerian, v_RTN_no_j2, v_RTN_keplerian, 'Numerical with no J2', 'Keplerian', 'Error between No-J2 Numerical and Keplerian, large time-step');
 
-%%%%%%% COMPUTE AND PLOTTING OF OE, ECCENTRICITY, ANGULAR MOMENTUM, SPECIFIC MECHANICAL ENERGY %%%%%%% 
+%%%%%%% COMPUTE AND PLOT OE, ECCENTRICITY, ANGULAR MOMENTUM, SPECIFIC MECHANICAL ENERGY %%%%%%% 
 [a_2,e_2,i_2,RAAN_2,omega_2,nu_2] = compute_and_plot_orbit_params(r_ECI_no_j2,v_ECI_no_j2,r_ECI_with_j2,v_ECI_with_j2,t_1,t_2);
 
 %%%%%%%% COMPUTE AND PLOT OSCULATING VERSUS MEAN %%%%%%%%%%%%
 [a_3,e_3,i_3,RAAN_3,omega_3,nu_3,t_3] = compute_mean_oe(a_init,ex_init,ey_init,i_init,RAAN_init,u_init,tstart,tint,tend);
 plot_osc_mean_oe(a_2,e_2,i_2,RAAN_2,omega_2,nu_2,t_2,a_3,e_3,i_3,RAAN_3,omega_3,nu_3,t_3);
+
