@@ -50,7 +50,7 @@ d_i_x_2_init = 79; % m
 d_i_y_2_init = 1005; % m
 
 [r_2_init, v_2_init] = ROE2ECI(a_init,ex_init,ey_init,i_init,RAAN_init,u_init, ...
-d_a_2_init,d_lambda_2_init,d_e_x_2_init,d_e_y_2_init,d_i_x_2_init,d_i_y_2_init)
+d_a_2_init,d_lambda_2_init,d_e_x_2_init,d_e_y_2_init,d_i_x_2_init,d_i_y_2_init);
 
 state_abs_SV2_init = [r_2_init;v_2_init];
 
