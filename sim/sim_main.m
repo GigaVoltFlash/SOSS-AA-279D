@@ -59,13 +59,9 @@ d_a_2_init,d_lambda_2_init,d_e_x_2_init,d_e_y_2_init,d_i_x_2_init,d_i_y_2_init);
 
 state_abs_SV2_init = [r_2_init;v_2_init];
 
-<<<<<<< HEAD
-% Converting initial swarm ECI coordinates to initial relative coordinates in
-=======
 [r_2_init, v_2_init] = OE2ECI(a_2_init, e_2_init, i_2_init, RAAN_2_init, w_2_init, nu_2_init);
 
 % Converting initial swarm ECI coordinates to initial relative co-ordinates in
->>>>>>> 8725c06 (Relative orbit methods)
 % chief's RTN frame.
 [r_2_rtn_init, v_2_rtn_init] = ECI2RTN_rel(r_init', v_init', r_2_init', v_2_init');
 r_2_rtn_init = r_2_rtn_init';
@@ -94,7 +90,6 @@ v_ECI_no_j2_SV2 = state5(:,4:6);
 % vectors of shape nx3.
 % Use plot_rel_sat_pos with the RTN position (ChatGPT function, I haven't tested it yet).
 
-<<<<<<< HEAD
 [t_5, state5] = rk4_eom_ECI(tstart:tint:tend, state_abs_SV2_init, false);
 r_SV2_ECI_no_j2 = state5(:,1:3);
 v_SV2_ECI_no_j2 = state5(:,4:6);
@@ -136,8 +131,6 @@ state_abs_SV2_inter_new = [r_SV2_ECI_no_j2_inter;v_SV2_ECI_no_j2_inter_new];
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLOTTING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-=======
->>>>>>> 8725c06 (Relative orbit methods)
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLOTTING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
