@@ -25,8 +25,8 @@ function plot_rel_sat_pos(SV2_rel_pos)
     % text(x2(end), y2(end), z2(end), ' SV3/Docker', 'Color', 'r', 'FontSize', 10);
 
     % Mark and label the origin
-    scatter3(0, 0, 0, 70, 'ko', 'filled');
-    text(0, 0, 0, ' SV1/Target/Chief', 'Color', 'k', 'FontSize', 10, 'HorizontalAlignment', 'left');
+    % scatter3(0, 0, 0, 70, 'ko', 'filled');
+    % text(0, 0, 0, ' SV1/Target/Chief', 'Color', 'k', 'FontSize', 10, 'HorizontalAlignment', 'left');
 
     % Labels and title
     xlabel('X [km]');

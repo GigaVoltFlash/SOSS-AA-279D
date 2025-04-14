@@ -25,7 +25,7 @@
    r0_dot = v_RTN(1);
    theta_ddot = -2*r0_dot*theta_dot/r0;
 
-   statedot(10) = 2*theta_dot*ydot + theta_ddot*y * theta_dot^2*x -mu_earth*(r0 + x)/((r0 + x)^2 + y^2 + z^2)^(3/2) + mu_earth/r0^2;
+   statedot(10) = 2*theta_dot*ydot + theta_ddot*y + theta_dot^2*x -mu_earth*(r0 + x)/((r0 + x)^2 + y^2 + z^2)^(3/2) + mu_earth/r0^2;
    statedot(11) = -2*theta_dot*xdot - theta_ddot*x + theta_dot^2*y -mu_earth*y/((r0 + x)^2 + y^2 + z^2)^(3/2);
    statedot(12) = -mu_earth*z/((r0 + x)^2 + y^2 + z^2)^(3/2);
 
