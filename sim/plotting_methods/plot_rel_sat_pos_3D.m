@@ -1,4 +1,4 @@
-function plot_rel_sat_pos(SV2_rel_pos)
+function plot_rel_sat_pos_3D(SV2_rel_pos)
     % Inputs:
     % SV2_rel_pos - nx3 array of [x, y, z] for SV2/Watcher
     % % SV3_rel_pos - nx3 array of [x, y, z] for SV3/Docker
