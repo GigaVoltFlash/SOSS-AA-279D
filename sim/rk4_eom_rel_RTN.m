@@ -19,10 +19,10 @@ function [tspan, x_out] = rk4_eom_rel_RTN(tspan, x0)
     for i = 2:n_steps
         t = tspan(i-1);
         
-        k1 = eom_rel_RTN(t, x, withJ2);
-        k2 = eom_rel_RTN(t + dt/2, x + dt/2 * k1, withJ2);
-        k3 = eom_rel_RTN(t + dt/2, x + dt/2 * k2, withJ2);
-        k4 = eom_rel_RTN(t + dt,   x + dt   * k3, withJ2);
+        k1 = eom_rel_RTN(t, x);
+        k2 = eom_rel_RTN(t + dt/2, x + dt/2 * k1);
+        k3 = eom_rel_RTN(t + dt/2, x + dt/2 * k2);
+        k4 = eom_rel_RTN(t + dt,   x + dt   * k3);
         
         x = x + dt/6 * (k1 + 2*k2 + 2*k3 + k4);
         x_out(i,:) = x.';

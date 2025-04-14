@@ -29,7 +29,7 @@ function [rho_RTN, rho_RTN_dot] = ECI2RTN_rel(r_ECI_0, v_ECI_0, r_ECI_1, v_ECI_1
     for i = 1:n
         Q = squeeze(Q_eci2rtn(i, :, :));   % ECI → RTN rotation
         rho_RTN(i, :) = Q * rho_ECI(i, :)';
-        rho_dot_corrected = (v_ECI_1(i,:) - v_ECI_0(i,:))' - cross(omega0_eci(i,:)', r_ECI_0');
+        rho_dot_corrected = (v_ECI_1(i,:) - v_ECI_0(i,:))' - cross(omega0_eci(i,:)', r_ECI_0(i, :)');
         rho_RTN_dot(i,:) = Q * rho_dot_corrected;
     end
 end

@@ -35,10 +35,10 @@ function plot_rel_sat_pos(SV2_rel_pos)
     title('Relative Satellite Positions in 3D (RTN Frame)');
     % legend({'SV2/Watcher', 'SV3/Docker'}, 'Location', 'best');
     legend({'SV2/Watcher'}, 'Location', 'best');
-
+    view(3);
     % Save the figure
     if ~exist('figures', 'dir')
         mkdir('figures');
     end
-    saveas(gcf, '../figures/satellite_trajectories.png');
+    % saveas(gcf, '../figures/satellite_trajectories.png');
 end
