@@ -1,1 +1,44 @@
 \section{Problem Set 2}
+\subsection{Everything is Relative}
+\subssubection{}
+
+\subssubection{}
+
+\subssubection{}
+
+\subssubection{}
+
+\subssubection{}
+To re-establish a bounded periodic relative motion between the deputy and the chief, the specific mechanical energies and, thus, the semi-major axes of the orbits must match. For a circular chief orbit (or near-circular as in our case), an equilibrium continuum exists that satisfies the energy matching condition: when the deputy is co-located on the same circular orbit of the chief. To achieve this condition, the semi-major axis of the deputy must be the same as the chief's, leading to both having the same mean motion. Therefore, an impulsive maneuver to adjust the deputy's semi-major axis is chosen. The Gauss Variational Equation (GVE) for semi-major axis is given as follows:
+\begin{align*}
+\frac{da}{dt} &= \frac{2e \sin f}{n \sqrt{1 - e^2}} f_r + \frac{2a \sqrt{1 - e^2}}{n r} f_t
+\end{align*}
+In order to find the size (delta-v) and location of the maneuver, we can integrate the GVE over an impulsive maneuver delta-v with constant orbit elements, using the following framework:
+\begin{align*}
+\int_{t^-}^{t^+} \frac{d\vec{o}}{dt} dt &= \int_{t^-}^{t^+} \frac{\partial \vec{o}}{\partial \vec{v}} \left( \vec{a} \right) dt
+\end{align*}
+Applying this to the semi-major axis GVE results in the following:
+\begin{align*}
+\Delta a = \int \frac{da}{dt} dt = \int \left( \frac{2a \sqrt{1 - e^2}}{n r} \cdot f_t \right) dt
+\end{align*}
+And then assuming impulsive maneuver, \( \int f_t dt = \Delta v_t \):
+\begin{align*}
+\Delta a = \frac{2a \sqrt{1 - e^2}}{n r} \Delta v_t
+\end{align*}
+Rearranging for $\Delta v_t$:
+\begin{align*}
+\Delta v_t = \frac{n r}{2a \sqrt{1 - e^2}} \Delta a
+\end{align*}
+This can be simplified for near-circular orbits \( e = 0, a \approx r \):
+\begin{align*}
+\Delta v_t = \frac{n}{2} \Delta a
+\end{align*}
+
+Note that we ignore the radial component of the GVE because radial acceleration is not as efficient at changing \( a \) as tangential acceleration is. Also, the radial term only contributes if \( e \neq 0 \), and the maneuver does not occur at periapsis or apoapsis due to its dependence on true anomaly \(\sin f\). While there is some eccentricity, the second condition will not hold for our maneuver. Thus, the most fuel-efficient maneuver will be in the along-track direction.
+
+For the most fuel-efficient location, the impulsive maneuver should be applied at periapsis due to the Oberth effect. Note that this is assuming the relative phasing of the deputy from the chief is less important than fuel efficiency. Also note that if the orbit is near-circular, there is not much added efficiency by performing at the periapsis as compared to anywhere else due to very small velocity changes throughout the orbit.
+
+Therefore, the most fuel-efficient impulsive maneuver will be performed at the periapsis of the deputy's orbit in the along-track direction with size $\Delta v_t$. 
+
+\subssubection{}
+
