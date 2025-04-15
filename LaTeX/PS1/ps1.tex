@@ -45,8 +45,8 @@ a & e \cos \omega & e \sin \omega & i & \Omega & \omega + M
 
 where $a, e, i, \Omega, \omega, M$ are the Keplerian orbit elements. These are converted to standard Keplerian orbital elements in Section \ref{sec:initial_oe}.
 
-\subsubsection{Relative Orbit Parameters}
-Again, inheriting from the Starling mission, the quasi-nonsingular relative orbit parameters of SV3 and SV2 with respect to SV4 are given by the following. These parameters, along with the absolute ones, occurred at 02/05/24 00:00:00 UTC, but we will define them as our starting parameters at an arbitrary point in the future: 
+\subsubsection{Relative Orbit Parameters}\label{sec:ROE_init}
+Again, inheriting from the Starling mission, the quasi-nonsingular relative orbit elements (ROE) of SV3 and SV2 with respect to SV4 are given by the following. These parameters, along with the absolute ones, occurred at 02/05/24 00:00:00 UTC, but we will define them as our starting parameters at an arbitrary point in the future: 
 \begin{table}[h!]
 \centering
 \begin{tabular}{ll}
@@ -132,7 +132,7 @@ The initial conditions are taken from the Starling mission literature \cite{krug
 
 For future use, it is also useful to note that the corresponding initial mean anomaly $M_0= -139.33^\circ$.
 
-The quasi-nonsingular absolute orbit parameters were converted to the Keplerian orbital elements by using the following procedure. First, vompute the argument of perigee, eccentricity, and the mean anomaly:
+The quasi-nonsingular absolute orbit parameters were converted to the Keplerian orbital elements by using the following procedure. First, compute the argument of perigee, eccentricity, and the mean anomaly:
 \[
 \omega = \tan^{-1} \left( \frac{e_y}{e_x} \right)
 \]
@@ -150,9 +150,9 @@ Finally, compute the true anomaly:
 \nu = \tan^{-1} \left( \frac{\sqrt{1 + e} \cdot \tan(E/2)}{\sqrt{1 - e}} \right) \cdot 2
 \]
 
-\subsubsection{Initial Position and Velocity in ECI}
+\subsubsection{Initial Position and Velocity in ECI}\label{sec:initial_ECI}
  Treating the initial Keplerian orbital elements for the target SV1 given in Table \ref{tab:abs_oe_kepler} as osculating quantities, they can be converted into Earth-Centered Inertial (ECI) position (in km) and velocity (in km/s), and are 
- \begin{align*}
+ \begin{align}
      \boldsymbol{r}_{0, ECI, SV1} &= \begin{bmatrix}
          -3663.3 \\
          -2986.4 \\
@@ -163,7 +163,7 @@ Finally, compute the true anomaly:
          -1.9915 \\
          4.9994
      \end{bmatrix}.
- \end{align*}
+ \end{align}
 
 The conversion from Keplerian orbital elements to ECI position and velocity is as follows. First, we calculate norm of the position $r$:
 
@@ -219,23 +219,23 @@ Finally, we can transform to the ECI frame:
 
 \subsubsection{Numerical Simulation of State with Perturbations}
 The state of the satellite is represented by 
-\begin{align*}
+\begin{align}
     \boldsymbol{x} = \begin{bmatrix}
         \boldsymbol{r}^T & \boldsymbol{v}^T
     \end{bmatrix}^T
-\end{align*}
+\end{align}
 
 The derivative of this state is given by 
-\begin{align*}
+\begin{align}
     \boldsymbol{\dot{x}} = \begin{bmatrix}
         \boldsymbol{v}^T & \boldsymbol{a}^T
     \end{bmatrix}^T
-\end{align*}
+\end{align}
 
 where $a$ is the acceleration on the satellite from the primary attractor. The acceleration due to gravity is given by
-\begin{align*}
+\begin{align}
     \boldsymbol{a_g} = \frac{-\mu}{||\boldsymbol{r}||^3} \boldsymbol{r}.
-\end{align*}
+\end{align}
 
 The additional J2 perturbation acceleration vector is given by 
 
@@ -266,7 +266,7 @@ Figure \ref{fig:3d_plots_with_j2} shows the 3D plot of the orbit in an inertial 
 
 As expected, the most prominent change in the orbit with J2 perturbations is in the RAAN. The change in RAAN is secular rather than periodic, as will be seen in more detail in the plots in Section \ref{sec:oe_compares}.
 
-\subsubsection{Comparison with Analytical Keplerian Propagation}
+\subsubsection{Comparison with Analytical Keplerian Propagation} \label{sec:analytical_and_eci2rtn}
 
 We can compare the no-J2 simulation with the analytical Keplerian result for the orbital parameters mentioned in Table \ref{tab:abs_oe_kepler}, but by varying the true anomaly $\nu$. 
 
@@ -274,21 +274,21 @@ The time-steps used in the numerical propagation $t$ are converted into $\nu$ va
 
 The rotation matrix from ECI to RTN is done as follows:
 
-\begin{align*}
+\begin{align}
     \hat{R} &= \frac{r_{ECI}}{||r_{ECI}||} \\
     \hat{N} &= \frac{r_{ECI} \times v_{ECI}}{||r_{ECI} \times v_{ECI}||} \\
     \hat{T} &= \hat{N} \times \hat{R} \\
     Q_{eci2rtn} &= \begin{bmatrix}
         \hat{R} & \hat{T} & \hat{N}
-    \end{bmatrix}^T \\
-\end{align*}
+    \end{bmatrix}^T 
+\end{align}
 
 From this, we calculate the RTN position $r_{RTN}$ and velocity $v_{RTN}$ to be
 
-\begin{align*}
+\begin{align}
     r_{RTN} &= R_{eci2rtn} r_{ECI} \\
     v_{RTN} &= R_{eci2rtn} v_{ECI} - \omega_{RTN} \times r_{RTN}
-\end{align*}
+\end{align}
 
 where $\omega_{RTN} = \begin{bmatrix}
     0 & 0 & ||r\times v ||/||r||^2
@@ -316,11 +316,11 @@ Based on this, we can conclude that the FODE method that was used here (Fundamen
 
 First we compute the osculating Keplerian orbital elements at each time step by converting from the ECI position and velocity at that time step given by our propagator. We then compute the eccentricity vector $\boldsymbol{e}$, the angular momentum vector $\boldsymbol{h}$, and the specific mechanical energy $\epsilon$, throughout the numerical simulations with and without J2 perturbations. To compute these orbital parameters we use the following relationships:
 
-\begin{align*}
+\begin{align}
     \boldsymbol{h} &= \boldsymbol{r}_{ECI} \times \boldsymbol{v}_{ECI} \\
     \boldsymbol{e} &= \frac{\boldsymbol{v}_{ECI} \times \boldsymbol{h}}{\mu_{earth}} - \frac{\boldsymbol{r}_{ECI}}{||\boldsymbol{r}_{ECI}||} \\
     \epsilon &= \frac{||\boldsymbol{v}_{ECI}||^2}{2} - \frac{\mu_{earth}}{||\boldsymbol{r}_{ECI}||}
-\end{align*}
+\end{align}
 
 Figure \ref{fig:j2_oe_comparison} shows the Keplerian orbital elements with and without J2 perturbations over 25 orbits. As expected when excluding J2 effects, all elements remain constant except true anomaly which cycles through 360 degrees. When including J2 effects, we observe periodic and secular effects on all elements, which is expected since J2 acts in all of the RTN directions. The purely periodic effects are seen in semi-major axis, eccentricity, and inclination. The amplitude of these periodic effects are relatively small, especially for inclination and eccentricity. The other three elements - RAAN, argument of periapsis, and true anomaly - experience both periodic and secular drifts, although at different rates of change. This agrees with averaging theory which says that only these three elements experience secular drifts. The largest secular drift is in the RAAN, which is expected from the expressions for average secular drifts. There is also a small but noticeable secular drift in the argument of perigee $\omega$, that also appears in true anomaly. 
 
@@ -361,13 +361,13 @@ Figure \ref{fig:specific_energy} compares the specific mechanical energy over 25
 
 \subsubsection{Osculating vs. Mean Orbital Elements with J2 Comparison}
 Now, to compare these results with the secular Gauss Variational Equations for J2 with mean orbital elements, we numerically integrate the following linear differential equations:
-\begin{align*}
+\begin{align}
 \frac{d e_x}{dt} &= -\frac{3}{4} n J_2 \left( \frac{R_\oplus}{a \left(1 - (e_x^2 + e_y^2)\right)} \right)^2 e_y (5 \cos^2 i - 1) \\
 \frac{d e_y}{dt} &= \phantom{-}\frac{3}{4} n J_2 \left( \frac{R_\oplus}{a \left(1 - (e_x^2 + e_y^2)\right)} \right)^2 e_x (5 \cos^2 i - 1) \\
 \frac{d\Omega}{dt} &= -\frac{3}{2} n J_2 \left( \frac{R_\oplus}{a \left(1 - (e_x^2 + e_y^2)\right)} \right)^2 \cos i  \\
 \frac{du}{dt} &= \frac{3}{4} n J_2 \left( \frac{R_\oplus}{a \left(1 - (e_x^2 + e_y^2)\right)} \right)^2 
 \left[ \sqrt{1 - (e_x^2 + e_y^2)} (3 \cos^2 i - 1) + (5 \cos^2 i - 1) \right] \quad 
-\end{align*}
+\end{align}
 
 Figure \ref{fig:osc_mean_oe} superimposes the resulting mean and osculating orbital elements on top of each other. As expected, the mean semi-major axis, eccentricity, and inclination remain constant even with J2. For these elements, the osculating elements are purely periodic, agreeing with the mean ones. For RAAN, there both mean and osculating exhibit a clear secular growth. For both argument of periapsis and true anomaly, the osculating elements exhibit periodic and secular behavior. The secular drift in both lines up with the secular drift seen in the mean elements.
 
