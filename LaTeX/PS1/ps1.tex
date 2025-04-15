@@ -46,7 +46,7 @@ a & e \cos \omega & e \sin \omega & i & \Omega & \omega + M
 where $a, e, i, \Omega, \omega, M$ are the Keplerian orbit elements. These are converted to standard Keplerian orbital elements in Section \ref{sec:initial_oe}.
 
 \subsubsection{Relative Orbit Parameters}
-Again, inheriting from the Starling mission, the quasi-nonsingular relative orbit parameters of SV3 and SV2 with respect to SV4 are given by the following. In real-life, these parameters, along with the absolute ones occurred at 02/05/24 00:00:00 UTC, but we will define them as our starting parameters at an arbitrary point in the future: 
+Again, inheriting from the Starling mission, the quasi-nonsingular relative orbit parameters of SV3 and SV2 with respect to SV4 are given by the following. These parameters, along with the absolute ones, occurred at 02/05/24 00:00:00 UTC, but we will define them as our starting parameters at an arbitrary point in the future: 
 \begin{table}[h!]
 \centering
 \begin{tabular}{ll}
@@ -72,10 +72,10 @@ The quasi-nonsingular ROE adopted by D'Amico \cite{damicothesis} are a function 
 \begin{bmatrix}
 \delta a \\
 \delta \lambda \\
-|\delta e| \cos \phi \\
-|\delta e| \sin \phi \\
-|\delta i| \cos \theta \\
-|\delta i| \sin \theta
+|\delta\mathbf{e}| \cos \phi \\
+|\delta\mathbf{e}| \sin \phi \\
+|\delta\mathbf{i}| \cos \theta \\
+|\delta\mathbf{i}| \sin \theta
 \end{bmatrix}
 = 
 \begin{bmatrix}
@@ -132,6 +132,24 @@ The initial conditions are taken from the Starling mission literature \cite{krug
 
 For future use, it is also useful to note that the corresponding initial mean anomaly $M_0= -139.33^\circ$.
 
+The quasi-nonsingular absolute orbit parameters were converted to the Keplerian orbital elements by using the following procedure. First, vompute the argument of perigee, eccentricity, and the mean anomaly:
+\[
+\omega = \tan^{-1} \left( \frac{e_y}{e_x} \right)
+\]
+\[
+e = \frac{e_x}{\cos \omega}
+\]
+\[
+M = u - \omega
+\]
+
+Then, convert mean anomaly to radians and solve Kepler's equation using Newton-Raphson to obtain eccentric anomaly \( E \).
+
+Finally, compute the true anomaly:
+\[
+\nu = \tan^{-1} \left( \frac{\sqrt{1 + e} \cdot \tan(E/2)}{\sqrt{1 - e}} \right) \cdot 2
+\]
+
 \subsubsection{Initial Position and Velocity in ECI}
  Treating the initial Keplerian orbital elements for the target SV1 given in Table \ref{tab:abs_oe_kepler} as osculating quantities, they can be converted into Earth-Centered Inertial (ECI) position (in km) and velocity (in km/s), and are 
  \begin{align*}
@@ -146,6 +164,58 @@ For future use, it is also useful to note that the corresponding initial mean an
          4.9994
      \end{bmatrix}.
  \end{align*}
+
+The conversion from Keplerian orbital elements to ECI position and velocity is as follows. First, we calculate norm of the position $r$:
+
+\[
+r = \frac{a(1 - e^2)}{1 + e \cos \nu}
+\]
+
+And then transform it into the PQW (perifocal) frame:
+\[
+\mathbf{r}_{PQW} = \begin{bmatrix}
+r \cos \nu \\
+r \sin \nu \\
+0
+\end{bmatrix}
+\]
+
+Next we compute mean motion:
+\[
+n = \sqrt{\frac{\mu}{a^3}}
+\]
+
+And then we compute the eccentric anomaly:
+\[
+E = 2 \cdot \tan^{-1} \left( \sqrt{\frac{1 - e}{1 + e}} \cdot \tan\left(\frac{\nu}{2}\right) \right)
+\]
+
+The rotation matrix from PQW to ECI (IJK) frame is given by:
+\[
+R_{\text{PQW} \to \text{ECI}} = 
+\begin{bmatrix}
+\cos\Omega\cos\omega - \sin\Omega\cos i\sin\omega & -\cos\Omega\sin\omega - \sin\Omega\cos i\cos\omega & \sin\Omega\sin i \\
+\sin\Omega\cos\omega + \cos\Omega\cos i\sin\omega & -\sin\Omega\sin\omega + \cos\Omega\cos i\cos\omega & -\cos\Omega\sin i \\
+\sin i\sin\omega & \sin i\cos\omega & \cos i
+\end{bmatrix}
+\]
+
+And the velocity in PQW frame is:
+\[
+\mathbf{v}_{PQW} = \frac{a n}{1 - e \cos E}
+\begin{bmatrix}
+-\sin E \\
+\sqrt{1 - e^2} \cos E \\
+0
+\end{bmatrix}
+\]
+
+Finally, we can transform to the ECI frame:
+\[
+\mathbf{r}_{ECI} = R_{\text{PQW} \to \text{ECI}} \cdot \mathbf{r}_{PQW}
+\qquad
+\mathbf{v}_{ECI} = R_{\text{PQW} \to \text{ECI}} \cdot \mathbf{v}_{PQW}
+\]
 
 \subsubsection{Numerical Simulation of State with Perturbations}
 The state of the satellite is represented by 
@@ -177,13 +247,15 @@ The additional J2 perturbation acceleration vector is given by
 \end{bmatrix}
 \]
 
-Then the total acceleration is when including J2 is
+Then the total acceleration when including J2 is
 
 \[
 \mathbf{a} = \mathbf{a}_{\text{g}} + \mathbf{a}_{J2}
 \]
 
-With these acceleration terms, we can propagate the state through an integer number of orbits (20 in our case) and obtain the orbital path. Figure \ref{fig:3d_plots_with_j2} shows the 3D plot of the orbit in an inertial frame, and compares the orbit with and without J2 perturbations.
+With these acceleration terms, we can propagate the state through an integer number of orbits (20 in our case) and obtain the orbital path. We used a custom Runge-Kutta (RK4) integrator with a fixed step size of $\frac{1}{500}$ of the orbit period to ensure accuracy. 
+
+Figure \ref{fig:3d_plots_with_j2} shows the 3D plot of the orbit in an inertial frame, and compares the orbit with and without J2 perturbations.
 
 \begin{figure}[H]
     \centering

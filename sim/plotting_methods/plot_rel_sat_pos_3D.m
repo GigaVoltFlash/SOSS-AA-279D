@@ -1,4 +1,4 @@
-function plot_rel_sat_pos_3D(SV2_rel_pos)
+function plot_rel_sat_pos_3D(SV2_rel_pos, fig_path)
     % Inputs:
     % SV2_rel_pos - nx3 array of [x, y, z] for SV2/Watcher
     % % SV3_rel_pos - nx3 array of [x, y, z] for SV3/Docker
@@ -36,9 +36,9 @@ function plot_rel_sat_pos_3D(SV2_rel_pos)
     % legend({'SV2/Watcher', 'SV3/Docker'}, 'Location', 'best');
     legend({'SV2/Watcher'}, 'Location', 'best');
     view(3);
-    % Save the figure
+    % Save the figsimure
     if ~exist('figures', 'dir')
         mkdir('figures');
     end
-    % saveas(gcf, '../figures/satellite_trajectories.png');
+    saveas(gcf, fig_path);
 end

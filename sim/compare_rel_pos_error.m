@@ -1,4 +1,4 @@
-function compare_rel_pos_error(t, pos1, pos2, vel1, vel2)
+function compare_rel_pos_error(t, pos1, pos2, vel1, vel2, fig_path)
     % Compute the error (component-wise)
     error_pos = pos2 - pos1;
     error_vel = vel2 - vel1;
@@ -27,4 +27,4 @@ function compare_rel_pos_error(t, pos1, pos2, vel1, vel2)
     end
 
     sgtitle('Relative Position & Velocity Error Components Over Time');
-end
+    saveas(gcf, fig_path);

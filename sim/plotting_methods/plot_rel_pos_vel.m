@@ -1,4 +1,4 @@
-function plot_rel_pos_vel(t, rel_pos, rel_vel, title_string)
+function plot_rel_pos_vel(t, rel_pos, rel_vel, title_string, fig_path)
     figure('Color', 'w');
     
     % --- Relative Position Plots ---
@@ -32,4 +32,5 @@ function plot_rel_pos_vel(t, rel_pos, rel_vel, title_string)
     xlabel('Time [s]');
 
     sgtitle(title_string, 'FontWeight', 'bold');
+    saveas(gcf, fig_path);
 end
