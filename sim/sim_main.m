@@ -48,7 +48,7 @@ v_ECI_no_j2 = state1(:,4:6);
 [r_RTN_keplerian, v_RTN_keplerian] = ECI2RTN(r_ECI_keplerian,v_ECI_keplerian);
 
 %%%%% INITIAL RELATIVE ORBITAL ELEMENTS %%%%%%%
-d_a_2_init = 21; % m
+d_a_2_init = -1000; % m
 d_lambda_2_init = -124350; % m
 d_e_x_2_init = 110; % m
 d_e_y_2_init = 202; % m
@@ -88,35 +88,24 @@ v_SV2_ECI_no_j2 = state5(:,4:6);
 % Do again for SV3, state 6
 
 %%%%% NEW INITIAL RELATIVE ORBIT ELEMENTS %%%%%
-% % % d_a_2_init_new = 1000; % m
-% % % 
-% % % % redo b and c: states 7,8,9,10
-% % % 
-% % % 
-% % % 
-% % % %%%%% APPLY SEMI-MAJOR AXIS MANEUVER %%%%%
-% % % desired_delta_a = 12; % km
-% % % maneuver_time = tend/2;
-% % % 
-% % % [t_11, state11] = rk4_eom_ECI(tstart:tint:maneuver_time, state_abs_SV2_init, false);
-% % % r_SV2_ECI_no_j2_inter = state11(end,1:3);
-% % % v_SV2_ECI_no_j2_inter = state11(end,4:6);
-% % % [a_SV2_inter,e_SV2_inter] = ECI2OE(r_SV2_ECI_no_j2_inter,v_SV2_ECI_no_j2_inter);
-% % % 
-% % % delta_v_t_RTN = sma_maneuver(a_SV2_inter,e_SV2_inter,r_SV2_ECI_no_j2_inter,desired_delta_a);
-% % % 
-% % % delta_v_ECI = dv_RTN2ECI(r_SV2_ECI_no_j2_inter, v_SV2_ECI_no_j2_inter, delta_v_t_RTN);
-% % % % do for SV3, state 12
-% % % v_SV2_ECI_no_j2_new = v_SV2_ECI_no_j2_inter+delta_v_ECI;
-% % % state_abs_SV2_inter_new = [r_SV2_ECI_no_j2_inter;v_SV2_ECI_no_j2_inter_new];
-% % % 
-% % % [t_13, state13] = rk4_eom_ECI(maneuver_time:tint:tend, state_abs_SV2_inter_new, false);
-% % % % do for SV3, state 12
-% % % 
-% % % % Plot result showing bounded relative motion
+%d_a_2_init_new = 1000; % m
+
+% redo b and c: states 7,8,9,10
 
 
-%%
+
+%%%%% APPLY SEMI-MAJOR AXIS MANEUVER %%%%%
+desired_delta_a_2 = -d_a_2_init/1000; % m --> km
+maneuver_time = tend/2;
+
+[rho_SV2_RTN_w_maneuver, rho_SV2_RTN_dot_w_maneuver, t_SV2_combined] = ...
+apply_sma_maneuver(state_abs_SV2_init,tstart,tint,maneuver_time,tend,desired_delta_a_2,r_ECI_no_j2,v_ECI_no_j2);
+
+% [rho_SV3_RTN_w_maneuver, rho_SV3_RTN_dot_w_maneuver, t_SV3_combined] = ...
+% apply_sma_maneuver(state_abs_SV3_init,tstart,tint,maneuver_time,tend,desired_delta_a_2,r_ECI_no_j2,v_ECI_no_j2);
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLOTTING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 if PS1_plots
@@ -145,6 +134,9 @@ if PS2_plots
     plot_rel_sat_pos_3D(rho_SV2_RTN) % For part c
     plot_rel_pos_vel(t_5, rho_SV2_RTN, rho_SV2_RTN_dot, 'Relative RTN position and velocity using ECI interpolation');
     plot_rel_pos_vel(t_5, rho_SV2_RTN, rho_SV2_RTN_dot, 'Relative RTN position and velocity using non-linear relative EOMs');
+    plot_rel_sat_pos_3D(rho_SV2_RTN_new) % For part f
+    plot_rel_pos_vel(t_SV2_combined, rho_SV2_RTN_new, rho_SV2_RTN_dot_new, 'Relative SV2 RTN position and velocity with maneuver');
+%    plot_rel_pos_vel(t_SV3_combined, rho_SV3_RTN_new, rho_SV3_RTN_dot_new, 'Relative SV3 RTN position and velocity with maneuver');
 
     compare_rel_pos_error(t_2, rho_SV2_RTN, SV2_rel_pos, rho_SV2_RTN_dot, SV2_rel_vel)
 end
