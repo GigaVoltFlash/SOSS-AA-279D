@@ -1,44 +1,153 @@
 \section{Problem Set 2}
 \subsection{Everything is Relative}
-\subssubection{}
 
-\subssubection{}
+\subsubsection{Variations in Initial Orbital Elements} \label{sec:rel_init_oe}
+We will use the initial quasi-nonsingular relative orbital elements (ROE) given in section \ref{sec:ROE_init}. Using the chief's initial quasi-nonsingular absolute orbital elements, we can find the initial absolute orbital elements and then the initial position and velocity in ECI of both of the deputy satellites (SV2 and SV3), through the following method: 
 
-\subssubection{}
+The subscript $o$ indicates the chief or "observer", while the subscript $t$ indicates the deputy or "target". First, we convert the chief semi-major axis from km to m to agree with the units of the ROEs:
+\[
+a_o \leftarrow a_o \cdot 10^3
+\]
 
-\subssubection{}
+Then, we compute the deputy semi-major axis, eccentricity components, inclination, RAAN, and argument of latitude:
+\[
+a_t = \frac{a_o + d_a}{10^3}
+\]
+\[
+e_{x,t} = \frac{d_{e_x}}{a_o} + e_{x,o}
+\]
+\[
+e_{y,t} = \frac{d_{e_y}}{a_o} + e_{y,o}
+\]
+\[
+i_t = \frac{d_{i_x}}{a_o}  + i_o
+\]
+\[
+\Omega_t = \frac{d_{i_y}}{a_o \cdot \sin(i_o)}  + \Omega_o
+\]
+\[
+u_t =  \frac{d_\lambda}{a_o}+ u_o - (\Omega_t - \Omega_o) \cdot \cos(i_o)
+\]
 
-\subssubection{}
+Then the quasi-nonsingular orbital elements can be converted to the Keplerian orbital elements through the method outlined in section \ref{sec:initial_oe}. Finally, the Keplerian orbital elements can be converted to position and velocity in the ECI frame through the method outlined in section \ref{sec:initial_ECI}. This results in the initial ECI position and velocity of both the deputies: 
+
+\[
+\mathbf{r}_{\text{SV2}} =
+\begin{bmatrix}
+-3574.8655 \\
+-2953.8783 \\
+-5180.4446
+\end{bmatrix} \text{km}
+\]
+\[
+\mathbf{v}_{\text{SV2}} =
+\begin{bmatrix}
+-5.3901 \\
+-2.0500 \\
+\phantom{-}4.8991
+\end{bmatrix} \text{km/s}
+\]
+\[
+\mathbf{r}_{\text{SV3}} =
+\begin{bmatrix}
+-3606.2292 \\
+-2965.3946 \\
+-5150.6778
+\end{bmatrix} \text{km}
+\]
+\[
+\mathbf{v}_{\text{SV3}} =
+\begin{bmatrix}
+-5.3652 \\
+-2.0292 \\
+\phantom{-}4.9357
+\end{bmatrix} \text{km/s}
+\]
+
+
+\subsubsection{Numerical Integration of Non-linear Equations for Relative Motion}
+Given the initial ECI conditions of the chief (SV1) and the deputies (SV2 and SV3), we can find the initial position and velocity of the deputies in the RTN frame of the chief. This is done with
+
+WRITE ECI2RTN relative STUFF HERE
+
+where $\rho$ is the relative position between the chief and deputy, so $\boldsymbol{\rho}^{RTN}$ is relative position of the deputy in the chief's RTN frame. Similarly, $\boldsymbol{\dot{\rho}}^{RTN}$ is the relative velocity of the deputy in the chief's RTN frame. We can define $\boldsymbol{\rho}^{RTN}$ and $\boldsymbol{\dot{\rho}}^{RTN}$ to be
+
+\begin{align}
+    \boldsymbol{\rho}^{RTN} &= \begin{bmatrix}
+        x & y & z
+    \end{bmatrix}^T, \\
+    \boldsymbol{\dot{\rho}}^{RTN} &= \begin{bmatrix}
+        \dot{x} & \dot{y} & \dot{z}
+    \end{bmatrix}^T 
+\end{align}
+
+The non-linear equations of motion for relative motion give us a method to numerically propagate $x, y, \text{and} \ z$. The equations of motion are given by
+
+\begin{equation*}
+\ddot{x} = 2\dot{\theta}_0 \dot{y} + \ddot{\theta}_0 y - \dot{\theta}_0^2 x -\frac{\mu (r_0 + x)}{\left[(r_0 + x)^2 + y^2 + z^2\right]^{3/2}} + \frac{\mu}{r_0^2}
+\end{equation*}
+
+\begin{equation*}
+\ddot{y} = - 2\dot{\theta}_0 \dot{x} - \ddot{\theta}_0 x + \dot{\theta}_0^2 y  -\frac{\mu y}{\left[(r_0 + x)^2 + y^2 + z^2\right]^{3/2}}
+\end{equation*}
+
+\begin{equation*}
+\ddot{z} = -\frac{\mu z}{\left[(r_0 + x)^2 + y^2 + z^2\right]^{3/2}}
+\end{equation*}
+
+First, the value $r_0$ is the radial position of the chief when expressed in the RTN frame (or, the norm of the position vector of the chief $\boldsymbol{r}_0 = ||\boldsymbol{r}^{ECI}_{SV1}|| = \boldsymbol{r}^{RTN}_{SV1, x}$ 
+Here, $\dot{\theta}$ is the angular velocity of the chief (and thus the angular velocity of the RTN frame), and $\ddot{\theta}$ is the angular acceleration of the chief. We can get 
+\begin{align}
+    \dot{\theta} &= \frac{{||\boldsymbol{r}_{SV1}^{ECI} \times \boldsymbol{v}_{SV1}^{ECI}||}}{r_0^2} \\
+    \ddot{\theta} &= -\frac{2\dot{r}_0\dot{\theta}}{r_0}
+\end{align}
+
+Here, $\dot{r}_0$ is the rate of change in the length of the position vector of the chief. A convenient way to get this is to take the radial component of the chief's velocity in its RTN frame.
+
+\begin{align*}
+    \dot{r}_0 = \boldsymbol{v}^{RTN}_{SV2, x}
+\end{align*}
+
+With these differential equations, the relative motion of the deputy satellitess are propagated through the entire duration that the chief is propagated.
+
+\be
+
+\subsubsection{}
+
+
+\subsubsection{}
+
+\subsubsection{Derivation of Impulsive Maneuver for Bounded Period Motion}
 To re-establish a bounded periodic relative motion between the deputy and the chief, the specific mechanical energies and, thus, the semi-major axes of the orbits must match. For a circular chief orbit (or near-circular as in our case), an equilibrium continuum exists that satisfies the energy matching condition: when the deputy is co-located on the same circular orbit of the chief. To achieve this condition, the semi-major axis of the deputy must be the same as the chief's, leading to both having the same mean motion. Therefore, an impulsive maneuver to adjust the deputy's semi-major axis is chosen. The Gauss Variational Equation (GVE) for semi-major axis is given as follows:
-\begin{align*}
+\begin{align}
 \frac{da}{dt} &= \frac{2e \sin f}{n \sqrt{1 - e^2}} f_r + \frac{2a \sqrt{1 - e^2}}{n r} f_t
-\end{align*}
+\end{align}
 In order to find the size (delta-v) and location of the maneuver, we can integrate the GVE over an impulsive maneuver delta-v with constant orbit elements, using the following framework:
-\begin{align*}
+\begin{align}
 \int_{t^-}^{t^+} \frac{d\vec{o}}{dt} dt &= \int_{t^-}^{t^+} \frac{\partial \vec{o}}{\partial \vec{v}} \left( \vec{a} \right) dt
-\end{align*}
+\end{align}
 Applying this to the semi-major axis GVE results in the following:
-\begin{align*}
+\begin{align}
 \Delta a = \int \frac{da}{dt} dt = \int \left( \frac{2a \sqrt{1 - e^2}}{n r} \cdot f_t \right) dt
-\end{align*}
+\end{align}
 And then assuming impulsive maneuver, \( \int f_t dt = \Delta v_t \):
-\begin{align*}
+\begin{align}
 \Delta a = \frac{2a \sqrt{1 - e^2}}{n r} \Delta v_t
-\end{align*}
+\end{align}
 Rearranging for $\Delta v_t$:
-\begin{align*}
+\begin{align}
 \Delta v_t = \frac{n r}{2a \sqrt{1 - e^2}} \Delta a
-\end{align*}
+\end{align}
 This can be simplified for near-circular orbits \( e = 0, a \approx r \):
-\begin{align*}
+\begin{align}
 \Delta v_t = \frac{n}{2} \Delta a
-\end{align*}
+\end{align}
 
 Note that we ignore the radial component of the GVE because radial acceleration is not as efficient at changing \( a \) as tangential acceleration is. Also, the radial term only contributes if \( e \neq 0 \), and the maneuver does not occur at periapsis or apoapsis due to its dependence on true anomaly \(\sin f\). While there is some eccentricity, the second condition will not hold for our maneuver. Thus, the most fuel-efficient maneuver will be in the along-track direction.
 
 For the most fuel-efficient location, the impulsive maneuver should be applied at periapsis due to the Oberth effect. Note that this is assuming the relative phasing of the deputy from the chief is less important than fuel efficiency. Also note that if the orbit is near-circular, there is not much added efficiency by performing at the periapsis as compared to anywhere else due to very small velocity changes throughout the orbit.
 
-Therefore, the most fuel-efficient impulsive maneuver will be performed at the periapsis of the deputy's orbit in the along-track direction with size $\Delta v_t$. 
+Therefore, the most fuel-efficient impulsive maneuver will be performed at the periapsis of the deputy's orbit in the along-track direction with size $\Delta v_t$. A single-burn maneuver will lead to a change in the eccentricity, which is acceptable for our purposes in this case. If no eccentricity change was desired, this could be accomplished with splitting up the single maneuver into two burns with one at the periapsis and one at the apoapsis, each with half of the original delta-v. 
 
-\subssubection{}
+\subsubsection{Application of Impulsive Maneuver for Bounded Period Motion}
 
