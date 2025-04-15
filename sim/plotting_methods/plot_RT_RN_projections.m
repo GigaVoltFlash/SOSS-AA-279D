@@ -1,4 +1,4 @@
-function plot_RT_RN_projections(SV2_rel_pos, SV3_rel_pos, fig_path)
+function plot_RT_RN_projections(SV2_rel_pos, SV3_rel_pos, title_string,fig_path)
     % Extract coordinates
     x1 = SV2_rel_pos(:,1); y1 = SV2_rel_pos(:,2); z1 = SV2_rel_pos(:,3);
     x2 = SV3_rel_pos(:,1); y2 = SV3_rel_pos(:,2); z2 = SV3_rel_pos(:,3);
@@ -28,7 +28,8 @@ function plot_RT_RN_projections(SV2_rel_pos, SV3_rel_pos, fig_path)
     title('R-N Plane Projection');
     legend('SV2 / Watcher', 'SV3 / Docker', 'SV1 / Chief');
     % legend('SV2 / Watcher', 'SV1 / Chief');
-
+    
+    sgtitle(title_string, 'FontWeight', 'bold');
     % Save figure
     saveas(gcf, fig_path);
 end

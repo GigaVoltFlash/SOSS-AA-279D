@@ -5,7 +5,7 @@ function [rho_RTN_w_maneuver, rho_RTN_dot_w_maneuver, t_combined] = apply_sma_ma
     v_ECI_1 = state1(:,4:6);
     
     [a_1,e_1,i_1,RAAN_1,omega_1,nu_1] = ECI2OE_array(r_ECI_1,v_ECI_1);
-    periapsis_indices = find(nu_1 < 0.5); 
+    periapsis_indices = find(nu_1 < 1); 
     last_periapsis_idx = periapsis_indices(end);
     
     r_inter = state1(last_periapsis_idx,1:3);
