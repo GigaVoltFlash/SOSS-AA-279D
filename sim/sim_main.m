@@ -4,6 +4,9 @@
 close all;
 addpath("plotting_methods\");
 addpath("mean_osc\");
+addpath("transformations\");
+addpath("propagators\");
+addpath("eoms\");
 
 % Load all constants from the constants file
 constants()
@@ -48,7 +51,7 @@ v_ECI_no_j2 = state1(:,4:6);
 [r_RTN_keplerian, v_RTN_keplerian] = ECI2RTN(r_ECI_keplerian,v_ECI_keplerian);
 
 %%%%% INITIAL RELATIVE ORBITAL ELEMENTS %%%%%%%
-d_a_SV2_init = 0; % m
+d_a_SV2_init = 1000; % m
 d_lambda_SV2_init = -124350; % m
 d_e_x_SV2_init = 110; % m
 d_e_y_SV2_init = 202; % m
@@ -159,26 +162,22 @@ if PS2_plots
     
     %%%%%%%% PLOT RELATIVE POSITIONS (IN CHIEF'S RTN FRAME) %%%%%%%
     
-    plot_rel_pos_vel(t_3, t_orbit, SV2_rel_pos, SV2_rel_vel, 'SV2 RTN position and velocity using non-linear relative EOMs', 'figures/SV2_rel_pos_vel_eom.png'); % For part b
-    plot_rel_pos_vel(t_4, t_orbit, SV3_rel_pos, SV3_rel_vel, 'SV3 RTN position and velocity using non-linear relative EOMs', 'figures/SV3_rel_pos_vel_eom.png'); % For part b
-    plot_rel_pos_vel(t_5, t_orbit, rho_SV2_RTN, rho_SV2_RTN_dot, 'SV2 RTN position and velocity using ECI interpolation', 'figures/SV2_rel_pos_vel_eci2rtn.png'); % For part c
-    plot_rel_pos_vel(t_6, t_orbit, rho_SV3_RTN, rho_SV3_RTN_dot, 'SV3 RTN position and velocity using ECI interpolation', 'figures/SV3_rel_pos_vel_eci2rtn.png'); % For part c
-    plot_rel_pos_vel(t_SV2_combined, t_orbit, rho_SV2_RTN_w_maneuver, rho_SV2_RTN_dot_w_maneuver, 'SV2 RTN position and velocity with maneuver','figures/SV2_rel_pos_vel_eom_maneuver.png'); % For part f
-    plot_rel_pos_vel(t_SV3_combined, t_orbit, rho_SV3_RTN_w_maneuver, rho_SV3_RTN_dot_w_maneuver, 'SV3 RTN position and velocity with maneuver','figures/SV3_rel_pos_vel_eom_maneuver.png'); % For part f
+    % plot_rel_pos_vel(t_3, t_orbit, SV2_rel_pos, SV2_rel_vel, rho_SV2_RTN, rho_SV2_RTN_dot, 'SV2 RTN position and velocity', 'figures/SV2_rel_pos_vel.png'); % For part b and c
+    % plot_rel_pos_vel(t_4, t_orbit, SV3_rel_pos, SV3_rel_vel, rho_SV3_RTN, rho_SV3_RTN_dot, 'SV3 RTN position and velocity', 'figures/SV3_rel_pos_vel.png'); % For part b and c
+
+    % plot_rel_pos_vel(t_SV2_combined, t_orbit, rho_SV2_RTN_w_maneuver, rho_SV2_RTN_dot_w_maneuver, 'SV2 RTN position and velocity with maneuver','figures/SV2_rel_pos_vel_eom_maneuver.png'); % For part f
+    % plot_rel_pos_vel(t_SV3_combined, t_orbit, rho_SV3_RTN_w_maneuver, rho_SV3_RTN_dot_w_maneuver, 'SV3 RTN position and velocity with maneuver','figures/SV3_rel_pos_vel_eom_maneuver.png'); % For part f
     
     %%%%%%% 3D PLOTTING OF ORBITS %%%%%%%%%
-    %plot_rel_sat_pos_3D(SV2_rel_pos, 'figures/SV2_3d_traj_rel_eom.png') % For part b
-    %plot_rel_sat_pos_3D(rho_SV2_RTN, 'figures/SV2_3d_traj_eci2rtn.png') % For part c
-    %plot_rel_sat_pos_3D(SV3_rel_pos, 'figures/SV3_3d_traj_rel_eom.png') % For part b
-    %plot_rel_sat_pos_3D(rho_SV3_RTN, 'figures/SV3_3d_traj_eci2rtn.png') % For part c
-    %plot_rel_sat_pos_3D(rho_SV2_RTN_new, 'figures/SV2_3d_traj_rel_eom.png') % For part f
+    % plot_rel_sat_pos_3D_multi_method(SV2_rel_pos, rho_SV2_RTN, SV3_rel_pos, rho_SV3_RTN, 'figures/SV2_SV3_3d_traj_rel.png') % For part b and c
+    % plot_rel_sat_pos_3D(rho_SV2_RTN_w_maneuver, 'figures/SV2_3d_traj_rel_eom.png') % For part f
     
     %%%%%%% PROJECTING ONTO RTN PLANES %%%%%%%%%
-    plot_RT_RN_projections(SV2_rel_pos, SV3_rel_pos, 'RTN projection using non-linear relative EOMs','figures/RTN_projection_rel_eom.png') % For part b
-    plot_RT_RN_projections(rho_SV2_RTN, rho_SV3_RTN, 'RTN position using ECI interpolation','figures/RTN_projection_eci2rtn.png') % For part c
-
+    % plot_RT_RN_projections_both(SV2_rel_pos, rho_SV2_RTN, SV3_rel_pos, rho_SV3_RTN, 'RTN position of SV2 and SV3','figures/RTN_projection.png') % For part c
+    
     %%%%%%% COMPARING ERRORS BETWEEN METHODS %%%%%%%%%
-    compare_rel_pos_error(t_5, t_orbit, rho_SV2_RTN, SV2_rel_pos, rho_SV2_RTN_dot, SV2_rel_vel,'SV2 RTN Error Comparison','figures/SV2_error_in_rel_methods.png'); % For part d
-    compare_rel_pos_error(t_6, t_orbit,  rho_SV3_RTN, SV3_rel_pos, rho_SV3_RTN_dot, SV3_rel_vel,'SV3 RTN Error Comparison','figures/SV3_error_in_rel_methods.png'); % For part d
+    % compare_rel_pos_error(t_5, t_orbit, rho_SV2_RTN, SV2_rel_pos, rho_SV2_RTN_dot, SV2_rel_vel,'SV2 RTN Error Comparison','figures/SV2_error_in_rel_methods.png'); % For part d
+    % compare_rel_pos_error(t_6, t_orbit,  rho_SV3_RTN, SV3_rel_pos, rho_SV3_RTN_dot, SV3_rel_vel,'SV3 RTN Error Comparison','figures/SV3_error_in_rel_methods.png'); % For part d
+    compare_rel_pos_error(t_5, t_orbit, rho_SV2_RTN, SV2_rel_pos, rho_SV2_RTN_dot, SV2_rel_vel,'SV2 RTN Error Comparison with non-zero relative SMA','figures/SV2_error_in_rel_methods_nonzero_a.png'); % For part d
 end
 
