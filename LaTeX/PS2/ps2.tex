@@ -5,65 +5,50 @@
 We will use the initial quasi-nonsingular relative orbital elements (ROE) given in section \ref{sec:ROE_init}, except with zero difference in semi-major axis ($\delta a =0$). Using the chief's initial quasi-nonsingular absolute orbital elements, we can find the initial absolute orbital elements and then the initial position and velocity in ECI of both of the deputy satellites (SV2 and SV3), through the following method: 
 
 The subscript $o$ indicates the chief or "observer", while the subscript $t$ indicates the deputy or "target". First, we convert the chief semi-major axis from km to m to agree with the units of the ROEs:
-\[
-a_o \leftarrow a_o \cdot 10^3
-\]
+\begin{align}
+   a_o \leftarrow a_o \cdot 10^3 
+\end{align}
+
 
 Then, we compute the deputy semi-major axis, eccentricity components, inclination, RAAN, and argument of latitude:
-\[
-a_t = \frac{a_o + d_a}{10^3}
-\]
-\[
-e_{x,t} = \frac{d_{e_x}}{a_o} + e_{x,o}
-\]
-\[
-e_{y,t} = \frac{d_{e_y}}{a_o} + e_{y,o}
-\]
-\[
-i_t = \frac{d_{i_x}}{a_o}  + i_o
-\]
-\[
-\Omega_t = \frac{d_{i_y}}{a_o \cdot \sin(i_o)}  + \Omega_o
-\]
-\[
-u_t =  \frac{d_\lambda}{a_o}+ u_o - (\Omega_t - \Omega_o) \cdot \cos(i_o)
-\]
+    \begin{align}
+    a_t &= \frac{a_o + d_a}{10^3} \\
+    e_{x,t} &= \frac{d_{e_x}}{a_o} + e_{x,o} \\
+    e_{y,t} &= \frac{d_{e_y}}{a_o} + e_{y,o} \\
+    i_t &= \frac{d_{i_x}}{a_o}  + i_o \\
+    \Omega_t &= \frac{d_{i_y}}{a_o \cdot \sin(i_o)}  + \Omega_o \\
+    u_t &=  \frac{d_\lambda}{a_o}+ u_o - (\Omega_t - \Omega_o) \cdot \cos(i_o)
+\end{align}
+
 
 Then the quasi-nonsingular orbital elements can be converted to the Keplerian orbital elements through the method outlined in section \ref{sec:initial_oe}. Finally, the Keplerian orbital elements can be converted to position and velocity in the ECI frame through the method outlined in section \ref{sec:initial_ECI}. This results in the initial ECI position and velocity of both the deputies: 
 
-\[
-\mathbf{r}_{\text{SV2}} =
-\begin{bmatrix}
--3574.8655 \\
--2953.8783 \\
--5180.4446
-\end{bmatrix} \text{km}
-\]
-\[
-\mathbf{v}_{\text{SV2}} =
-\begin{bmatrix}
--5.3901 \\
--2.0500 \\
-\phantom{-}4.8991
-\end{bmatrix} \text{km/s}
-\]
-\[
-\mathbf{r}_{\text{SV3}} =
-\begin{bmatrix}
--3606.2292 \\
--2965.3946 \\
--5150.6778
-\end{bmatrix} \text{km}
-\]
-\[
-\mathbf{v}_{\text{SV3}} =
-\begin{bmatrix}
--5.3652 \\
--2.0292 \\
-\phantom{-}4.9357
-\end{bmatrix} \text{km/s}
-\]
-
+\begin{align}
+    \mathbf{r}_{\text{SV2}} &=
+    \begin{bmatrix}
+    -3574.8655 \\
+    -2953.8783 \\
+    -5180.4446
+    \end{bmatrix} \text{km} \\
+    \mathbf{v}_{\text{SV2}} &=
+    \begin{bmatrix}
+    -5.3901 \\
+    -2.0500 \\
+    \phantom{-}4.8991
+    \end{bmatrix} \text{km/s} \\
+    \mathbf{r}_{\text{SV3}} &=
+    \begin{bmatrix}
+    -3606.2292 \\
+    -2965.3946 \\
+    -5150.6778
+    \end{bmatrix} \text{km} \\
+    \mathbf{v}_{\text{SV3}} &=
+    \begin{bmatrix}
+    -5.3652 \\
+    -2.0292 \\
+    \phantom{-}4.9357
+    \end{bmatrix} \text{km/s}
+\end{align}
 
 \subsubsection{Numerical Integration of Non-linear Equations for Relative Motion} \label{sec:nonlinear_rel_eom}
 Given the initial ECI conditions of the chief (SV1) and the deputies (SV2 and SV3), we can find the initial position and velocity of the deputies in the RTN frame of the chief. Similar to what was shown in Equations \ref{eq:eci2rtn} to \ref{eq:v_rtn}, the rotation matrix from ECI to RTN is done as follows, 
@@ -74,10 +59,10 @@ Given the initial ECI conditions of the chief (SV1) and the deputies (SV2 and SV
     \boldsymbol{\hat{T}} &= \boldsymbol{\hat{N}} \times \boldsymbol{\hat{R}} \\
     Q_{eci2rtn} &= \begin{bmatrix}
         \boldsymbol{\hat{R}} & \boldsymbol{\hat{T}} & \boldsymbol{\hat{N}}
-    \end{bmatrix}^T \label{eq:eci2rtn}
+    \end{bmatrix}^T
 \end{align}
 
-We take $\boldsymbol{\rho}$ as the relative position between the chief and deputy, so $\boldsymbol{\rho}^{RTN}$ is relative position of the deputy in the chief's RTN frame. Similarly, $\boldsymbol{\dot{\rho}}^{RTN}$ is the relative velocity of the deputy in the chief's RTN frame.
+We take $\boldsymbol{\rho}$ as the relative position between the chief and deputy (for the equations below, we use SV2), so $\boldsymbol{\rho}^{RTN}$ is relative position of the deputy in the chief's RTN frame. Similarly, $\boldsymbol{\dot{\rho}}^{RTN}$ is the relative velocity of the deputy in the chief's RTN frame.
 
 \begin{align}
     \boldsymbol{\rho}_{SV2}^{ECI} &= \boldsymbol{r}^{ECI}_{SV2} - \boldsymbol{r}^{ECI}_{SV1}\\
@@ -87,7 +72,7 @@ We take $\boldsymbol{\rho}$ as the relative position between the chief and deput
 
 where $\omega_{RTN} = \begin{bmatrix}
     0 & 0 & ||r\times v ||/||r||^2
-\end{bmatrix}$. We can define $\boldsymbol{\rho}^{RTN}$ and $\boldsymbol{\dot{\rho}}^{RTN}$ to be
+\end{bmatrix}$. We can define $\boldsymbol{\rho}^{RTN}$ and $\boldsymbol{\dot{\rho}}^{RTN}$ (Here, the time derivative accounts for the rotating RTN frame) to be
 
 \begin{align}
     \boldsymbol{\rho}^{RTN} &= \begin{bmatrix}
@@ -100,19 +85,13 @@ where $\omega_{RTN} = \begin{bmatrix}
 
 The non-linear equations of motion for relative motion give us a method to numerically propagate $x, y, \text{and} \ z$. The equations of motion are given by
 
-\begin{equation*}
-\ddot{x} = 2\dot{\theta}_0 \dot{y} + \ddot{\theta}_0 y - \dot{\theta}_0^2 x -\frac{\mu (r_0 + x)}{\left[(r_0 + x)^2 + y^2 + z^2\right]^{3/2}} + \frac{\mu}{r_0^2}
-\end{equation*}
+\begin{align}
+\ddot{x} &= 2\dot{\theta}_0 \dot{y} + \ddot{\theta}_0 y - \dot{\theta}_0^2 x -\frac{\mu (r_0 + x)}{\left[(r_0 + x)^2 + y^2 + z^2\right]^{3/2}} + \frac{\mu}{r_0^2} \\
+\ddot{y} &= - 2\dot{\theta}_0 \dot{x} - \ddot{\theta}_0 x + \dot{\theta}_0^2 y  -\frac{\mu y}{\left[(r_0 + x)^2 + y^2 + z^2\right]^{3/2}} \\
+\ddot{z} &= -\frac{\mu z}{\left[(r_0 + x)^2 + y^2 + z^2\right]^{3/2}}
+\end{align}
 
-\begin{equation*}
-\ddot{y} = - 2\dot{\theta}_0 \dot{x} - \ddot{\theta}_0 x + \dot{\theta}_0^2 y  -\frac{\mu y}{\left[(r_0 + x)^2 + y^2 + z^2\right]^{3/2}}
-\end{equation*}
-
-\begin{equation*}
-\ddot{z} = -\frac{\mu z}{\left[(r_0 + x)^2 + y^2 + z^2\right]^{3/2}}
-\end{equation*}
-
-First, the value $r_0$ is the radial position of the chief when expressed in the RTN frame (or, the norm of the position vector of the chief $\boldsymbol{r}_0 = ||\boldsymbol{r}^{ECI}_{SV1}|| = \boldsymbol{r}^{RTN}_{SV1, x}$ 
+The value $r_0$ is the radial position of the chief when expressed in the RTN frame (or, the norm of the position vector of the chief) $\boldsymbol{r}_0 = ||\boldsymbol{r}^{ECI}_{SV1}|| = \boldsymbol{r}^{RTN}_{SV1, x}$ 
 Here, $\dot{\theta}$ is the angular velocity of the chief (and thus the angular velocity of the RTN frame), and $\ddot{\theta}$ is the angular acceleration of the chief. We can get 
 \begin{align}
     \dot{\theta} &= \frac{{||\boldsymbol{r}_{SV1}^{ECI} \times \boldsymbol{v}_{SV1}^{ECI}||}}{r_0^2} \\
@@ -121,9 +100,9 @@ Here, $\dot{\theta}$ is the angular velocity of the chief (and thus the angular 
 
 Here, $\dot{r}_0$ is the rate of change in the length of the position vector of the chief. A convenient way to get this is to take the radial component of the chief's velocity in its RTN frame.
 
-\begin{align*}
+\begin{align}
     \dot{r}_0 = \boldsymbol{v}^{RTN}_{SV2, x}
-\end{align*}
+\end{align}
 
 With these differential equations and the initial conditions in RTN, the relative motion of the deputy satellites is propagated using RK4 (Runga-Kutta-4) through the entire duration that the chief is propagated. The specifications of the time-steps are given below:
 
@@ -135,22 +114,22 @@ With these differential equations and the initial conditions in RTN, the relativ
 
 
 All the above operations are also repeated for the third satellite, SV3/Docker, for which the initial conditions are given in Section \ref{sec:rel_init_oe}.
-The results of the propagation are shown in Figures \ref{fig:rel_3d_traj}, \ref{fig:rel_3d_proj}, \ref{}
+The results of the propagation are shown in Figures \ref{fig:rel_3d_traj}, \ref{fig:rel_3d_proj}, \ref{fig:rel_pos_vel_rtn_sv2}, and \ref{fig:rel_pos_vel_rtn_sv3}.
 
 \subsubsection{Computing Relative Orbits using FODE of Absolute Motion}
 
-In this method, we perform the absolute orbit propagation of the three satellites SV1, SV2, and SV3 using just the fundamental orbital differential equations of absolute motion utilized in Section \ref{sec:fode_simulation}. Once the motion of all three satellites is calculated, the positions and velocities of the deputies SV2 and SV3 can be converted into the RTN frame of the chief using the procedure described in Section \ref{sec:nonlinear_rel_eom} in equations \ref{eq:q_eci2rtn_rel} to \ref{eq:v_rtn_rel}. This FODE propagation is done with the same numerical method and time-steps as the nonlinear relative motion method, given in equation \ref{eq:timestep}. The results of this method are shown and compared in Figures \ref{fig:rel_3d_traj}, \ref{fig:rel_3d_proj}, \ref{fig:rel_pos_vel_rtn_sv2}, and \ref{fig:rel_pos_vel_rtn_sv3}.
+In this method, we perform the absolute orbit propagation of the three satellites SV1, SV2, and SV3 using just the fundamental orbital differential equations of absolute motion utilized in Section \ref{sec:fode_simulation}. Once the motion of all three satellites is calculated, the positions and velocities of the deputies SV2 and SV3 can be converted into the RTN frame of the chief using the procedure described in Section \ref{sec:nonlinear_rel_eom} in equations \ref{eq:q_eci2rtn_rel} to \ref{eq:v_rtn_rel}. This FODE propagation is done with the same numerical method (RK4) and time-steps as the nonlinear relative motion method, given in equation \ref{eq:timestep}. The results of this method are shown and compared in Figures \ref{fig:rel_3d_traj}, \ref{fig:rel_3d_proj}, \ref{fig:rel_pos_vel_rtn_sv2}, and \ref{fig:rel_pos_vel_rtn_sv3}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\linewidth]{sim/figures/SV2_SV3_3d_traj.png}
+    \includegraphics[width=0.9\linewidth]{sim/figures/SV2_SV3_3d_traj_rel.png}
     \caption{The 3D trajectories of SV2 and SV3 with the relative orbit propagation and FODE absolute motion propagation}
     \label{fig:rel_3d_traj}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\linewidth]{sim/figures/RTN_projections.png}
+    \includegraphics[width=0.9\linewidth]{sim/figures/RTN_projection.png}
     \caption{Projection of the trajectory to the Radial-Tangential and Radial-Normal planes, for both SV2 and SV3, and for both methods.}
     \label{fig:rel_3d_proj}
 \end{figure}
@@ -172,28 +151,28 @@ In this method, we perform the absolute orbit propagation of the three satellite
 \subsubsection{Comparison of Relative Orbit Calculation Methods}
 Since the two methods used above for relative orbit calculation are mathematically equivalent irrespective of initial conditions utilized, the only difference in the results should be numerical errors. Figures \ref{fig:error_in_SV2_rel} and \ref{fig:error_in_SV3_rel} showcase the error between the two methods for SV2 and SV3 respectively.
 
-\begin{figure}[H]
+\begin{figure}
     \centering
-    \includegraphics[width=0.7\linewidth]{sim/figures/SV2_error_in_rel_methods.png}
+    \includegraphics[width=0.75\linewidth]{sim/figures/SV2_error_in_rel_methods.png}
     \caption{Error between the relative orbits of SV2 calculated by FODE methods and Nonlinear relative EOM methods.}
     \label{fig:error_in_SV2_rel}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}
     \centering
-    \includegraphics[width=0.7\linewidth]{sim/figures/SV3_error_in_rel_methods.png}
+    \includegraphics[width=0.75\linewidth]{sim/figures/SV3_error_in_rel_methods.png}
     \caption{Error between the relative orbits of SV3 calculated by FODE methods and Nonlinear relative EOM methods.}
     \label{fig:error_in_SV3_rel}
 \end{figure}
 
 We see that using fine time-steps, we can keep the numerical error between the two methods contained to negligible amounts.
 
-This also holds when the initial condition has a semi-major axis difference, which we can see in Figure \ref{fig:error_in_SV2_rel_nonzero_a} for SV2 when its initial conditions of SV2 have a non-zero difference in the semi-major axis. 
+This also holds when the initial condition has a semi-major axis difference, which we can see in Figure \ref{fig:error_in_SV2_rel_nonzero_a} for SV2 when its initial conditions of SV2 have a non-zero difference in the semi-major axis. Although the error has a different profile than in the previous plots, the error is still at a much smaller magnitude than the actual values, so is negligible, and can be attributed to numerical error.
 
-\begin{figure}[H]
+\begin{figure}
     \centering
-    \includegraphics[width=0.5\linewidth]{sim/figures/SV2_error_in_rel_methods_nonzero_a.png}
-    \caption{Error between the relative orbits of SV3 calculated by FODE methods and Nonlinear relative EOM methods, in a case where there is a relative semi-major axis difference.}
+    \includegraphics[width=0.7\linewidth]{sim/figures/SV2_error_in_rel_methods_nonzero_a.png}
+    \caption{Error between the relative orbits of SV2 calculated by FODE methods and Nonlinear relative EOM methods, in a case where there is a relative semi-major axis difference.}
     \label{fig:error_in_SV2_rel_nonzero_a}
 \end{figure}
 

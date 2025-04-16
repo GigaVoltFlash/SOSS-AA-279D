@@ -11,7 +11,12 @@ We are designing a mission called \textbf{SOSS}: \textbf{S}ervicing and \textbf{
 \subsubsection{Primary and Secondary Mission Objectives}
 \begin{itemize}
     \item Primary objective is to service and extend the mission lifetime of an existing Target satellite.
-    \item Secondary objective is to demonstrate in-orbit visual navigation for spacecraft rendezvous.
+    \item Secondary objectives include:
+    \begin{itemize}
+        \item Demonstrating in-orbit relative visual navigation for spacecraft rendezvous.
+        \item Demonstrating centimeter-level accuracy position control of docking spacecraft to meet servicing requirements.
+        \item Demonstrating convex trajectory optimization methods for real-time generation of safe and dynamically feasible rendezvous trajectories.
+    \end{itemize}
 \end{itemize}
     
 \subsubsection{Number and Type of Satellites}
@@ -253,7 +258,13 @@ Then the total acceleration when including J2 is
 \mathbf{a} = \mathbf{a}_{\text{g}} + \mathbf{a}_{J2}
 \]
 
-With these acceleration terms, we can propagate the state through an integer number of orbits (20 in our case) and obtain the orbital path. We used a custom Runge-Kutta (RK4) integrator with a fixed step size of $\frac{1}{500}$ of the orbit period to ensure accuracy. 
+With these acceleration terms, we can propagate the state through an integer number of orbits (25 in our case) and obtain the orbital path. We used a custom Runge-Kutta (RK4) integrator with a fixed step size of $\frac{1}{500}$ of the orbit period to ensure accuracy. This choice is validated by the analysis in Section \ref{sec:analytical_and_eci2rtn}.
+
+\begin{align}
+    t_{orbit} = 2\pi \sqrt{\frac{a_0^3}{\mu_{earth}}} \\
+    t_{total} = 25t_{orbit} \\
+    \Delta t = \frac{t_{orbit}}{500} \label{eq:timestep}% Time step (s)
+\end{align}
 
 Figure \ref{fig:3d_plots_with_j2} shows the 3D plot of the orbit in an inertial frame, and compares the orbit with and without J2 perturbations.
 
@@ -292,7 +303,7 @@ From this, we calculate the RTN position $r_{RTN}$ and velocity $v_{RTN}$ to be
 
 where $\omega_{RTN} = \begin{bmatrix}
     0 & 0 & ||r\times v ||/||r||^2
-\end{bmatrix}$ is the angular velocity of the frame. As expected, the position is only in the radial direction. With the velocity, since the frame is rotation at the same rate as the satellite, the velocity in the RTN frame is nearly zero (apart from a small radial component because of the eccentricity of the orbit). If the orbit was more eccentric, there would be a larger radial component.
+\end{bmatrix}$ is the angular velocity of the frame. As expected, the position of the chief in its own RTN frame is only in the radial direction. With the velocity, since the frame is rotation at the same rate as the chief satellite, the velocity in the RTN frame is nearly zero (apart from a small radial component because of the eccentricity of the orbit). If the orbit was more eccentric, there would be a larger radial component.
 
 In the absence of numerical errors, the results from the numerical simulation and Keplerian solution should match. However, with larger time-steps, the numerical error in the numerical propagator increases. Figure \ref{fig:rtn_compare_large_timestep} shows the increasing numerical error in the position and velocity vectors when using a large time-step (only 50 steps per orbit). On the other hand, if we use a smaller time-step so that we have 500 steps per orbit, then the numerical error is much more contained, as can be seen in Figure \ref{fig:rtn_compare_small_timestep}. Since the tangential and normal components are zero in the RTN frame for both the numerical propagator and the Keplerian propagator, the error in those is also just noise.
 
