@@ -2,7 +2,7 @@
 \subsection{Everything is Relative}
 
 \subsubsection{Variations in Initial Orbital Elements} \label{sec:rel_init_oe}
-We will use the initial quasi-nonsingular relative orbital elements (ROE) given in section \ref{sec:ROE_init}. Using the chief's initial quasi-nonsingular absolute orbital elements, we can find the initial absolute orbital elements and then the initial position and velocity in ECI of both of the deputy satellites (SV2 and SV3), through the following method: 
+We will use the initial quasi-nonsingular relative orbital elements (ROE) given in section \ref{sec:ROE_init}, except with zero difference in semi-major axis ($\delta a =0$). Using the chief's initial quasi-nonsingular absolute orbital elements, we can find the initial absolute orbital elements and then the initial position and velocity in ECI of both of the deputy satellites (SV2 and SV3), through the following method: 
 
 The subscript $o$ indicates the chief or "observer", while the subscript $t$ indicates the deputy or "target". First, we convert the chief semi-major axis from km to m to agree with the units of the ROEs:
 \[
@@ -65,12 +65,29 @@ Then the quasi-nonsingular orbital elements can be converted to the Keplerian or
 \]
 
 
-\subsubsection{Numerical Integration of Non-linear Equations for Relative Motion}
-Given the initial ECI conditions of the chief (SV1) and the deputies (SV2 and SV3), we can find the initial position and velocity of the deputies in the RTN frame of the chief. This is done with
+\subsubsection{Numerical Integration of Non-linear Equations for Relative Motion} \label{sec:nonlinear_rel_eom}
+Given the initial ECI conditions of the chief (SV1) and the deputies (SV2 and SV3), we can find the initial position and velocity of the deputies in the RTN frame of the chief. Similar to what was shown in Equations \ref{eq:eci2rtn} to \ref{eq:v_rtn}, the rotation matrix from ECI to RTN is done as follows, 
 
-WRITE ECI2RTN relative STUFF HERE
+\begin{align}
+    \boldsymbol{\hat{R}} &= \frac{\boldsymbol{r}^{ECI}_{SV1}}{||\boldsymbol{r}^{ECI}_{SV1}||} \\ \label{eq:q_eci2rtn_rel}
+    \boldsymbol{\hat{N}} &= \frac{\boldsymbol{r}^{ECI}_{SV1} \times \boldsymbol{v}^{ECI}_{SV1}}{||\boldsymbol{r}^{ECI}_{SV1} \times \boldsymbol{v}^{ECI}_{SV1}||} \\
+    \boldsymbol{\hat{T}} &= \boldsymbol{\hat{N}} \times \boldsymbol{\hat{R}} \\
+    Q_{eci2rtn} &= \begin{bmatrix}
+        \boldsymbol{\hat{R}} & \boldsymbol{\hat{T}} & \boldsymbol{\hat{N}}
+    \end{bmatrix}^T \label{eq:eci2rtn}
+\end{align}
 
-where $\rho$ is the relative position between the chief and deputy, so $\boldsymbol{\rho}^{RTN}$ is relative position of the deputy in the chief's RTN frame. Similarly, $\boldsymbol{\dot{\rho}}^{RTN}$ is the relative velocity of the deputy in the chief's RTN frame. We can define $\boldsymbol{\rho}^{RTN}$ and $\boldsymbol{\dot{\rho}}^{RTN}$ to be
+We take $\boldsymbol{\rho}$ as the relative position between the chief and deputy, so $\boldsymbol{\rho}^{RTN}$ is relative position of the deputy in the chief's RTN frame. Similarly, $\boldsymbol{\dot{\rho}}^{RTN}$ is the relative velocity of the deputy in the chief's RTN frame.
+
+\begin{align}
+    \boldsymbol{\rho}_{SV2}^{ECI} &= \boldsymbol{r}^{ECI}_{SV2} - \boldsymbol{r}^{ECI}_{SV1}\\
+    \boldsymbol{r}^{RTN}_{SV1} &= Q_{eci2rtn} \boldsymbol{\rho}_{SV2}^{ECI} \\
+    \boldsymbol{\dot{\rho}}^{RTN}_{SV2} &= Q_{eci2rtn} \left(\boldsymbol{v}^{ECI}_{SV2} - \boldsymbol{v}^{ECI}_{SV1}\right)  - \omega_{RTN} \times \boldsymbol{\rho}^{RTN}_{SV2} \label{eq:v_rtn_rel}
+\end{align}
+
+where $\omega_{RTN} = \begin{bmatrix}
+    0 & 0 & ||r\times v ||/||r||^2
+\end{bmatrix}$. We can define $\boldsymbol{\rho}^{RTN}$ and $\boldsymbol{\dot{\rho}}^{RTN}$ to be
 
 \begin{align}
     \boldsymbol{\rho}^{RTN} &= \begin{bmatrix}
@@ -108,14 +125,70 @@ Here, $\dot{r}_0$ is the rate of change in the length of the position vector of 
     \dot{r}_0 = \boldsymbol{v}^{RTN}_{SV2, x}
 \end{align*}
 
-With these differential equations, the relative motion of the deputy satellitess are propagated through the entire duration that the chief is propagated.
+With these differential equations and the initial conditions in RTN, the relative motion of the deputy satellites is propagated using RK4 (Runga-Kutta-4) through the entire duration that the chief is propagated. The specifications of the time-steps are given below:
 
-\be
+\begin{align}
+    t_{orbit} = 2\pi \sqrt{\frac{a_0^3}{\mu_{earth}}} \\
+    t_{total} = 25t_{orbit} \\
+    \Delta t = \frac{t_{orbit}}{500} \label{eq:timestep}% Time step (s)
+\end{align}
 
-\subsubsection{}
+
+All the above operations are also repeated for the third satellite, SV3/Docker, for which the initial conditions are given in Section \ref{sec:rel_init_oe}.
+The results of the propagation are shown in Figures \ref{fig:rel_3d_traj}, \ref{fig:rel_3d_proj}, \ref{}
+
+\subsubsection{Computing Relative Orbits using FODE of Absolute Motion}
+
+In this method, we perform the absolute orbit propagation of the three satellites SV1, SV2, and SV3 using just the fundamental orbital differential equations of absolute motion utilized in Section \ref{sec:fode_simulation}. Once the motion of all three satellites is calculated, the positions and velocities of the deputies SV2 and SV3 can be converted into the RTN frame of the chief using the procedure described in Section \ref{sec:nonlinear_rel_eom} in equations \ref{eq:q_eci2rtn_rel} to \ref{eq:v_rtn_rel}. This FODE propagation is done with the same numerical method and time-steps as the nonlinear relative motion method, given in equation \ref{eq:timestep}. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{sim/figures/SV2_3d_traj_eci2rtn.png}
+    \caption{The 3D trajectories of SV2 and SV3 with the relative orbit propagation and FODE absolute motion propagation}
+    \label{fig:rel_3d_traj}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{sim/figures/RTN_projection_eci2rtn.png}
+    \caption{Caption}
+    \label{fig:rel_3d_proj}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{sim/figures/SV2_rel_pos_vel_eci2rtn.png}
+    \caption{Caption}
+    \label{fig:enter-label}
+\end{figure}
+
+\subsubsection{Comparison of Relative Orbit Calculation Methods}
+Since the two methods used above for relative orbit calculation are mathematically equivalent irrespective of initial conditions utilized, the only difference in the results should be numerical errors. Figures \ref{fig:error_in_SV2_rel} and \ref{fig:error_in_SV3_rel} showcase the error between the two methods for SV2 and SV3 respectively.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{sim/figures/SV2_error_in_rel_methods.png}
+    \caption{Error between the relative orbits of SV2 calculated by FODE methods and Nonlinear relative EOM methods.}
+    \label{fig:error_in_SV2_rel}
+\end{figure}
 
 
-\subsubsection{}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{sim/figures/SV3_error_in_rel_methods.png}
+    \caption{Error between the relative orbits of SV3 calculated by FODE methods and Nonlinear relative EOM methods.}
+    \label{fig:error_in_SV3_rel}
+\end{figure}
+
+We see that using fine time-steps, we can keep the numerical error between the two methods contained to negligible amounts.
+
+This also holds when the initial condition has a semi-major axis difference, which we can see in Figure \ref{fig:error_in_SV2_rel_nonzero_a} for SV2 when its initial conditions of SV2 have a non-zero difference in the semi-major axis. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{sim/figures/SV2_error_in_rel_methods_nonzero_a.png}
+    \caption{Caption}
+    \label{fig:error_in_SV2_rel_nonzero_a}
+\end{figure}
 
 \subsubsection{Derivation of Impulsive Maneuver for Bounded Period Motion}
 To re-establish a bounded periodic relative motion between the deputy and the chief, the specific mechanical energies and, thus, the semi-major axes of the orbits must match. For a circular chief orbit (or near-circular as in our case), an equilibrium continuum exists that satisfies the energy matching condition: when the deputy is co-located on the same circular orbit of the chief. To achieve this condition, the semi-major axis of the deputy must be the same as the chief's, leading to both having the same mean motion. Therefore, an impulsive maneuver to adjust the deputy's semi-major axis is chosen. The Gauss Variational Equation (GVE) for semi-major axis is given as follows:
@@ -150,4 +223,25 @@ For the most fuel-efficient location, the impulsive maneuver should be applied a
 Therefore, the most fuel-efficient impulsive maneuver will be performed at the periapsis of the deputy's orbit in the along-track direction with size $\Delta v_t$. A single-burn maneuver will lead to a change in the eccentricity, which is acceptable for our purposes in this case. If no eccentricity change was desired, this could be accomplished with splitting up the single maneuver into two burns with one at the periapsis and one at the apoapsis, each with half of the original delta-v. 
 
 \subsubsection{Application of Impulsive Maneuver for Bounded Period Motion}
+To apply the impulsive maneuver to re-establish bounded periodic motion, we first found the required $\Delta v_t$ from the desired $\Delta a$ to match the chief's semi-major axis. The differences in semi-major axes of the deputies were arbitrarily set to be large to create a noticeable drift. Specifically, the initial conditions were:
 
+\begin{align*}
+\delta a_{\text{SV2, init}} &= 200 \text{ m} \\
+\delta a_{\text{SV3, init}}  &= -1000 \text{ m}
+\end{align*}
+
+Both orbits were propagated for approximately 12 orbits. Then burn was performed at the periapsis of the 12th orbit for fuel-optimality. As seen in both Figure \ref{fig:SV2_rel_pos_vel_eom_maneuver} and \ref{fig:SV3_rel_pos_vel_eom_maneuver}, the drift in radial ($x$) and tangential ($y$) positions was stopped by the maneuver. Instead of oscillations with secular drift, there are now purely oscillations post-maneuver. The secular drift arises from differences in the mean motions of the deputy and chief due to the difference in semi-major axis of the two. The drift cancellation arises from the equilibrium condition of semi-major axis matching. The amplitude of oscillations is related to the phasing of the deputies with respect to the chief, which is a function of timing and relative positioning during the maneuver. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{sim/figures/SV2_rel_pos_vel_eom_maneuver.png}
+    \caption{SV2 RTN position and velocity with maneuver applied}
+    \label{fig:SV2_rel_pos_vel_eom_maneuver}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{sim/figures/SV3_rel_pos_vel_eom_maneuver.png}
+    \caption{SV3 RTN position and velocity with maneuver applied}
+    \label{fig:SV3_rel_pos_vel_eom_maneuver}
+\end{figure}
