@@ -104,14 +104,7 @@ Here, $\dot{r}_0$ is the rate of change in the length of the position vector of 
     \dot{r}_0 = \boldsymbol{v}^{RTN}_{SV2, x}
 \end{align}
 
-With these differential equations and the initial conditions in RTN, the relative motion of the deputy satellites is propagated using RK4 (Runga-Kutta-4) through the entire duration that the chief is propagated. The specifications of the time-steps are given below:
-
-\begin{align}
-    t_{orbit} = 2\pi \sqrt{\frac{a_0^3}{\mu_{earth}}} \\
-    t_{total} = 25t_{orbit} \\
-    \Delta t = \frac{t_{orbit}}{500} \label{eq:timestep}% Time step (s)
-\end{align}
-
+With these differential equations and the initial conditions in RTN, the relative motion of the deputy satellites is propagated using RK4 (Runga-Kutta-4) through the entire duration that the chief is propagated. The specifications of the time-steps are the same as Equation \ref{eq:timestep}.
 
 All the above operations are also repeated for the third satellite, SV3/Docker, for which the initial conditions are given in Section \ref{sec:rel_init_oe}.
 The results of the propagation are shown in Figures \ref{fig:rel_3d_traj}, \ref{fig:rel_3d_proj}, \ref{fig:rel_pos_vel_rtn_sv2}, and \ref{fig:rel_pos_vel_rtn_sv3}.
@@ -119,6 +112,8 @@ The results of the propagation are shown in Figures \ref{fig:rel_3d_traj}, \ref{
 \subsubsection{Computing Relative Orbits using FODE of Absolute Motion}
 
 In this method, we perform the absolute orbit propagation of the three satellites SV1, SV2, and SV3 using just the fundamental orbital differential equations of absolute motion utilized in Section \ref{sec:fode_simulation}. Once the motion of all three satellites is calculated, the positions and velocities of the deputies SV2 and SV3 can be converted into the RTN frame of the chief using the procedure described in Section \ref{sec:nonlinear_rel_eom} in equations \ref{eq:q_eci2rtn_rel} to \ref{eq:v_rtn_rel}. This FODE propagation is done with the same numerical method (RK4) and time-steps as the nonlinear relative motion method, given in equation \ref{eq:timestep}. The results of this method are shown and compared in Figures \ref{fig:rel_3d_traj}, \ref{fig:rel_3d_proj}, \ref{fig:rel_pos_vel_rtn_sv2}, and \ref{fig:rel_pos_vel_rtn_sv3}.
+
+It is interesting to note that in Figure \ref{fig:rel_3d_traj}, the relative orbits are not centered around the $x = 0$ point. Instead, the deputy satellites always have a negative radial position despite having the same semi-major axis as the chief. This is because we are using rectilinear co-ordinates instead of curvi-linear co-ordinates, and so these plots don't correct for the curvature of the earth, which is non-negligible when one has large cross-track separations.
 
 \begin{figure}[H]
     \centering
