@@ -217,7 +217,7 @@ Finally, we can transform to the ECI frame:
 \mathbf{v}_{ECI} = R_{\text{PQW} \to \text{ECI}} \cdot \mathbf{v}_{PQW}
 \]
 
-\subsubsection{Numerical Simulation of State with Perturbations}
+\subsubsection{Numerical Simulation of State with Perturbations} \label{sec:fode_simulation}
 The state of the satellite is represented by 
 \begin{align}
     \boldsymbol{x} = \begin{bmatrix}
@@ -270,24 +270,24 @@ As expected, the most prominent change in the orbit with J2 perturbations is in 
 
 We can compare the no-J2 simulation with the analytical Keplerian result for the orbital parameters mentioned in Table \ref{tab:abs_oe_kepler}, but by varying the true anomaly $\nu$. 
 
-The time-steps used in the numerical propagation $t$ are converted into $\nu$ values (via intermediate computation of mean anomaly $M$ and eccentric anomaly $E$). The state outputs from both the numerical simulation and the analytical keplerian solution are converted from the ECI frame into the Radial-Tangent-Normal (RTN) frame.
+The time-steps used in the numerical propagation $t$ are converted into $\nu$ values (via intermediate computation of mean anomaly $M$ and eccentric anomaly $E$). The state outputs from both the numerical simulation and the analytical keplerian solution are converted from the ECI frame into the Radial-Tangent-Normal (RTN) frame of the chief (SV1).
 
-The rotation matrix from ECI to RTN is done as follows:
+The rotation matrix from ECI to RTN of the chief is done as follows:
 
 \begin{align}
-    \hat{R} &= \frac{r_{ECI}}{||r_{ECI}||} \\
-    \hat{N} &= \frac{r_{ECI} \times v_{ECI}}{||r_{ECI} \times v_{ECI}||} \\
-    \hat{T} &= \hat{N} \times \hat{R} \\
+    \boldsymbol{\hat{R}} &= \frac{\boldsymbol{r}^{ECI}_{SV1}}{||\boldsymbol{r}^{ECI}_{SV1}||} \\ \
+    \boldsymbol{\hat{N}} &= \frac{\boldsymbol{r}^{ECI}_{SV1} \times \boldsymbol{v}^{ECI}_{SV1}}{||\boldsymbol{r}^{ECI}_{SV1} \times \boldsymbol{v}^{ECI}_{SV1}||} \\
+    \boldsymbol{\hat{T}} &= \boldsymbol{\hat{N}} \times \boldsymbol{\hat{R}} \\
     Q_{eci2rtn} &= \begin{bmatrix}
-        \hat{R} & \hat{T} & \hat{N}
-    \end{bmatrix}^T 
+        \boldsymbol{\hat{R}} & \boldsymbol{\hat{T}} & \boldsymbol{\hat{N}}
+    \end{bmatrix}^T \label{eq:eci2rtn}
 \end{align}
 
 From this, we calculate the RTN position $r_{RTN}$ and velocity $v_{RTN}$ to be
 
 \begin{align}
-    r_{RTN} &= R_{eci2rtn} r_{ECI} \\
-    v_{RTN} &= R_{eci2rtn} v_{ECI} - \omega_{RTN} \times r_{RTN}
+    \boldsymbol{r}^{RTN}_{SV1} &= R_{eci2rtn} \boldsymbol{r}^{ECI}_{SV1} \\
+    \boldsymbol{v}^{RTN}_{SV1} &= R_{eci2rtn} \boldsymbol{v}^{ECI}_{SV1} - \omega_{RTN} \times \boldsymbol{r}^{RTN}_{SV1} \label{eq:v_rtn}
 \end{align}
 
 where $\omega_{RTN} = \begin{bmatrix}
