@@ -17,7 +17,7 @@ function [] = plot_rtn_compare(t, t_orbit, r_RTN_1, r_RTN_2, v_RTN_1, v_RTN_2, l
             title('Error in RTN Position Components');
         end
         if i == 3
-            xlabel('Time [s]');
+            xlabel('Time [No. of orbits]');
         end
         grid on;
     
@@ -29,12 +29,12 @@ function [] = plot_rtn_compare(t, t_orbit, r_RTN_1, r_RTN_2, v_RTN_1, v_RTN_2, l
             title('Error in RTN Velocity Components');
         end
         if i == 3
-            xlabel('Time [s]');
+            xlabel('Time [No. of orbits]');
         end
         grid on;
     end
     
-    % xlabel('Time [s]');
+    % xlabel('Time [No. of orbits]');
     sgtitle(title_string);
     saveas(gcf, fig_path);
 
