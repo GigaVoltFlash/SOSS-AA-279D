@@ -124,18 +124,18 @@ d_a_SV3_init_new,d_lambda_SV3_init,d_e_x_SV3_init,d_e_y_SV3_init,d_i_x_SV3_init,
 state_abs_SV3_init_new = [r_SV3_init;v_SV3_init];
 
 
-%%%%% APPLY SEMI-MAJOR AXIS MANEUVERs %%%%%
-maneuver_time = tend/2; % set arbitrary desired maneuevr time 
-% (later find periapsis for fuel-optimality)
-
-desired_delta_a_SV2 = -d_a_SV2_init_new/1000; % m --> km
-desired_delta_a_SV3 = -d_a_SV3_init_new/1000; % m --> km
-
-[rho_SV2_RTN_w_maneuver, rho_SV2_RTN_dot_w_maneuver, t_SV2_combined] = ...
-apply_sma_maneuver(state_abs_SV2_init_new,tstart,tint,maneuver_time,tend,desired_delta_a_SV2,r_ECI_no_j2,v_ECI_no_j2);
-
-[rho_SV3_RTN_w_maneuver, rho_SV3_RTN_dot_w_maneuver, t_SV3_combined] = ...
-apply_sma_maneuver(state_abs_SV3_init_new,tstart,tint,maneuver_time,tend,desired_delta_a_SV3,r_ECI_no_j2,v_ECI_no_j2);
+% %%%%% APPLY SEMI-MAJOR AXIS MANEUVERs %%%%%
+% maneuver_time = tend/2; % set arbitrary desired maneuevr time 
+% % (later find periapsis for fuel-optimality)
+% 
+% desired_delta_a_SV2 = -d_a_SV2_init_new/1000; % m --> km
+% desired_delta_a_SV3 = -d_a_SV3_init_new/1000; % m --> km
+% 
+% [rho_SV2_RTN_w_maneuver, rho_SV2_RTN_dot_w_maneuver, t_SV2_combined] = ...
+% apply_sma_maneuver(state_abs_SV2_init_new,tstart,tint,maneuver_time,tend,desired_delta_a_SV2,r_ECI_no_j2,v_ECI_no_j2);
+% 
+% [rho_SV3_RTN_w_maneuver, rho_SV3_RTN_dot_w_maneuver, t_SV3_combined] = ...
+% apply_sma_maneuver(state_abs_SV3_init_new,tstart,tint,maneuver_time,tend,desired_delta_a_SV3,r_ECI_no_j2,v_ECI_no_j2);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLOTTING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
@@ -145,7 +145,7 @@ if PS1_plots
     plot_3D_orbit_aoe_compare(r_ECI_no_j2, r_ECI_keplerian, 'Orbit without J2', 'Keplerian Propagator')
     
     %%%%%% COMPARE RTN VALUES %%%%%% 
-    plot_rtn_compare(t_1, r_RTN_no_j2, r_RTN_keplerian, v_RTN_no_j2, v_RTN_keplerian, 'Numerical with no J2', 'Keplerian', 'Error between No-J2 Numerical and Keplerian, large time-step');
+    plot_rtn_compare(t_1, t_orbit, r_RTN_no_j2, r_RTN_keplerian, v_RTN_no_j2, v_RTN_keplerian, 'Numerical with no J2', 'Keplerian', 'Error between No-J2 Numerical and Keplerian, small time-step', 'figures/comparing_rtn_small_timestep.png');
     
     %%%%%%% COMPUTE AND PLOT OE, ECCENTRICITY, ANGULAR MOMENTUM, SPECIFIC MECHANICAL ENERGY %%%%%%% 
     [a_2,e_2,i_2,RAAN_2,omega_2,nu_2] = compute_and_plot_orbit_params(r_ECI_no_j2,v_ECI_no_j2,r_ECI_with_j2,v_ECI_with_j2,t_1,t_2);
