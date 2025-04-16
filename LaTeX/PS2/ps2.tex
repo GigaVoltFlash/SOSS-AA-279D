@@ -139,26 +139,34 @@ The results of the propagation are shown in Figures \ref{fig:rel_3d_traj}, \ref{
 
 \subsubsection{Computing Relative Orbits using FODE of Absolute Motion}
 
-In this method, we perform the absolute orbit propagation of the three satellites SV1, SV2, and SV3 using just the fundamental orbital differential equations of absolute motion utilized in Section \ref{sec:fode_simulation}. Once the motion of all three satellites is calculated, the positions and velocities of the deputies SV2 and SV3 can be converted into the RTN frame of the chief using the procedure described in Section \ref{sec:nonlinear_rel_eom} in equations \ref{eq:q_eci2rtn_rel} to \ref{eq:v_rtn_rel}. This FODE propagation is done with the same numerical method and time-steps as the nonlinear relative motion method, given in equation \ref{eq:timestep}. 
+In this method, we perform the absolute orbit propagation of the three satellites SV1, SV2, and SV3 using just the fundamental orbital differential equations of absolute motion utilized in Section \ref{sec:fode_simulation}. Once the motion of all three satellites is calculated, the positions and velocities of the deputies SV2 and SV3 can be converted into the RTN frame of the chief using the procedure described in Section \ref{sec:nonlinear_rel_eom} in equations \ref{eq:q_eci2rtn_rel} to \ref{eq:v_rtn_rel}. This FODE propagation is done with the same numerical method and time-steps as the nonlinear relative motion method, given in equation \ref{eq:timestep}. The results of this method are shown and compared in Figures \ref{fig:rel_3d_traj}, \ref{fig:rel_3d_proj}, \ref{fig:rel_pos_vel_rtn_sv2}, and \ref{fig:rel_pos_vel_rtn_sv3}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\linewidth]{sim/figures/SV2_3d_traj_eci2rtn.png}
+    \includegraphics[width=0.7\linewidth]{sim/figures/SV2_SV3_3d_traj.png}
     \caption{The 3D trajectories of SV2 and SV3 with the relative orbit propagation and FODE absolute motion propagation}
     \label{fig:rel_3d_traj}
 \end{figure}
+
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\linewidth]{sim/figures/RTN_projection_eci2rtn.png}
-    \caption{Caption}
+    \includegraphics[width=0.7\linewidth]{sim/figures/RTN_projections.png}
+    \caption{Projection of the trajectory to the Radial-Tangential and Radial-Normal planes, for both SV2 and SV3, and for both methods.}
     \label{fig:rel_3d_proj}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\linewidth]{sim/figures/SV2_rel_pos_vel_eci2rtn.png}
-    \caption{Caption}
-    \label{fig:enter-label}
+    \includegraphics[width=0.7\linewidth]{sim/figures/SV2_rel_pos_vel.png}
+    \caption{The RTN position and velocity of SV2, for both methods of relative orbit calculation.}
+    \label{fig:rel_pos_vel_rtn_sv2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{sim/figures/SV2_rel_pos_vel.png}
+    \caption{The RTN position and velocity of SV3, for both methods of relative orbit calculation.}
+    \label{fig:rel_pos_vel_rtn_sv3}
 \end{figure}
 
 \subsubsection{Comparison of Relative Orbit Calculation Methods}
@@ -170,7 +178,6 @@ Since the two methods used above for relative orbit calculation are mathematical
     \caption{Error between the relative orbits of SV2 calculated by FODE methods and Nonlinear relative EOM methods.}
     \label{fig:error_in_SV2_rel}
 \end{figure}
-
 
 \begin{figure}[H]
     \centering
@@ -186,7 +193,7 @@ This also holds when the initial condition has a semi-major axis difference, whi
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{sim/figures/SV2_error_in_rel_methods_nonzero_a.png}
-    \caption{Caption}
+    \caption{Error between the relative orbits of SV3 calculated by FODE methods and Nonlinear relative EOM methods, in a case where there is a relative semi-major axis difference.}
     \label{fig:error_in_SV2_rel_nonzero_a}
 \end{figure}
 
@@ -211,7 +218,7 @@ Rearranging for $\Delta v_t$:
 \begin{align}
 \Delta v_t = \frac{n r}{2a \sqrt{1 - e^2}} \Delta a
 \end{align}
-This can be simplified for near-circular orbits \( e = 0, a \approx r \):
+This can be simplified for near-circular orbits \( e = 0, a \approx r \), however we will use the more accurate previous expresision:
 \begin{align}
 \Delta v_t = \frac{n}{2} \Delta a
 \end{align}
