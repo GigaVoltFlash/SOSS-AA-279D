@@ -16,6 +16,9 @@ function [] = plot_rtn_compare(t, t_orbit, r_RTN_1, r_RTN_2, v_RTN_1, v_RTN_2, l
         if i == 1
             title('Error in RTN Position Components');
         end
+        if i == 3
+            xlabel('Time [s]');
+        end
         grid on;
     
         % Velocity subplot (right column)
@@ -25,10 +28,13 @@ function [] = plot_rtn_compare(t, t_orbit, r_RTN_1, r_RTN_2, v_RTN_1, v_RTN_2, l
         if i == 1
             title('Error in RTN Velocity Components');
         end
+        if i == 3
+            xlabel('Time [s]');
+        end
         grid on;
     end
     
-    xlabel('Time [s]');
+    % xlabel('Time [s]');
     sgtitle(title_string);
     saveas(gcf, fig_path);
 
