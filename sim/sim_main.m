@@ -124,18 +124,18 @@ d_a_SV3_init_new,d_lambda_SV3_init,d_e_x_SV3_init,d_e_y_SV3_init,d_i_x_SV3_init,
 state_abs_SV3_init_new = [r_SV3_init;v_SV3_init];
 
 
-% %%%%% APPLY SEMI-MAJOR AXIS MANEUVERs %%%%%
-% maneuver_time = tend/2; % set arbitrary desired maneuevr time 
-% % (later find periapsis for fuel-optimality)
-% 
-% desired_delta_a_SV2 = -d_a_SV2_init_new/1000; % m --> km
-% desired_delta_a_SV3 = -d_a_SV3_init_new/1000; % m --> km
-% 
-% [rho_SV2_RTN_w_maneuver, rho_SV2_RTN_dot_w_maneuver, t_SV2_combined] = ...
-% apply_sma_maneuver(state_abs_SV2_init_new,tstart,tint,maneuver_time,tend,desired_delta_a_SV2,r_ECI_no_j2,v_ECI_no_j2);
-% 
-% [rho_SV3_RTN_w_maneuver, rho_SV3_RTN_dot_w_maneuver, t_SV3_combined] = ...
-% apply_sma_maneuver(state_abs_SV3_init_new,tstart,tint,maneuver_time,tend,desired_delta_a_SV3,r_ECI_no_j2,v_ECI_no_j2);
+%%%%% APPLY SEMI-MAJOR AXIS MANEUVERs %%%%%
+maneuver_time = tend/2; % set arbitrary desired maneuevr time 
+% (later find periapsis for fuel-optimality)
+
+desired_delta_a_SV2 = -d_a_SV2_init_new/1000; % m --> km
+desired_delta_a_SV3 = -d_a_SV3_init_new/1000; % m --> km
+
+[rho_SV2_RTN_w_maneuver, rho_SV2_RTN_dot_w_maneuver, t_SV2_combined] = ...
+apply_sma_maneuver(state_abs_SV2_init_new,tstart,tint,maneuver_time,tend,desired_delta_a_SV2,r_ECI_no_j2,v_ECI_no_j2);
+
+[rho_SV3_RTN_w_maneuver, rho_SV3_RTN_dot_w_maneuver, t_SV3_combined] = ...
+apply_sma_maneuver(state_abs_SV3_init_new,tstart,tint,maneuver_time,tend,desired_delta_a_SV3,r_ECI_no_j2,v_ECI_no_j2);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLOTTING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
@@ -168,7 +168,7 @@ if PS2_plots
 
     % plot_rel_pos_vel(t_SV2_combined, t_orbit, rho_SV2_RTN_w_maneuver, rho_SV2_RTN_dot_w_maneuver, 'SV2 RTN position and velocity with maneuver','figures/SV2_rel_pos_vel_eom_maneuver.png'); % For part f
     % plot_rel_pos_vel(t_SV3_combined, t_orbit, rho_SV3_RTN_w_maneuver, rho_SV3_RTN_dot_w_maneuver, 'SV3 RTN position and velocity with maneuver','figures/SV3_rel_pos_vel_eom_maneuver.png'); % For part f
-    
+     
     %%%%%%% 3D PLOTTING OF ORBITS %%%%%%%%%
     plot_rel_sat_pos_3D_multi_method(SV2_rel_pos, rho_SV2_RTN, SV3_rel_pos, rho_SV3_RTN, 'figures/SV2_SV3_3d_traj_rel.png') % For part b and c
     % plot_rel_sat_pos_3D(rho_SV2_RTN_w_maneuver, 'figures/SV2_3d_traj_rel_eom.png') % For part f

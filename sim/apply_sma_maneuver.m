@@ -29,6 +29,8 @@ function [rho_RTN_w_maneuver, rho_RTN_dot_w_maneuver, t_combined] = apply_sma_ma
     
     r_ECI_new = state_combined(:,1:3);
     v_ECI_new = state_combined(:,4:6);
+
+    %compute_and_plot_orbit_params(r_ECI_no_j2,v_ECI_no_j2,r_ECI_new,v_ECI_new,t_combined,t_combined);
     
     [rho_RTN_w_maneuver, rho_RTN_dot_w_maneuver] = ECI2RTN_rel(r_ECI_no_j2, v_ECI_no_j2, r_ECI_new, v_ECI_new);
 end
