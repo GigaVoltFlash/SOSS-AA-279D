@@ -266,7 +266,7 @@ With these acceleration terms, we can propagate the state through an integer num
     \Delta t = \frac{t_{orbit}}{500} \label{eq:timestep}% Time step (s)
 \end{align}
 
-Figure \ref{fig:3d_plots_with_j2} shows the 3D plot of the orbit in an inertial frame, and compares the orbit with and without J2 perturbations.
+Figure \ref{fig:3d_plots_with_j2} shows the 3D plot of the orbit in an inertial frame, and compares the orbit with and without J2 perturbations, but propagated for 200 orbits to illustrate the change in the argument of periapsis. 
 
 \begin{figure}[H]
     \centering
@@ -361,7 +361,7 @@ Figure \ref{fig:angular_momentum} compares the angular momentum vector over 25 o
 Figure \ref{fig:eccentricity_vector} compares the eccentricity vector over 25 orbits with and without J2. As expected, without J2, the eccentricity vector remains constant. As expected from averaging theory, with J2 there are secular drifts in the x and y components of the eccentricity vector. This corresponds to the secular drift in the argument of periapsis. There are also short-periodic effects on these components from J2.  
 
 
-Figure \ref{fig:specific_energy} compares the specific mechanical energy over 25 orbits with and without J2. As expected, without J2, the specific mechanical energy remains constant. With J2, the average specific mechanical energy also remains constant, which is expected since gravity is a conservative force and thus will not affect the specific mechanical energy. The periodic behavior with J2 may be due to computational error. 
+Figure \ref{fig:specific_energy} compares the specific mechanical energy over 25 orbits with and without J2. As expected, without J2, the specific mechanical energy remains constant. With J2, the average specific mechanical energy also remains constant, which is expected since gravity is a conservative force and thus will not affect the specific mechanical energy. The periodic behavior with J2 is due to the oscillating behavior in the semi-major axis. 
 
 \begin{figure}[H]
     \centering
@@ -389,5 +389,5 @@ Figure \ref{fig:osc_mean_oe} superimposes the resulting mean and osculating orbi
     \label{fig:osc_mean_oe}
 \end{figure}
 
-\subsubsection{Issues with Comparison}
-Issues could arise from the comparison of osculating and mean orbital elements due to the initialization procedure. Specifically, we interpreted our initial orbital elements as osculating at first and then as mean states later on. To ensure that the comparisons remain consistent, it would be most appropriate to convert our initial orbital elements from mean to osculating at first. Furthermore, to ensure that both methods align, the final results from osculating could be converted to mean elements to numerically determine if there are any discrepancies, rather than by visual inspection.
+\subsubsection{Issues with Comparison}\label{sec:comp_issues}
+Issues could arise from the comparison of osculating and mean orbital elements due to the initialization procedure. Specifically, we interpreted our initial orbital elements as osculating at first and then as mean states later on. To ensure that the comparisons remain consistent, it would be most appropriate to convert our initial orbital elements from mean to osculating at first using Brower's Theory. Furthermore, to ensure that both methods align, the final results from osculating could be converted to mean elements to numerically determine if there are any discrepancies, rather than by visual inspection.
