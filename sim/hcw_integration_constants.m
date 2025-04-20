@@ -2,12 +2,15 @@ function [K] = hcw_integration_constants(initial_RTN, a)
     % Initial RTN includes the x, y, z, xdot, ydot, zdot that is also used
     % in relative orbital motion calculation
     % a is the semi-major axis of the chief
-    x     = initial_RTN(1);
-    y     = initial_RTN(2);
-    z     = initial_RTN(3);
-    xdot  = initial_RTN(4);
-    ydot  = initial_RTN(5);
-    zdot  = initial_RTN(6); 
-
-    % a = block()
+    global mu_earth;
+    n = sqrt(mu_earth/a^3);
+    A = [a*eye(3), zeros(3); zeros(3), a*n*eye(3)];
+    B = [1 0 1 0 0 0; ...
+        0 2 0 1 0 0; ...
+        0 0 0 0 0 1; ...
+        0 1 0 0 0 0; ...
+        -3/2 0 -2 0 0 0; ...
+        0 0 0 0 1 0];
+    total = A * B;
+    K = total\initial_RTN;
 end

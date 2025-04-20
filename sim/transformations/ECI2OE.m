@@ -1,6 +1,6 @@
 % Converting ECI to Orbital Elements
 function [a,e,i,RAAN,omega,nu] = ECI2OE(r_IJK,v_IJK)
-    mu_earth = 3.986e5; % km^3/s^2
+    global mu_earth
     r_norm = norm(r_IJK);
     r_i = r_IJK(1);
     r_j = r_IJK(2);
