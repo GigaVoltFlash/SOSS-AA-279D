@@ -82,5 +82,8 @@ if run_PS2
     % compare_rel_pos_error(t_5, t_orbit, rho_SV2_RTN, SV2_rel_pos, rho_SV2_RTN_dot, SV2_rel_vel,'SV2 RTN Error Comparison with non-zero relative SMA','figures/SV2_error_in_rel_methods_nonzero_a.png'); % For part d, run with non-zero delta a
 end
 
-% if run_PS3
-
+if run_PS3
+    %%%%% PLOT OF RELATIVE ORBITS USING HCW %%%%%
+    plot_RT_RN_projections(SV2_HCW_pos, SV3_HCW_pos, 'HCW evaluated relative orbits', 'figures/PS3/RTN_projections_HCW.png');
+    plot_RT_RN_projections(SV2_rel_pos, SV3_rel_pos, 'HCW evaluated relative orbits', 'figures/PS3/RTN_projections_numerical.png');
+end

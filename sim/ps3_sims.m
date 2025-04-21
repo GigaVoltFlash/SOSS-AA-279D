@@ -14,15 +14,15 @@ d_a_SV2_init = 0; % m
 d_lambda_SV2_init = -124; % m
 d_e_x_SV2_init = 0; % m
 d_e_y_SV2_init = 0; % m
-d_i_x_SV2_init = 79; % m
-d_i_y_SV2_init = 1005; % m
+d_i_x_SV2_init = 500; % m
+d_i_y_SV2_init = 700; % m
 
 d_a_SV3_init = 0; % m
 d_lambda_SV3_init = -798; % m
 d_e_x_SV3_init = 0; % m
 d_e_y_SV3_init = 0; % m
-d_i_x_SV3_init = 36; % m
-d_i_y_SV3_init = 827; % m
+d_i_x_SV3_init = 500; % m
+d_i_y_SV3_init = 500; % m
 
 [r_SV2_init, v_SV2_init] = ROE2ECI(a_SV1_init,ex_SV1_init,ey_SV1_init,i_SV1_init,RAAN_SV1_init,u_SV1_init, ...
 d_a_SV2_init,d_lambda_SV2_init,d_e_x_SV2_init,d_e_y_SV2_init,d_i_x_SV2_init,d_i_y_SV2_init);
@@ -63,6 +63,11 @@ K_SV2 = hcw_integration_constants([r_SV2_RTN_init; v_SV2_RTN_init], a_SV1_init);
 K_SV3 = hcw_integration_constants([r_SV3_RTN_init; v_SV3_RTN_init], a_SV1_init);
 
 % WIP
-% SV2_HCW_state = evaluate_HCW(K_SV2, a_SV1_init, t_2);
-% SV3_HCW_state = evaluate_HCW(K_SV3, a_SV1_init, t_2);
+SV2_HCW_state = evaluate_HCW(t_2, a_SV1_init, K_SV2);
+SV3_HCW_state = evaluate_HCW(t_2, a_SV1_init, K_SV3);
+SV2_HCW_pos = SV2_HCW_state(:, 1:3);
+SV3_HCW_pos = SV3_HCW_state(:, 1:3);
+SV2_HCW_vel = SV2_HCW_state(:, 4:6);
+SV3_HCW_vel = SV3_HCW_state(:, 4:6);
+
 
