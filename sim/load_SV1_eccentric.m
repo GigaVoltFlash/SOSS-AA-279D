@@ -4,7 +4,7 @@
 
 a_SV1_init = 6944;
 ex_SV1_init = -4e-5;
-ey_SV1_init = 0.15;
+ey_SV1_init = 1.6e-3; %0.15;
 i_SV1_init = 99.4;
 RAAN_SV1_init = -151.1;
 u_SV1_init = -47.9;

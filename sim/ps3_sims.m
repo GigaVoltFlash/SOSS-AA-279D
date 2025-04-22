@@ -111,9 +111,9 @@ state_rel_SV3_init = [r_SV1_ECI_init; v_SV1_ECI_init; r_SV3_RTN_init; v_SV3_RTN_
 [t_2, state_2] = rk4_eom_rel_RTN(tstart:tint:tend, state_rel_SV2_init);
 [t_3, state_3] = rk4_eom_rel_RTN(tstart:tint:tend, state_rel_SV3_init);
 SV2_rel_pos_ecc = [state_2(:, 7), state_2(:, 8), state_2(:, 9)];
-SV2_rel_vel = [state_2(:, 10), state_2(:, 11), state_2(:, 12)];
+SV2_rel_vel_ecc = [state_2(:, 10), state_2(:, 11), state_2(:, 12)];
 SV3_rel_pos_ecc = [state_3(:, 7), state_3(:, 8), state_3(:, 9)];
-SV3_rel_vel = [state_3(:, 10), state_3(:, 11), state_3(:, 12)];
+SV3_rel_vel_ecc = [state_3(:, 10), state_3(:, 11), state_3(:, 12)];
 
 % We see that the ratio of relative distance to orbit size is smaller than 1e-3
 rho_pos_ratio_SV2 = vecnorm(SV2_rel_pos_ecc, 2, 2)./r_RTN_no_j2(:, 1);

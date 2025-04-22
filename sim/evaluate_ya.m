@@ -11,10 +11,11 @@ function states = evaluate_ya(t, a, e, M_init, K)
     states = zeros(N, 6);
     for i=1:N
         M = deg2rad(M_init) + n*t(i);
-        M = mod(M, 2*pi);
+        %M = mod(M, 2*pi);
         
-        E = Newton_Raphson(deg2rad(M), e, 1e-5); % in radians
+        E = Newton_Raphson(M, e, 1e-5); % in radians
         f = 2*atan2(sqrt(1+e)*tan(E/2),sqrt(1-e)); % in radians
+        f = mod(f,2*pi);
         eta = sqrt(1-e^2);
         tau = n*t(i)/eta^3; 
         k = 1 + e*cos(f);
@@ -45,7 +46,7 @@ function B = compute_B(e, tau, f, k, k_prime)
     psi_y_dot_3 = -e - (k^2 + 1)*cos(f);
     psi_y_dot_4 = -k_prime;
     psi_z_dot_5 = e + cos(f);
-    psi_z_dot_6 = sin(f);
+    psi_z_dot_6 = -sin(f);
 
     B = [psi_x_1 psi_x_2 psi_x_3 0 0 0; ...
         psi_y_1 psi_y_2 psi_y_3 psi_y_4 0 0; ...

@@ -27,7 +27,7 @@ function [] = plot_3D_rel_orbit(SV2_rel_pos1, SV3_rel_pos1, fig_path)
     title('SV3 3D Relative Orbits with HCW')
     grid on;
     axis equal;
-    legend('YA Dif. Eq.', 'YA Mapping');
+    %legend('YA Dif. Eq.', 'YA Mapping');
     hold off;
 
     saveas(gcf, fig_path);
