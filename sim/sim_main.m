@@ -84,27 +84,27 @@ end
 
 if run_PS3
     %%%%% PLOT OF RELATIVE ORBITS USING HCW %%%%%
-    plot_rel_pos_vel_single(t_2, t_orbit, SV2_HCW_pos, SV2_HCW_vel, 'SV2 HCW evaluate relative position + velocity', 'figures/PS3/HCW_pos_vel_SV2.png');
-    plot_rel_pos_vel_single(t_2, t_orbit, SV3_HCW_pos, SV3_HCW_vel, 'SV3 HCW evaluate relative position + velocity', 'figures/PS3/HCW_pos_vel_SV3.png');
+    %plot_rel_pos_vel_single(t_2, t_orbit, SV2_HCW_pos, SV2_HCW_vel, 'SV2 HCW evaluate relative position + velocity', 'figures/PS3/HCW_pos_vel_SV2.png');
+    %plot_rel_pos_vel_single(t_2, t_orbit, SV3_HCW_pos, SV3_HCW_vel, 'SV3 HCW evaluate relative position + velocity', 'figures/PS3/HCW_pos_vel_SV3.png');
     plot_RT_RN_projections(SV2_HCW_pos_test, SV3_HCW_pos_test, 'HCW evaluated relative orbits', 'figures/PS3/RTN_projections_HCW.png');
     plot_RT_RN_projections(SV2_rel_pos, SV3_rel_pos, 'Non-linear EOMs relative orbits', 'figures/PS3/RTN_projections_numerical.png');
 
     %plot_RT_RN_projections_both(SV2_HCW_pos,SV2_rel_pos,SV3_HCW_pos,SV3_rel_pos, 'Testing HCW comparison', 'figures/PS3/RTN_projections_HCW_comparison.png');
-    %plot_3D_rel_orbit(SV2_HCW_pos,SV3_HCW_pos, 'figures/PS3/3D_HCW_comparison.png');
+    plot_3D_rel_orbit(SV2_HCW_pos,SV3_HCW_pos, 'figures/PS3/3D_HCW_comparison.png');
 
     %%%%% PLOT OF RELATIVE ORBITS USING YA %%%%%
-    plot_rel_pos_vel_single(t_2, t_orbit, SV2_rel_pos_ecc, SV2_rel_vel_ecc, 'SV2 non-linear relative position + velocity with eccentric chief', 'figures/PS3/ecc_nonlinear_pos_vel_SV2.png');
+    %plot_rel_pos_vel_single(t_2, t_orbit, SV2_rel_pos_ecc, SV2_rel_vel_ecc, 'SV2 non-linear relative position + velocity with eccentric chief', 'figures/PS3/ecc_nonlinear_pos_vel_SV2.png');
     
-    plot_rel_pos_vel_single(t_2, t_orbit, SV2_YA_pos, SV2_YA_vel, 'SV2 YA evaluate relative position + velocity', 'figures/PS3/YA_pos_vel_SV2.png');
-    plot_rel_pos_vel_single(t_2, t_orbit, SV3_YA_pos, SV3_YA_vel, 'SV3 YA evaluate relative position + velocity', 'figures/PS3/YA_pos_vel_SV3.png');
+    %plot_rel_pos_vel_single(t_2, t_orbit, SV2_YA_pos, SV2_YA_vel, 'SV2 YA evaluate relative position + velocity', 'figures/PS3/YA_pos_vel_SV2.png');
+    %plot_rel_pos_vel_single(t_2, t_orbit, SV3_YA_pos, SV3_YA_vel, 'SV3 YA evaluate relative position + velocity', 'figures/PS3/YA_pos_vel_SV3.png');
     plot_RT_RN_projections(SV2_YA_pos, SV3_YA_pos, 'YA evaluated relative orbits', 'figures/PS3/RTN_projections_YA.png');
     plot_RT_RN_projections(SV2_rel_pos_ecc, SV3_rel_pos_ecc, 'Non-linear EOMs relative orbits with eccentric chief', 'figures/PS3/RTN_projections_numerical_eccentric.png');
 
-    plot_rel_pos_vel_single(t_2, t_orbit, SV2_YA_mapping_pos, SV2_YA_mapping_vel, 'SV2 YA gemetric mapping relative position + velocity', 'figures/PS3/YA_mapping_pos_vel_SV2.png');
-    plot_rel_pos_vel_single(t_2, t_orbit, SV3_YA_mapping_pos, SV3_YA_mapping_vel, 'SV3 YA gemetric mapping relative position + velocity', 'figures/PS3/YA_mapping_pos_vel_SV3.png');
+    %plot_rel_pos_vel_single(t_2, t_orbit, SV2_YA_mapping_pos, SV2_YA_mapping_vel, 'SV2 YA gemetric mapping relative position + velocity', 'figures/PS3/YA_mapping_pos_vel_SV2.png');
+    %plot_rel_pos_vel_single(t_2, t_orbit, SV3_YA_mapping_pos, SV3_YA_mapping_vel, 'SV3 YA gemetric mapping relative position + velocity', 'figures/PS3/YA_mapping_pos_vel_SV3.png');
     %plot_RT_RN_projections(SV2_YA_mapping_pos, SV3_YA_mapping_pos, 'YA geometric mapping relative orbits', 'figures/PS3/RTN_projections_YA_mapping.png');
     plot_RT_RN_projections_triple(SV2_YA_pos,SV2_YA_mapping_pos,SV2_rel_pos_ecc,SV3_YA_pos,SV3_YA_mapping_pos,SV3_rel_pos_ecc, 'Comparison of YA methods', 'figures/PS3/RTN_projections_YA_comparison.png');
-    %plot_3D_rel_orbits_triple(SV2_YA_pos,SV2_YA_mapping_pos,SV2_rel_pos_ecc,SV3_YA_pos,SV3_YA_mapping_pos,SV3_rel_pos_ecc,'figures/PS3/3D_YA_comparison.png');
+    plot_3D_rel_orbits_triple(SV2_YA_pos,SV2_YA_mapping_pos,SV2_rel_pos_ecc,SV3_YA_pos,SV3_YA_mapping_pos,SV3_rel_pos_ecc,'figures/PS3/3D_YA_comparison.png');
     %plot_3D_rel_orbits_both(SV2_YA_pos,SV2_YA_mapping_pos,SV3_YA_pos,SV3_YA_mapping_pos,'figures/PS3/3D_YA_comparison.png');
 
 end
