@@ -110,14 +110,14 @@ state_rel_SV3_init = [r_SV1_ECI_init; v_SV1_ECI_init; r_SV3_RTN_init; v_SV3_RTN_
 %%%%%% RUN SIM OF RELATIVE MOTION %%%%%%%%
 [t_2, state_2] = rk4_eom_rel_RTN(tstart:tint:tend, state_rel_SV2_init);
 [t_3, state_3] = rk4_eom_rel_RTN(tstart:tint:tend, state_rel_SV3_init);
-SV2_rel_pos = [state_2(:, 7), state_2(:, 8), state_2(:, 9)];
+SV2_rel_pos_ecc = [state_2(:, 7), state_2(:, 8), state_2(:, 9)];
 SV2_rel_vel = [state_2(:, 10), state_2(:, 11), state_2(:, 12)];
-SV3_rel_pos = [state_3(:, 7), state_3(:, 8), state_3(:, 9)];
+SV3_rel_pos_ecc = [state_3(:, 7), state_3(:, 8), state_3(:, 9)];
 SV3_rel_vel = [state_3(:, 10), state_3(:, 11), state_3(:, 12)];
 
 % We see that the ratio of relative distance to orbit size is smaller than 1e-3
-rho_pos_ratio_SV2 = vecnorm(SV2_rel_pos, 2, 2)./r_RTN_no_j2(:, 1);
-rho_pos_ratio_SV3 = vecnorm(SV3_rel_pos, 2, 2)./r_RTN_no_j2(:, 1);
+rho_pos_ratio_SV2 = vecnorm(SV2_rel_pos_ecc, 2, 2)./r_RTN_no_j2(:, 1);
+rho_pos_ratio_SV3 = vecnorm(SV3_rel_pos_ecc, 2, 2)./r_RTN_no_j2(:, 1);
 
 %%%%% CALCULATE THE YA INTEGRATION CONSTANTS %%%%% 
 K_YA_SV2 = ya_integration_constants([r_SV2_RTN_init; v_SV2_RTN_init], a_SV1_init, e_SV1_init, nu_SV1_init);
@@ -126,10 +126,23 @@ K_YA_SV3 = ya_integration_constants([r_SV3_RTN_init; v_SV3_RTN_init], a_SV1_init
 
 %%%% PROPAGATE RELATIVE POS, VEL USING YA SOLUTION %%%%%%
 % evaluate_ya(t, a, e, K, M_init)
-SV2_YA_state = evaluate_ya(t_2, a_SV1_init, e_SV1_init, M_SV1_init, K_SV2);
-%SV3_HCW_state = evaluate_HCW(t_2, a_SV1_init, K_SV3);  
+SV2_YA_state = evaluate_ya(t_2, a_SV1_init, e_SV1_init, M_SV1_init, K_YA_SV2);
+SV3_YA_state = evaluate_ya(t_2, a_SV1_init, e_SV1_init, M_SV1_init, K_YA_SV3);  
 
-SV2_HCW_pos = SV2_YA_state(:, 1:3);
-%SV3_HCW_pos = SV3_HCW_state(:, 1:3);
-SV2_HCW_vel = SV2_YA_state(:, 4:6);
-%SV3_HCW_vel = SV3_HCW_state(:, 4:6);
+SV2_YA_pos = SV2_YA_state(:, 1:3);
+SV3_YA_pos = SV3_YA_state(:, 1:3);
+SV2_YA_vel = SV2_YA_state(:, 4:6);
+SV3_YA_vel = SV3_YA_state(:, 4:6);
+
+%%%% PROPAGATE RELATIVE POS, VEL USING YA GEOMETRIC LINEAR MAPPING %%%%%%
+SV2_YA_state_mapping = evaluate_YA_geometric_mapping(t_2,a_SV1_init,ex_SV1_init,...
+    ey_SV1_init,i_SV1_init,w_SV1_init,M_SV1_init,d_a_SV2_init,d_lambda_SV2_init,...
+    d_e_x_SV2_init,d_e_y_SV2_init,d_i_x_SV2_init,d_i_y_SV2_init);
+SV3_YA_state_mapping = evaluate_YA_geometric_mapping(t_2,a_SV1_init,ex_SV1_init,...
+    ey_SV1_init,i_SV1_init,w_SV1_init,M_SV1_init,d_a_SV3_init,d_lambda_SV3_init,...
+    d_e_x_SV3_init,d_e_y_SV3_init,d_i_x_SV3_init,d_i_y_SV3_init);
+
+SV2_YA_mapping_pos = SV2_YA_state(:, 1:3);
+SV3_YA_mapping_pos = SV3_YA_state(:, 1:3);
+SV2_YA_mapping_vel = SV2_YA_state(:, 4:6);
+SV3_YA_mapping_vel = SV3_YA_state(:, 4:6);
