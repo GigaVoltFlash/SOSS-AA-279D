@@ -85,7 +85,13 @@ end
 if run_PS3
     %%%%% PLOT OF RELATIVE ORBITS USING HCW %%%%%
     plot_rel_pos_vel_single(t_2, t_orbit, SV2_HCW_pos, SV2_HCW_vel, 'SV2 HCW evaluate relative position + velocity', 'figures/PS3/HCW_pos_vel_SV2.png');
-    plot_rel_pos_vel_single(t_2, t_orbit, SV3_HCW_pos, SV3_HCW_vel, 'SV3 HCW evaluate relative position + velocity', 'figures/PS3/HCW_pos_vel_SV2.png');
+    plot_rel_pos_vel_single(t_2, t_orbit, SV3_HCW_pos, SV3_HCW_vel, 'SV3 HCW evaluate relative position + velocity', 'figures/PS3/HCW_pos_vel_SV3.png');
     plot_RT_RN_projections(SV2_HCW_pos_test, SV3_HCW_pos_test, 'HCW evaluated relative orbits', 'figures/PS3/RTN_projections_HCW.png');
     plot_RT_RN_projections(SV2_rel_pos, SV3_rel_pos, 'Non-linear EOMs relative orbits', 'figures/PS3/RTN_projections_numerical.png');
+
+    %%%%% PLOT OF RELATIVE ORBITS USING YA %%%%%
+    plot_rel_pos_vel_single(t_2, t_orbit, SV2_YA_pos, SV2_YA_vel, 'SV2 YA evaluate relative position + velocity', 'figures/PS3/YA_pos_vel_SV2.png');
+    %plot_rel_pos_vel_single(t_2, t_orbit, SV3_YA_pos, SV3_YA_vel, 'SV3 YA evaluate relative position + velocity', 'figures/PS3/YA_pos_vel_SV3.png');
+    %plot_RT_RN_projections(SV2_HCW_pos_test, SV3_HCW_pos_test, 'HCW evaluated relative orbits', 'figures/PS3/RTN_projections_HCW.png');
+    %plot_RT_RN_projections(SV2_rel_pos, SV3_rel_pos, 'Non-linear EOMs relative orbits', 'figures/PS3/RTN_projections_numerical.png');
 end

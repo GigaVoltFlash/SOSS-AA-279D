@@ -122,3 +122,14 @@ rho_pos_ratio_SV3 = vecnorm(SV3_rel_pos, 2, 2)./r_RTN_no_j2(:, 1);
 %%%%% CALCULATE THE YA INTEGRATION CONSTANTS %%%%% 
 K_YA_SV2 = ya_integration_constants([r_SV2_RTN_init; v_SV2_RTN_init], a_SV1_init, e_SV1_init, nu_SV1_init);
 K_YA_SV3 = ya_integration_constants([r_SV3_RTN_init; v_SV3_RTN_init], a_SV1_init, e_SV1_init, nu_SV1_init);
+
+
+%%%% PROPAGATE RELATIVE POS, VEL USING YA SOLUTION %%%%%%
+% evaluate_ya(t, a, e, K, M_init)
+SV2_YA_state = evaluate_ya(t_2, a_SV1_init, e_SV1_init, M_SV1_init, K_SV2);
+%SV3_HCW_state = evaluate_HCW(t_2, a_SV1_init, K_SV3);  
+
+SV2_HCW_pos = SV2_YA_state(:, 1:3);
+%SV3_HCW_pos = SV3_HCW_state(:, 1:3);
+SV2_HCW_vel = SV2_YA_state(:, 4:6);
+%SV3_HCW_vel = SV3_HCW_state(:, 4:6);

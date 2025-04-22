@@ -1,4 +1,4 @@
-%% AA279D Simulations for PSET 3
+%% AA279D Simulations for PSET 1
 % Tycho Bogdanowitsch
 % Anshuk Chigullapalli 
 
