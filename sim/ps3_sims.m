@@ -58,9 +58,15 @@ SV3_rel_vel = [state_3(:, 10), state_3(:, 11), state_3(:, 12)];
 rho_pos_ratio_SV2 = vecnorm(SV2_rel_pos, 2, 2)./r_RTN_no_j2(:, 1);
 rho_pos_ratio_SV3 = vecnorm(SV3_rel_pos, 2, 2)./r_RTN_no_j2(:, 1);
 
+average_rho_pos_ratio_SV2 = mean(rho_pos_ratio_SV2);
+average_rho_pos_ratio_SV3 = mean(rho_pos_ratio_SV3);
+
 %%%%% CALCULATE THE HCW INTEGRATION CONSTANTS %%%%% 
 K_SV2 = hcw_integration_constants([r_SV2_RTN_init; v_SV2_RTN_init], a_SV1_init);
 K_SV3 = hcw_integration_constants([r_SV3_RTN_init; v_SV3_RTN_init], a_SV1_init);
+
+geometry_values_SV2 = integration_constants_to_geometry(K_SV2, a_SV1_init);
+geometry_values_SV3 = integration_constants_to_geometry(K_SV3, a_SV1_init);
 
 %%%%% EVALUATE HCW (TWO DIFFERENT METHODS %%%%%%%%%
 SV2_HCW_state = evaluate_HCW(t_2, a_SV1_init, K_SV2);
