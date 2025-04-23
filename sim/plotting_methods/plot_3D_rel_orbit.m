@@ -17,7 +17,7 @@ function [] = plot_3D_rel_orbit(SV2_rel_pos1, SV3_rel_pos1, title_string, fig_pa
     axis equal;
     %legend('YA Dif. Eq.', 'YA Mapping');
     hold off;
-    saveas(gcf, fig_path_SV2);
+    %saveas(gcf, fig_path_SV2);
 
     subplot(1, 2, 2);
     plot3(x2_1, y2_1, z2_1, 'b');

@@ -84,13 +84,20 @@ end
 
 if run_PS3
     %%%%% PLOT OF RELATIVE ORBITS USING HCW %%%%%
-    plot_rel_pos_vel_single(t_2, t_orbit, SV2_HCW_pos, SV2_HCW_vel, 'SV2 HCW evaluate relative position + velocity', 'figures/PS3/HCW_pos_vel_SV2.png');
-    plot_rel_pos_vel_single(t_2, t_orbit, SV3_HCW_pos, SV3_HCW_vel, 'SV3 HCW evaluate relative position + velocity', 'figures/PS3/HCW_pos_vel_SV3.png');
-    plot_RT_RN_projections(SV2_HCW_pos, SV3_HCW_pos, 'HCW evaluated relative orbits', 'figures/PS3/RTN_projections_HCW.png');
+    %plot_rel_pos_vel_single(t_2, t_orbit, SV2_HCW_pos, SV2_HCW_vel, 'SV2 HCW evaluate relative position + velocity', 'figures/PS3/HCW_pos_vel_SV2.png');
+    %plot_rel_pos_vel_single(t_2, t_orbit, SV3_HCW_pos, SV3_HCW_vel, 'SV3 HCW evaluate relative position + velocity', 'figures/PS3/HCW_pos_vel_SV3.png');
+    %plot_RT_RN_projections(SV2_HCW_pos_test, SV3_HCW_pos_test, 'HCW evaluated relative orbits', 'figures/PS3/RTN_projections_HCW.png');
+    %plot_RT_RN_projections(SV2_rel_pos, SV3_rel_pos, 'Non-linear EOMs relative orbits', 'figures/PS3/RTN_projections_numerical.png');
+
+    %plot_RT_RN_projections_both(SV2_HCW_pos,SV2_rel_pos,SV3_HCW_pos,SV3_rel_pos, 'Testing HCW comparison', 'figures/PS3/RTN_projections_HCW_comparison.png');
+    %plot_3D_rel_orbit(SV2_HCW_pos,SV3_HCW_pos, 'figures/PS3/3D_HCW_comparison.png');
+    %plot_rel_pos_vel_single(t_2, t_orbit, SV2_HCW_pos, SV2_HCW_vel, 'SV2 HCW evaluate relative position + velocity', 'figures/PS3/HCW_pos_vel_SV2.png');
+    %plot_rel_pos_vel_single(t_2, t_orbit, SV3_HCW_pos, SV3_HCW_vel, 'SV3 HCW evaluate relative position + velocity', 'figures/PS3/HCW_pos_vel_SV3.png');
+    %plot_RT_RN_projections(SV2_HCW_pos, SV3_HCW_pos, 'HCW evaluated relative orbits', 'figures/PS3/RTN_projections_HCW.png');
     % plot_RT_RN_projections(SV2_rel_pos, SV3_rel_pos, 'Non-linear EOMs relative orbits', 'figures/PS3/RTN_projections_numerical.png');
 
-    plot_RT_RN_projections_both(SV2_HCW_pos,SV2_rel_pos,SV3_HCW_pos,SV3_rel_pos, 'Comparing HCW with non-linear propagation', 'figures/PS3/RTN_projections_HCW_comparison.png');
-    plot_3D_rel_orbit(SV2_HCW_pos,SV3_HCW_pos, 'figures/PS3/3D_HCW_orbit_SV2.png', 'figures/PS3/3D_HCW_orbit_SV3.png');
+    %plot_RT_RN_projections_both(SV2_HCW_pos,SV2_rel_pos,SV3_HCW_pos,SV3_rel_pos, 'Comparing HCW with non-linear propagation', 'figures/PS3/RTN_projections_HCW_comparison.png');
+    %plot_3D_rel_orbit(SV2_HCW_pos,SV3_HCW_pos, 'figures/PS3/3D_HCW_orbit_SV2.png', 'figures/PS3/3D_HCW_orbit_SV3.png');
 
     %%%%% PLOT OF RELATIVE ORBITS USING YA %%%%%
     fprintf('Average rho-to-r_o ratio for SV2: %.3e\n',rho_pos_ratio_SV2_avg);
