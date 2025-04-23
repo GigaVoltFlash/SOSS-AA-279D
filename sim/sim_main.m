@@ -112,22 +112,22 @@ if run_PS3
     disp(ROE_SV3_unscaled); 
     
     % Non-linear (ground truth)
-    %plot_rel_pos_vel_single(t_2, t_orbit, SV2_rel_pos_ecc, SV2_rel_vel_ecc, 'Non-linear method: SV2 relative position + velocity with eccentric chief', 'figures/PS3/ecc_nonlinear_pos_vel_SV2.png');
-    %plot_rel_pos_vel_single(t_2, t_orbit, SV3_rel_pos_ecc, SV3_rel_vel_ecc, 'Non-linear method: SV3 relative position + velocity with eccentric chief', 'figures/PS3/ecc_nonlinear_pos_vel_SV3.png');
+    plot_rel_pos_vel_single(t_2, t_orbit, SV2_rel_pos_ecc, SV2_rel_vel_ecc, 'Non-linear method: SV2 relative position + velocity with eccentric chief', 'figures/PS3/ecc_nonlinear_pos_vel_SV2.png');
+    plot_rel_pos_vel_single(t_2, t_orbit, SV3_rel_pos_ecc, SV3_rel_vel_ecc, 'Non-linear method: SV3 relative position + velocity with eccentric chief', 'figures/PS3/ecc_nonlinear_pos_vel_SV3.png');
     plot_RT_RN_projections(SV2_rel_pos_ecc, SV3_rel_pos_ecc, 'Non-linear method: relative orbits with eccentric chief', 'figures/PS3/RTN_projections_numerical_eccentric.png');
-    plot_3D_rel_orbit(SV2_rel_vel_ecc,SV2_rel_vel_ecc,'Non-linear method: 3D orbits','figures/PS3/ecc_nonlinear_3D_orbits')
+    plot_3D_rel_orbit(SV2_rel_vel_ecc,SV2_rel_vel_ecc,'Non-linear method: 3D orbits','figures/PS3/ecc_nonlinear_3D_orbits.png')
 
     % YA Solution
-    %plot_rel_pos_vel_single(t_2, t_orbit, SV2_YA_pos, SV2_YA_vel, 'YA solution: SV2 relative position + velocity', 'figures/PS3/YA_pos_vel_SV2.png');
-    %plot_rel_pos_vel_single(t_2, t_orbit, SV3_YA_pos, SV3_YA_vel, 'YA solution: SV3 relative position + velocity', 'figures/PS3/YA_pos_vel_SV3.png');
+    plot_rel_pos_vel_single(t_2, t_orbit, SV2_YA_pos, SV2_YA_vel, 'YA solution: SV2 relative position + velocity', 'figures/PS3/YA_pos_vel_SV2.png');
+    plot_rel_pos_vel_single(t_2, t_orbit, SV3_YA_pos, SV3_YA_vel, 'YA solution: SV3 relative position + velocity', 'figures/PS3/YA_pos_vel_SV3.png');
     plot_RT_RN_projections(SV2_YA_pos, SV3_YA_pos, 'YA solution: relative orbits', 'figures/PS3/RTN_projections_YA.png');
-    plot_3D_rel_orbit(SV2_YA_pos,SV2_YA_vel,'YA solution: 3D orbits','figures/PS3/YA_sol_3D_orbits')
+    plot_3D_rel_orbit(SV2_YA_pos,SV2_YA_vel,'YA solution: 3D orbits','figures/PS3/YA_sol_3D_orbits.png')
 
     % Geometric mapping
-    %plot_rel_pos_vel_single(t_2, t_orbit, SV2_YA_mapping_pos, SV2_YA_mapping_vel, 'Geometric mapping: SV2 relative position + velocity', 'figures/PS3/YA_mapping_pos_vel_SV2.png');
-    %plot_rel_pos_vel_single(t_2, t_orbit, SV3_YA_mapping_pos, SV3_YA_mapping_vel, 'Geometric mapping: SV3 relative position + velocity', 'figures/PS3/YA_mapping_pos_vel_SV3.png');
+    plot_rel_pos_vel_single(t_2, t_orbit, SV2_YA_mapping_pos, SV2_YA_mapping_vel, 'Geometric mapping: SV2 relative position + velocity', 'figures/PS3/YA_mapping_pos_vel_SV2.png');
+    plot_rel_pos_vel_single(t_2, t_orbit, SV3_YA_mapping_pos, SV3_YA_mapping_vel, 'Geometric mapping: SV3 relative position + velocity', 'figures/PS3/YA_mapping_pos_vel_SV3.png');
     plot_RT_RN_projections(SV2_YA_mapping_pos, SV3_YA_mapping_pos, 'Geometric mapping: relative orbits', 'figures/PS3/RTN_projections_YA_mapping.png');
-    plot_3D_rel_orbit(SV2_YA_mapping_pos,SV2_YA_mapping_vel,'Geometric mapping: 3D orbits','figures/PS3/YA_mapping_3D_orbits')
+    plot_3D_rel_orbit(SV2_YA_mapping_pos,SV2_YA_mapping_vel,'Geometric mapping: 3D orbits','figures/PS3/YA_mapping_3D_orbits.png')
 
     % Combined plots
     plot_RT_RN_projections_triple(SV2_YA_pos,SV2_YA_mapping_pos,SV2_rel_pos_ecc,SV3_YA_pos,SV3_YA_mapping_pos,SV3_rel_pos_ecc, 'Comparison of YA methods', 'figures/PS3/RTN_projections_YA_comparison.png');
