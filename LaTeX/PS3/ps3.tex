@@ -29,9 +29,13 @@ The main differences in these quasi-nonsingular relative orbital elements (and t
     \item $\delta e_y$ and $\delta i_y$ are set to convenient values close to the original relative orbital elements in Table \ref{tab:relative_oe}.
 \end{itemize}
 
-Based on these initial conditions, we see that the ratio of the maximum separation between spacecraft is small relative to the distance of the chief from the primary attractor. This is verified by propagating the nonlinear equations of motion throughout the time scale, and the
+Based on these initial conditions, we see that the ratio of the maximum separation between spacecraft is small relative to the distance of the chief from the primary attractor. This is verified by propagating the nonlinear equations of motion throughout the time scale to get the position of the chief and the relative positions of the deputies, and finding the average ratio over time (since the orbit is circular, this worst-case ratio is very close to the average). We see that the average ratios are
 
-
+\begin{align}
+    \frac{\rho_{SV2}}{r_{SV1}} = 9.49\cdot10^{-5} \\
+    \frac{\rho_{SV3}}{r_{SV1}} = 8.69\cdot10^{-5}
+\end{align}
+Both of these are well below the $10^{-3}$ requirement.
 
 \subsubsection{Transforming the Initial Conditions} \label{sec:hcw_initial_conditions}
 We can convert the initial conditions set in Table \ref{tab:relative_oe_hcw} to different representations. The initial conditions for the chief are not recalculated, as these have not been modified from previous sections.
@@ -39,8 +43,6 @@ We can convert the initial conditions set in Table \ref{tab:relative_oe_hcw} to 
 \textbf{ECI and Absolute Orbital Elements} \\
 Using the transformations highlighted in Equation \ref{eq:quasi_nonsign_roe}, 
 we convert the quasi-nonsingular relative orbital elements into absolute orbital elements. The results for SV2 and SV3 are given in Table \ref{tab:abs_oe_kepler_SV2_HCW} and Table \ref{tab:abs_oe_kepler_SV3_HCW}. The absolute orbital elements of the chief remain the same as in Table \ref{tab:abs_oe_kepler}.
-
-TODO: Need to update these tables.
 
 \begin{table}[h]
 \centering
@@ -220,7 +222,7 @@ The results in these plots are analyzed in the Section \ref{sec:analysis_of_hcw}
 
 \begin{figure}[htpb]
     \centering
-    \includegraphics[width=0.7\linewidth]{sim/figures/PS3/RTN_projections_HCW_comparison.png}
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS3/RTN_projections_HCW_comparison.png}
     \caption{RTN Projections of SV2 and SV3 comparison between HCW and FERM.}
     \label{fig:hcw_comparisons_projections}
 \end{figure}
@@ -271,7 +273,7 @@ The integration constants provided in Table \ref{tab:integration_constants_HCW} 
 
 If we compute these quantities for SV2 and SV3, we get the results in Table \ref{tab:HCW_geometry_values}. Using these values in the Figure \ref{fig:hcw_gemeotry} guide, we see that our integration constants correspond correctly to the geometry we see in Figure \ref{fig:hcw_projections}.
 
-\begin{table}[ht]
+\begin{table}[htpb]
     \centering
     \renewcommand{\arraystretch}{1.2}
     \begin{tabular}{c c c}
