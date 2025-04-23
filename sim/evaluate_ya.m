@@ -21,7 +21,7 @@ function states = evaluate_ya(t, a, e, M_init, K)
         k = 1 + e*cos(f);
         k_prime = -e*sin(f);
         
-        A = [a*eye(3), zeros(3); zeros(3), a*n*eye(3)];
+        A = [a*(eta^2)*eye(3), zeros(3); zeros(3), a*(n/eta)*eye(3)];
         B = compute_B(e, tau, f, k, k_prime);
         total = A * B;
         states(i, :) = (total * K)';
