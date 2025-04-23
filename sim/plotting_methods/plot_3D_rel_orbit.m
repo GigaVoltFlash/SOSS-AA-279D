@@ -1,9 +1,9 @@
-function [] = plot_3D_rel_orbit(SV2_rel_pos1, SV3_rel_pos1, fig_path)
-    x1_1 = SV2_rel_pos1(:,1); y1_1 = SV2_rel_pos1(:,2); z1_1 = SV2_rel_pos1(:,3);
-    x2_1 = SV3_rel_pos1(:,1); y2_1 = SV3_rel_pos1(:,2); z2_1 = SV3_rel_pos1(:,3);
+function [] = plot_3D_rel_orbit(SV2_rel_pos1, SV3_rel_pos1, fig_path_SV2, fig_path_SV3)
+    x1 = SV2_rel_pos1(:,1); y1 = SV2_rel_pos1(:,2); z1 = SV2_rel_pos1(:,3);
+    x2 = SV3_rel_pos1(:,1); y2 = SV3_rel_pos1(:,2); z2 = SV3_rel_pos1(:,3);
     
     figure();
-    plot3(x1_1, y1_1, z1_1, 'b');
+    plot3(x1, y1, z1, 'b');
     hold on;
 
 
@@ -15,9 +15,10 @@ function [] = plot_3D_rel_orbit(SV2_rel_pos1, SV3_rel_pos1, fig_path)
     axis equal;
     %legend('YA Dif. Eq.', 'YA Mapping');
     hold off;
+    saveas(gcf, fig_path_SV2);
 
     figure();
-    plot3(x2_1, y2_1, z2_1, 'b');
+    plot3(x2, y2, z2, 'b');
     hold on;
 
 
@@ -30,5 +31,5 @@ function [] = plot_3D_rel_orbit(SV2_rel_pos1, SV3_rel_pos1, fig_path)
     %legend('YA Dif. Eq.', 'YA Mapping');
     hold off;
 
-    saveas(gcf, fig_path);
+    saveas(gcf, fig_path_SV3);
 end
