@@ -175,7 +175,7 @@ x_0 \\ y_0 \\ z_0 \\ \dot{x}_0 \\ \dot{y}_0 \\ \dot{z}_0
 \end{bmatrix}
 \end{align}
 
-For our chosen initial conditions, the integration constants computer are provided in Table \ref{tab:integration_constants_HCW}.
+For our chosen initial conditions, the integration constants computed are provided in Table \ref{tab:integration_constants_HCW}.
 
 \begin{table}[ht]
     \centering
@@ -198,12 +198,155 @@ For our chosen initial conditions, the integration constants computer are provid
 
 \subsubsection{Relative State Propagation Using HCW Solution}
 
-With the integration constants known, we can find the state (position and velocity) of SV2 and SV3 over all the 15 orbits we want to simulate, using the relation in Equation \ref{eq:HCW_solution}. Since this assumes circular orbits, we can use time as our independent variable rather than true anomaly.
+With the integration constants known, we can find the state (position and velocity) of SV2 and SV3 over all the 15 orbits we want to simulate, using the relation in Equation \ref{eq:HCW_solution}. Since this assumes circular orbits, we can use time as our independent variable rather than true anomaly. The time series used is the same Equation \ref{eq:timestep}, except with 15 orbits instead of 25. This is done for both SV2 and SV3.
 
+Figures \ref{fig:hcw_sv2_pos_vel} and \ref{fig:hcw_sv2_pos_vel} showcase the position and velocity of SV2 and SV3 over time with HCW. Figure \ref{fig:hcw_projections} projects the RTN projection of SV2 and SV3 on the R-N, R-T, and T-N frames to give a better idea of the relative motion of the deputy satellites. Figure \ref{fig:hcw_comparisons_projections} compares the HCW result with the Fundamental Equations of Relative Motion (FERM) result, computed with the nonlinear equations described in Section \ref{sec:nonlinear_rel_eom}. Finally, for additional visualization, Figure \ref{fig:hcw_3d_side_by_side} showcases the trajectory of SV2 and SV3 in the chief's RTN frame over time in 3D.
 
+The results in these plots are analyzed in the Section \ref{sec:analysis_of_hcw}.
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.7\linewidth]{sim/figures/PS3/HCW_pos_vel_SV2.png}
+    \caption{Relative position and velocity of SV2 in the chief's RTN frame, evaluated using HCW equations.}
+    \label{fig:hcw_sv2_pos_vel}
+\end{figure}
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.7\linewidth]{sim/figures/PS3/HCW_pos_vel_SV3.png}
+    \caption{Relative position and velocity of SV3 in the chief's RTN frame, evaluated using HCW equations.}
+    \label{fig:hcw_sv2_pos_vel}
+\end{figure}
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.7\linewidth]{sim/figures/PS3/RTN_projections_HCW.png}
+    \caption{RTN Projections of SV2 and SV3 trajectories calculating using HCW}
+    \label{fig:hcw_projections}
+\end{figure}
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.7\linewidth]{sim/figures/PS3/RTN_projections_HCW_comparison.png}
+    \caption{RTN Projections of SV2 and SV3 comparison between HCW and FERM.}
+    \label{fig:hcw_comparisons_projections}
+\end{figure}
+
+\begin{figure}[htpb]
+    \centering
+    \begin{subfigure}[t]{0.45\linewidth}
+        \centering
+        \includegraphics[width=1.2\linewidth]{sim/figures/PS3/3D_HCW_orbit_SV2.png}
+        \caption{SV2-HCW Orbit}
+        \label{fig:hcw_sv2}
+    \end{subfigure}%
+    \begin{subfigure}[t]{0.45\linewidth}
+        \centering
+        \includegraphics[width=1.2\linewidth]{sim/figures/PS3/3D_HCW_orbit_SV3.png}
+        \caption{SV3-HCW Orbit}
+        \label{fig:hcw_sv3}
+    \end{subfigure}
+    \caption{3D HCW-relative orbits of SV2 and SV3.}
+    \label{fig:hcw_3d_side_by_side}
+\end{figure}
 
 \subsubsection{Analysis of HCW Solution Behavior}
 
-TODO
+\newpage
 
 \subsection{We are Close in Eccentric Orbits}
+\subsubsection{Initial Conditions for Tschauner-Hempel Equations}
+Now, we turn our analysis to eccentric orbits, where relative motion is described by the Tschauner-Hempel (TH) equations. The TH equations can be solved using the Yamanaka-Ankersen (YA) model. We will use the same initial conditions for the absolute and relative states as with HCW, except now the chief's orbit has an eccentricity of 0.15. The ROE for SV2 and SV3 remain the same as outlined in Table \ref{{tab:relative_oe_hcw}}, as these initial conditions also lie whtin the range of validity of the TH equations. Specifically, the chief and deputy have equal semi-major axes and the the maximum separation between spacecraft is small relative to the minimum distance from the primary attractor center. 
+
+\subsection{YA Integration Constants}
+From these chosen initial conditions, the 6 integration constants of the YA solution can be computed through the following process.
+
+Willis outlines the transformation matrices ($A,B$) from YA integration constants to RTN position and velocity of the deputy \cite{willis2023analytical}. These matrices can be inverted to instead go from initial RTN position and velocity to YA integration constants. 
+
+YA defines the following expressions:
+\begin{align*}
+n &= \sqrt{\frac{\mu_{\text{earth}}}{a^3}} \\
+\eta &= \sqrt{1 - e^2} \\
+\tau &= \frac{nt}{\eta^3}\\
+k &= 1 + e \cos(f) \\
+k' &= -e \sin(f)
+\end{align*}
+
+And the following transformation components:
+\begin{align*}
+\psi_{x1} &= \frac{1}{k} + \frac{3}{2}k' \tau, &
+\psi_{x2} &= \sin(f), &
+\psi_{x3} &= \cos(f) \\
+\psi_{y1} &= -\frac{3}{2}k\tau, &
+\psi_{y2} &= \left(1 + \frac{1}{k}\right)\cos(f), &
+\psi_{y3} &= -\left(1 + \frac{1}{k}\right)\sin(f), &
+\psi_{y4} &= \frac{1}{k} \\
+\psi_{z5} &= \frac{1}{k}\sin(f), &
+\psi_{z6} &= \frac{1}{k}\cos(f)
+\end{align*}
+
+And their respective derivatives:
+\begin{align*}
+\psi_{x1}' &= \frac{k'}{2} - \frac{3}{2}k^2(k - 1)\tau, &
+\psi_{x2}' &= k^2 \cos(f), &
+\psi_{x3}' &= -k^2 \sin(f) \\
+\psi_{y1}' &= -\frac{3}{2}\left(k + k^2k'\tau\right), &
+\psi_{y2}' &= -(k^2 + 1)\sin(f), &
+\psi_{y3}' &= -e - (k^2 + 1)\cos(f), &
+\psi_{y4}' &= -k' \\
+\psi_{z5}' &= e + \cos(f), &
+\psi_{z6}' &= -\sin(f)
+\end{align*}
+
+And finally the full transformation matrices:
+\begin{align*}
+A &= 
+\begin{bmatrix}
+a\eta^2 I_{3 \times 3} & 0 \\
+0 & \frac{a n}{\eta} I_{3 \times 3}
+\end{bmatrix}
+\end{align*}
+
+\begin{align*}
+B &=
+\begin{bmatrix}
+\psi_{x1} & \psi_{x2} & \psi_{x3} & 0 & 0 & 0 \\
+\psi_{y1} & \psi_{y2} & \psi_{y3} & \psi_{y4} & 0 & 0 \\
+0 & 0 & 0 & 0 & \psi_{z5} & \psi_{z6} \\
+\psi_{x1}' & \psi_{x2}' & \psi_{x3}' & 0 & 0 & 0 \\
+\psi_{y1}' & \psi_{y2}' & \psi_{y3}' & \psi_{y4}' & 0 & 0 \\
+0 & 0 & 0 & 0 & \psi_{z5}' & \psi_{z6}'
+\end{bmatrix}
+\end{align*}
+
+We then invert the transformation matrices to solve for the initial conditions:
+\[
+K = (A B)^{-1} \cdot \begin{bmatrix}
+x_0 \\ y_0 \\ z_0 \\ \dot{x}_0 \\ \dot{y}_0 \\ \dot{z}_0
+\end{bmatrix}
+\]
+
+Note that in solving this equation, $\tau$ will be zero because our initial time is 0. For our chosen initial conditions, the integration constants computed are provided in Table \ref{tab:integration_constants_HCW}.
+
+\begin{table}[ht]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{c c c}
+        \toprule
+        \textbf{Constant} & \textbf{SV2} & \textbf{SV3} \\
+        \midrule
+        $K_1$ & $-1.5886\cdot10^{-8}$ & $-1.0799\cdot10^{-8}$ \\
+        $K_2$ & $3.7051\cdot10^{-6}$ & $2.9694\cdot10^{-6}$ \\
+        $K_3$ & $-1.4750\cdot10^{-5}$& $-2.9477\cdot10^{-5}$\\
+        $K_4$ & $8.4251\cdot10^{-7}$ & $6.7435\cdot10^{-7}$ \\
+        $K_5$ & $1.4401\cdot10^{-4}$ & $1.1521\cdot10^{-4}$ \\
+        $K_6$ & $3.8971\cdot10^{-8}$ & $3.0781\cdot10^{-8}$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Integration Constants for SV2 and SV3 Used in HCW Analytical Solution}
+    \label{tab:integration_constants_HCW}
+\end{table}
+
+\subsection{Relative State Propagation Using YA Solution}
+We use the same propagation strategy as with the HCW solution, except now using the YA integration constants and STM. 
+
