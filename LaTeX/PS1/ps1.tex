@@ -45,7 +45,7 @@ a & e_x & e_y & i & \Omega & u
 &= 
 \begin{bmatrix}
 a & e \cos \omega & e \sin \omega & i & \Omega & \omega + M
-\end{bmatrix}^\top \tag{3}
+\end{bmatrix}^\top
 \end{align}
 
 where $a, e, i, \Omega, \omega, M$ are the Keplerian orbit elements. These are converted to standard Keplerian orbital elements in Section \ref{sec:initial_oe}.
@@ -62,6 +62,8 @@ SV2 & $\delta\boldsymbol{\alpha} = [21, -124350, 110, 202, 79, 1005]~\text{m}$ \
 SV3 & $\delta\boldsymbol{\alpha} = [-1, -79328, 42, 452, 36, 827]~\text{m}$ \\
 \bottomrule
 \end{tabular}
+\caption{Quasi-Nonsingular Relative Orbit Parameters}
+\label{tab:relative_oe}
 \end{table}
 
 We will take the Starling SV4 to be our Target SV1, the Starling SV2 to be our Watcher SV2, and Starling SV3 to be our Docker SV3. 
@@ -69,7 +71,7 @@ We will take the Starling SV4 to be our Target SV1, the Starling SV2 to be our W
 The quasi-nonsingular ROE adopted by D'Amico \cite{damicothesis} are a function of the orbit elements of the target $t$ and observer $o$. They are given by:
 \begin{align}
 \delta \boldsymbol{\alpha} &= 
-\begin{bmatrix}
+\begin{bmatrix} \label{eq:quasi_nonsign_roe}
 \delta a & \delta \lambda & \delta e_x & \delta e_y & \delta i_x & \delta i_y
 \end{bmatrix}^\top \notag \\
 &= 
@@ -91,7 +93,7 @@ e_{y,t} - e_{y,o} \\
 i_t - i_o \\
 (\Omega_t - \Omega_o) \sin i_o
 \end{bmatrix}
-\right) \tag{4}
+\right)
 \end{align}
 
 where $[\delta e_x, \delta e_y]$ are components of the relative eccentricity vector with phase $\phi$ and $[\delta i_x, \delta i_y]$ are components of the relative inclination vector with phase $\theta$.    
@@ -138,26 +140,22 @@ The initial conditions are taken from the Starling mission literature \cite{krug
 For future use, it is also useful to note that the corresponding initial mean anomaly $M_0= -139.33^\circ$.
 
 The quasi-nonsingular absolute orbit parameters were converted to the Keplerian orbital elements by using the following procedure. First, compute the argument of perigee, eccentricity, and the mean anomaly:
-\[
+\begin{align}
 \omega = \tan^{-1} \left( \frac{e_y}{e_x} \right)
-\]
-\[
 e = \frac{e_x}{\cos \omega}
-\]
-\[
 M = u - \omega
-\]
+\end{align}
 
 Then, convert mean anomaly to radians and solve Kepler's equation using Newton-Raphson to obtain eccentric anomaly \( E \).
 
 Finally, compute the true anomaly:
-\[
+\begin{align}
 \nu = \tan^{-1} \left( \frac{\sqrt{1 + e} \cdot \tan(E/2)}{\sqrt{1 - e}} \right) \cdot 2
-\]
+\end{align}
 
 \subsubsection{Initial Position and Velocity in ECI}\label{sec:initial_ECI}
  Treating the initial Keplerian orbital elements for the target SV1 given in Table \ref{tab:abs_oe_kepler} as osculating quantities, they can be converted into Earth-Centered Inertial (ECI) position (in km) and velocity (in km/s), and are 
- \begin{align}
+ \begin{align} \label{eq:SV1_initial_ECI}
      \boldsymbol{r}_{0, ECI, SV1} &= \begin{bmatrix}
          -3663.3 \\
          -2986.4 \\
@@ -172,55 +170,55 @@ Finally, compute the true anomaly:
 
 The conversion from Keplerian orbital elements to ECI position and velocity is as follows. First, we calculate norm of the position $r$:
 
-\[
+\begin{align}
 r = \frac{a(1 - e^2)}{1 + e \cos \nu}
-\]
+\end{align}
 
 And then transform it into the PQW (perifocal) frame:
-\[
+\begin{align}
 \mathbf{r}_{PQW} = \begin{bmatrix}
 r \cos \nu \\
 r \sin \nu \\
 0
 \end{bmatrix}
-\]
+\end{align}
 
 Next we compute mean motion:
-\[
+\begin{align}
 n = \sqrt{\frac{\mu}{a^3}}
-\]
+\end{align}
 
 And then we compute the eccentric anomaly:
-\[
+\begin{align}
 E = 2 \cdot \tan^{-1} \left( \sqrt{\frac{1 - e}{1 + e}} \cdot \tan\left(\frac{\nu}{2}\right) \right)
-\]
+\end{align}
 
 The rotation matrix from PQW to ECI (IJK) frame is given by:
-\[
+\begin{align}
 R_{\text{PQW} \to \text{ECI}} = 
 \begin{bmatrix}
 \cos\Omega\cos\omega - \sin\Omega\cos i\sin\omega & -\cos\Omega\sin\omega - \sin\Omega\cos i\cos\omega & \sin\Omega\sin i \\
 \sin\Omega\cos\omega + \cos\Omega\cos i\sin\omega & -\sin\Omega\sin\omega + \cos\Omega\cos i\cos\omega & -\cos\Omega\sin i \\
 \sin i\sin\omega & \sin i\cos\omega & \cos i
 \end{bmatrix}
-\]
+\end{align}
 
 And the velocity in PQW frame is:
-\[
+\begin{align}
 \mathbf{v}_{PQW} = \frac{a n}{1 - e \cos E}
 \begin{bmatrix}
 -\sin E \\
 \sqrt{1 - e^2} \cos E \\
 0
 \end{bmatrix}
-\]
+\end{align}
 
 Finally, we can transform to the ECI frame:
-\[
+\begin{align}
 \mathbf{r}_{ECI} = R_{\text{PQW} \to \text{ECI}} \cdot \mathbf{r}_{PQW}
 \qquad
 \mathbf{v}_{ECI} = R_{\text{PQW} \to \text{ECI}} \cdot \mathbf{v}_{PQW}
-\]
+\end{align}
 
 \subsubsection{Numerical Simulation of State with Perturbations} \label{sec:fode_simulation}
 The state of the satellite is represented by 
