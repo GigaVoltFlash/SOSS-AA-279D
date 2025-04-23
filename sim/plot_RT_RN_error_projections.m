@@ -17,13 +17,14 @@ function plot_RT_RN_error_projections(SV2_rel_pos1, SV2_rel_pos2, SV2_rel_pos_tr
     plot(y2_2, x2_2, 'y--', 'LineWidth', 1.5);
     plot(0, 0, 'ko', 'MarkerFaceColor', 'k'); % Origin
     grid on;
+    axis equal;
     ylabel('Radial Error [km]'); xlabel('Tangential Error [km]');
     ylim([-2.0, 2.0]);
     title('R-T Plane Projection');
     legend('SV2 / Watcher with YA Dif. Eq.', 'SV2 / Watcher with YA Mapping', ...
         'SV3 / Watcher with YA Dif. Eq.', 'SV3 / Watcher with YA Mapping',...
         'SV1 / Chief');
-    
+
     % === X-Z Plane ===
     subplot(1, 3, 2);
     plot(z1_1, x1_1, 'c', 'LineWidth', 1.5); hold on;
@@ -32,6 +33,7 @@ function plot_RT_RN_error_projections(SV2_rel_pos1, SV2_rel_pos2, SV2_rel_pos_tr
     plot(z2_2, x2_2, 'y--', 'LineWidth', 1.5);
     plot(0, 0, 'ko', 'MarkerFaceColor', 'k'); % Origin
     grid on;
+    axis equal;
     ylabel('Radial Error [km]'); xlabel('Normal Error [km]');
     ylim([-2.0, 2.0]);
     title('R-N Plane Projection');
@@ -47,6 +49,7 @@ function plot_RT_RN_error_projections(SV2_rel_pos1, SV2_rel_pos2, SV2_rel_pos_tr
     plot(y2_2, z2_2, 'y--', 'LineWidth', 1.5);
     plot(0, 0, 'ko', 'MarkerFaceColor', 'k'); % Origin
     grid on;
+    axis equal;
     ylabel('Normal Error [km]'); xlabel('Tangential Error [km]');
     title('N-T Plane Projection');
     legend('SV2 / Watcher with YA Dif. Eq.', 'SV2 / Watcher with YA Mapping', ...

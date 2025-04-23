@@ -19,6 +19,7 @@ function plot_RT_RN_projections_triple(SV2_rel_pos1, SV2_rel_pos2, SV2_rel_pos3,
     plot(y2_3, x2_3, 'r--', 'LineWidth', 1.5);
     plot(0, 0, 'ko', 'MarkerFaceColor', 'k'); % Origin
     grid on;
+    axis equal;
     ylabel('Radial [km]'); xlabel('Tangential [km]');
     %ylim([-2.0, 2.0]);
     title('R-T Plane Projection');
@@ -36,6 +37,7 @@ function plot_RT_RN_projections_triple(SV2_rel_pos1, SV2_rel_pos2, SV2_rel_pos3,
     plot(z2_3, x2_3, 'r--', 'LineWidth', 1.5);
     plot(0, 0, 'ko', 'MarkerFaceColor', 'k'); % Origin
     grid on;
+    axis equal;
     ylabel('Radial [km]'); xlabel('Normal [km]');
     %ylim([-2.0, 2.0]);
     title('R-N Plane Projection');
@@ -52,6 +54,7 @@ function plot_RT_RN_projections_triple(SV2_rel_pos1, SV2_rel_pos2, SV2_rel_pos3,
     plot(y2_3, z2_3, 'r--', 'LineWidth', 1.5);
     plot(0, 0, 'ko', 'MarkerFaceColor', 'k'); % Origin
     grid on;
+    axis equal;
     ylabel('Normal [km]'); xlabel('Tangential [km]');
     title('N-T Plane Projection');
     legend('SV2 / Watcher with YA Dif. Eq.', 'SV2 / Watcher with YA Mapping', 'SV2 / Watcher with FERM',...
