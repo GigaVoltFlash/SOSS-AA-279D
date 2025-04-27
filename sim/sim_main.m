@@ -15,7 +15,8 @@ constants;
 % Flags for which plots to create
 run_PS1 = false;
 run_PS2 = false;
-run_PS3 = true;
+run_PS3 = false;
+run_PS4 = true;
 
 % Load SV1 information
 load_SV1;
@@ -36,6 +37,10 @@ end
 if run_PS3
     ps3_sims;
 end
+if run_PS4
+    ps4_sims;
+end
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLOTTING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
@@ -149,5 +154,11 @@ if run_PS3
     %plot_RT_RN_projections(SV2_YA_mapping_pos, SV3_YA_mapping_pos, 'YA geometric mapping relative orbits', 'figures/PS3/RTN_projections_YA_mapping.png');
    
     %plot_3D_rel_orbits_both(SV2_YA_pos,SV2_YA_mapping_pos,SV3_YA_pos,SV3_YA_mapping_pos,'figures/PS3/3D_YA_comparison.png');
+
+end
+
+if run_PS4
+
+
 
 end

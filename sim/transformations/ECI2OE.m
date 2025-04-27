@@ -1,5 +1,5 @@
 % Converting ECI to Orbital Elements
-function [a,e,i,RAAN,omega,nu] = ECI2OE(r_IJK,v_IJK)
+function [a,e,i,RAAN,omega,nu,M] = ECI2OE(r_IJK,v_IJK)
     global mu_earth
     r_norm = norm(r_IJK);
     r_i = r_IJK(1);
@@ -27,6 +27,7 @@ function [a,e,i,RAAN,omega,nu] = ECI2OE(r_IJK,v_IJK)
     RAAN = rad2deg(RAAN);
     omega = rad2deg(omega);
     nu = rad2deg(nu);
+    M = rad2deg(M);
     if nu<0
         nu = 360 + nu;
     end
