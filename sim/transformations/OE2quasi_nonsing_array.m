@@ -1,4 +1,4 @@
-function [a, e_x, e_y, i, RAAN, u] = OE2quasi_nonsing_array(a,e,i,RAAN,w,M)
+function [a_result, e_x, e_y, i_result, RAAN_result, u] = OE2quasi_nonsing_array(a,e,i,RAAN,w,M)
     % Takes in deg, outputs in deg
 
     N = length(a);
@@ -10,10 +10,7 @@ function [a, e_x, e_y, i, RAAN, u] = OE2quasi_nonsing_array(a,e,i,RAAN,w,M)
     u = zeros(1,N);
 
     for k = 1:N
-        [a(k),e_x(k),e_y(k),i(k),RAAN(k),u(k)] = OE2quasi_nonsing(a(k),e(k),i(k),RAAN(k),w(k),M(k));
+        [a_result(k),e_x(k),e_y(k),i_result(k),RAAN_result(k),u(k)] = OE2quasi_nonsing(a(k),e(k),i(k),RAAN(k),w(k),M(k));
     end
 
-    a = a_result;
-    i = i_result;
-    RAAN = RAAN_result;
 end
