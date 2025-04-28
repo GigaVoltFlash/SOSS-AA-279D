@@ -27,7 +27,7 @@ function [roe_output] = roe_stm_j2(t, qns_roe_init, SV1_oe_init)
 
     exi = e_SV1_init*cosd(w_SV1_init);
     eyi = e_SV2_init*cosd(w_SV1_init); 
-    
+
     roe_output = zeros((n_t, 6));
     roe_output(1, :) = qns_roe_init;
 
