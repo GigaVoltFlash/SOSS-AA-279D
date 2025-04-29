@@ -1,6 +1,6 @@
 function [statedot] = secular_J2(t, state)
     mu = 3.986e5; % km^3/s^2
-    J2 = 1.08263e-3;
+    global J2
     R_earth = 6378.13; % km
     
     % state vector:[a e_x e_y i RAAN u]'

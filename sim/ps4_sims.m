@@ -71,6 +71,7 @@ end
 % List of spacecraft to simulate
 sc_names = fieldnames(state_abs);
 
+% Absolute dynamics simulations
 for k = 1:length(sc_names)
     sc = sc_names{k}; % 'SV1', 'SV2_1', 'SV3_1', 'SV2_2', 'SV3_2'
     x0 = state_abs.(sc);
@@ -103,7 +104,7 @@ roe_results = struct();
 % Loop over each case
 for idx = 1:size(roe_cases,1)
     init_case = roe_cases{idx,1};  % 'initial1' or 'initial2'
-    j2_case = roe_cases{idx,2};    % 'no_j2' or 'with_j2'
+    j2_case = roe_cases{idx,2};    % 'no_j2', 'with_j2'
     
     SV2_name = roe_cases{idx,3}; % 'SV2_1' or 'SV2_2'
     SV3_name = roe_cases{idx,4}; % 'SV3_1' or 'SV3_2'
@@ -173,7 +174,40 @@ for idx = 1:size(roe_cases,1)
     end
 end
 
-plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
+roe_analytical_results = struct();
+deputy_mapping = struct( ...
+    'SV2_1', 'initial1', ...
+    'SV3_1', 'initial1', ...
+    'SV2_2', 'initial2', ...
+    'SV3_2', 'initial2' ...
+);
+% Loop through deputy initializations
+for k = 1:size(deputy_inits,1)
+    deputy_name = deputy_inits{k,1};
+    d_a = deputy_inits{k,2};
+    d_lambda = deputy_inits{k,3};
+    d_e_x = deputy_inits{k,4};
+    d_e_y = deputy_inits{k,5};
+    d_i_x = deputy_inits{k,6};
+    d_i_y = deputy_inits{k,7};
+
+    condition = deputy_mapping.(deputy_name);
+
+    % deputy_ic = [d_a, d_lambda, d_e_x, d_e_y, d_i_x, d_i_y];
+    % TODO: FIGURE OUT WHAT IS HAPPENING HERE
+    deputy_output = roe_results.(condition).with_j2.(deputy_name);
+    deputy_ic = [deputy_output.d_a_mean(1), deputy_output.d_lambda_mean(1), deputy_output.d_e_x_mean(1), deputy_output.d_e_y_mean(1), deputy_output.d_i_x_mean(1), deputy_output.d_i_y_mean(1)];
+
+    chief_name = 'SV1'; % Chief is always SV1
+    t_series = sim_results.(chief_name).('no_j2').t; % Pulling a random t vector
+    SV1_oe_init = [a_SV1_init, e_SV1_init, i_SV1_init, RAAN_SV1_init, w_SV1_init];
+    roe_output = roe_stm_j2(t_series, deputy_ic, SV1_oe_init);
+
+    roe_analytical_results.(condition).(deputy_name) = struct('roe_analytical_j2', roe_output);
+end
+
+% plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
+plot_ROE_compare_analytical(roe_results, roe_analytical_results, tstart, tint, tend, t_orbit);
 
 
 %%%%%%%%%%%%% CONVERT TO RTN %%%%%%%%%%%%%%%%
