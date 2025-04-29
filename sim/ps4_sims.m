@@ -132,7 +132,6 @@ for idx = 1:size(roe_cases,1)
             J2_flag = 0;
         end
 
-        % Call your compute function
         [d_a_osc, d_lambda_osc, d_e_x_osc, d_e_y_osc, d_i_x_osc, d_i_y_osc, ...
          d_a_mean, d_lambda_mean, d_e_x_mean, d_e_y_mean, d_i_x_mean, d_i_y_mean, ...
          a_osc, e_x_osc, e_y_osc, i_osc, RAAN_osc, u_osc, ...
@@ -206,8 +205,8 @@ for k = 1:size(deputy_inits,1)
     roe_analytical_results.(condition).(deputy_name) = struct('roe_analytical_j2', roe_output);
 end
 
-% plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
-plot_ROE_compare_analytical(roe_results, roe_analytical_results, tstart, tint, tend, t_orbit);
+plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
+%plot_ROE_compare_analytical(roe_results, roe_analytical_results, tstart, tint, tend, t_orbit);
 
 
 %%%%%%%%%%%%% CONVERT TO RTN %%%%%%%%%%%%%%%%
