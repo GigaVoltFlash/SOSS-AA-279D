@@ -33,7 +33,7 @@ function plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
 
         % 1. Absolute Elements (Mean)
         figure('Position', [100, 100, 800, 600]);
-        sgtitle(sprintf('Absolute Orbital Elements (Mean) - %s', deputy_type));
+        %sgtitle(sprintf('Absolute Orbital Elements (Mean) - %s', deputy_type));
         
         legend_handles = [];
 
@@ -77,7 +77,7 @@ function plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
 
         % 2. Absolute Elements (Oscillating)
         figure('Position', [100, 100, 800, 600]);
-        sgtitle(sprintf('Absolute Orbital Elements (Oscullating) - %s', deputy_type));
+        %sgtitle(sprintf('Absolute Orbital Elements (Oscullating) - %s', deputy_type));
         
         legend_handles = [];
         
@@ -122,7 +122,7 @@ function plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
 
         % 3. Relative Elements (Mean)
         figure('Position', [100, 100, 800, 600]);
-        sgtitle(sprintf('Relative Orbital Elements (Mean) - %s', deputy_type));
+        %sgtitle(sprintf('Relative Orbital Elements (Mean) - %s', deputy_type));
 
         legend_handles = [];
 
@@ -166,7 +166,7 @@ function plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
 
         % 4. Relative Elements (Oscillating)
         figure('Position', [100, 100, 800, 600]);
-        sgtitle(sprintf('Relative Orbital Elements (Oscullating) - %s', deputy_type));
+        %sgtitle(sprintf('Relative Orbital Elements (Oscullating) - %s', deputy_type));
 
         legend_handles = [];
 
@@ -214,7 +214,7 @@ function plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
         deputy_type = all_deputies{deputy_idx};
 
         figure('Color', 'w','Position', [100, 100, 800, 600]);
-        sgtitle(sprintf('RTN Relative Motion (Mean Elements) - %s', deputy_type));
+        %sgtitle(sprintf('RTN Relative Motion (Mean Elements) - %s', deputy_type));
 
         ax1 = subplot(1,3,1);
         hold(ax1, 'on');
@@ -293,7 +293,7 @@ function plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
         xlabel('Radial [m]');
         ylabel('Tangential [m]');
         zlabel('Normal [m]');
-        title(sprintf('3D Relative Motion (Mean Elements) - %s', deputy_type));
+        %title(sprintf('3D Relative Motion (Mean Elements) - %s', deputy_type));
         
         legend_handles = [];
 
@@ -336,7 +336,7 @@ function plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
 
         % Osculating
         figure('Color', 'w','Position', [100, 100, 1000, 600]);
-        sgtitle(sprintf('Relative Orbital Elements (Osculating) - %s', deputy_type));
+        %sgtitle(sprintf('Relative Orbital Elements (Osculating) - %s', deputy_type));
 
         % Plot relative eccentricity vector (d_e_x vs d_e_y)
         ax1 = subplot(1,3,1);
@@ -417,7 +417,7 @@ function plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
 
         % Mean
         figure('Color', 'w','Position', [100, 100, 1000, 600]);
-        sgtitle(sprintf('Relative Orbital Elements (Mean) - %s', deputy_type));
+        %sgtitle(sprintf('Relative Orbital Elements (Mean) - %s', deputy_type));
 
         ax1 = subplot(1,3,1);
         hold(ax1, 'on');
