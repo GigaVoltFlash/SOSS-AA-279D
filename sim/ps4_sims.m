@@ -209,7 +209,6 @@ end
 % plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
 plot_ROE_compare_analytical(roe_results, roe_analytical_results, tstart, tint, tend, t_orbit);
 
-
 %%%%%%%%%%%%% CONVERT TO RTN %%%%%%%%%%%%%%%%
 % Convert the absolute ECI positions of the chief and deputies and convert to RTN.
 %[rho_SV2_RTN, rho_SV2_RTN_dot] = ECI2RTN_rel(r_SV1_ECI_no_j2, v_SV1_ECI_no_j2, r_SV2_ECI_no_j2, v_SV2_ECI_no_j2);
