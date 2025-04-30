@@ -15,7 +15,8 @@ function plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
 
     deputy_mapping = struct( ...
         'initial1', struct('SV2', 'SV2_1', 'SV3', 'SV3_1'), ...
-        'initial2', struct('SV2', 'SV2_2', 'SV3', 'SV3_2') ...
+        'initial2', struct('SV2', 'SV2_2', 'SV3', 'SV3_2'), ...
+        'initial3', struct('SV2', 'SV2_3', 'SV3', 'SV3_3') ...
     );
 
     abs_fields = {'a', 'e_x', 'e_y', 'i', 'RAAN', 'u'};
@@ -494,5 +495,166 @@ function plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
         lgd.FontSize = 10;
 
         saveas(gcf, sprintf('figures/PS4/ROE_projections_mean_%s.png', deputy_type));
+
+        % Osculating but in the no-drift case
+        figure('Color', 'w','Position', [100, 100, 1000, 600]);
+        %sgtitle(sprintf('Relative Orbital Elements (Osculating) - %s', deputy_type));
+
+        % Plot relative eccentricity vector (d_e_x vs d_e_y)
+        ax1 = subplot(1,3,1);
+        hold(ax1, 'on');
+        axis equal;
+        grid on;
+        xlabel('\Delta e_x [m]');
+        ylabel('\Delta e_y [m]');
+        %title('Relative Eccentricity Vector');
+
+        % Plot relative inclination vector (d_i_x vs d_i_y)
+        ax2 = subplot(1,3,2);
+        hold(ax2, 'on');
+        axis equal;
+        grid on;
+        xlabel('\Delta i_x [m]');
+        ylabel('\Delta i_y [m]');
+        %title('Relative Inclination Vector');
+
+        % Plot relative mean longitude vs semi-major axis (d_lambda vs d_a)
+        ax3 = subplot(1,3,3);
+        hold(ax3, 'on');
+        axis equal;
+        grid on;
+        xlabel('\Delta \lambda [m]');
+        ylabel('\Delta a [m]');
+        %title('Relative Mean Longitude vs Semi-Major Axis');
+
+        legend_handles_osc = [];
+        cases_to_plot = {'initial3'};
+        curve_idx = 0;
+        for init_idx = 1:length(cases_to_plot)
+            for j2_idx = 1:length(j2_conditions)
+                curve_idx = curve_idx + 1;
+                init_case = cases_to_plot{init_idx};
+                j2_case = j2_conditions{j2_idx};
+                deputy_name = deputy_mapping.(init_case).(deputy_type);
+
+                d_e_x_osc = roe_results.(init_case).(j2_case).(deputy_name).d_e_x_osc;
+                d_e_y_osc = roe_results.(init_case).(j2_case).(deputy_name).d_e_y_osc;
+                d_i_x_osc = roe_results.(init_case).(j2_case).(deputy_name).d_i_x_osc;
+                d_i_y_osc = roe_results.(init_case).(j2_case).(deputy_name).d_i_y_osc;
+                d_lambda_osc = roe_results.(init_case).(j2_case).(deputy_name).d_lambda_osc;
+                d_a_osc = roe_results.(init_case).(j2_case).(deputy_name).d_a_osc;
+
+                if strcmp(j2_case, 'no_j2')
+                    lw = 2.5;
+                    
+                    h = plot(ax1, d_e_x_osc, d_e_y_osc, 'LineWidth', lw);
+                    plot(ax2, d_i_x_osc, d_i_y_osc, 'LineWidth', lw);
+                    plot(ax3, d_lambda_osc, d_a_osc, 'LineWidth', lw);
+
+                    plot(ax1, d_e_x_osc(1), d_e_y_osc(1), 'o', 'MarkerSize', 8, 'MarkerFaceColor', h.Color, 'MarkerEdgeColor', h.Color);
+                    plot(ax2, d_i_x_osc(1), d_i_y_osc(1), 'o', 'MarkerSize', 8, 'MarkerFaceColor', h.Color, 'MarkerEdgeColor', h.Color);
+                    plot(ax3, d_lambda_osc(1), d_a_osc(1), 'o', 'MarkerSize', 8, 'MarkerFaceColor', h.Color, 'MarkerEdgeColor', h.Color);
+                else
+                    lw = 1.5;
+
+                    h = plot(ax1, d_e_x_osc, d_e_y_osc,'Color',"#D95319", 'LineWidth', lw);
+                    plot(ax2, d_i_x_osc, d_i_y_osc,'Color', "#D95319", 'LineWidth', lw);
+                    plot(ax3, d_lambda_osc, d_a_osc,'Color', "#D95319", 'LineWidth', lw);
+                end
+
+                legend_handles_osc(end+1) = h;
+            end
+        end
+
+        hold(ax1, 'off');
+        hold(ax2, 'off');
+        hold(ax3, 'off');
+
+        lgd = legend(legend_handles_osc, custom_legends, 'Orientation', 'horizontal');
+        lgd.Units = 'normalized';
+        lgd.Position = [0.35, 0.02, 0.3, 0.03]; 
+        lgd.FontSize = 10;
+
+        saveas(gcf, sprintf('figures/PS4/ROE_projections_osc_no_drift_%s.png', deputy_type));
+
+       % Mean but for the initial condition where ix is zeroed out.
+        figure('Color', 'w','Position', [100, 100, 1000, 600]);
+        %sgtitle(sprintf('Relative Orbital Elements (Mean) - %s', deputy_type));
+
+        ax1 = subplot(1,3,1);
+        hold(ax1, 'on');
+        axis equal;
+        grid on;
+        xlabel('\delta e_x [m]');
+        ylabel('\delta e_y [m]');
+        %title('Relative Eccentricity Vector (Mean)');
+
+        ax2 = subplot(1,3,2);
+        hold(ax2, 'on');
+        axis equal;
+        grid on;
+        xlabel('\delta i_x [m]');
+        ylabel('\delta i_y [m]');
+        %title('Relative Inclination Vector (Mean)');
+
+        ax3 = subplot(1,3,3);
+        hold(ax3, 'on');
+        axis equal;
+        grid on;
+        xlabel('\delta \lambda [m]');
+        ylabel('\delta a [m]');
+        %title('Relative Mean Longitude vs Semi-Major Axis (Mean)');
+
+        legend_handles_mean = [];
+        
+        curve_idx = 0;
+        for init_idx = 1:length(cases_to_plot)
+            for j2_idx = 1:length(j2_conditions)
+                curve_idx = curve_idx + 1;
+                init_case = cases_to_plot{init_idx};
+                j2_case = j2_conditions{j2_idx};
+                deputy_name = deputy_mapping.(init_case).(deputy_type);
+
+                % Extract mean relative elements
+                d_e_x_mean = roe_results.(init_case).(j2_case).(deputy_name).d_e_x_mean;
+                d_e_y_mean = roe_results.(init_case).(j2_case).(deputy_name).d_e_y_mean;
+                d_i_x_mean = roe_results.(init_case).(j2_case).(deputy_name).d_i_x_mean;
+                d_i_y_mean = roe_results.(init_case).(j2_case).(deputy_name).d_i_y_mean;
+                d_lambda_mean = roe_results.(init_case).(j2_case).(deputy_name).d_lambda_mean;
+                d_a_mean = roe_results.(init_case).(j2_case).(deputy_name).d_a_mean;
+
+                if strcmp(j2_case, 'no_j2')
+                    lw = 2.5;
+                    
+                    h = plot(ax1, d_e_x_mean, d_e_y_mean, 'LineWidth', lw);
+                    plot(ax2, d_i_x_mean, d_i_y_mean, 'LineWidth', lw);
+                    plot(ax3, d_lambda_mean, d_a_mean, 'LineWidth', lw);
+
+                    plot(ax1, d_e_x_mean(1), d_e_y_mean(1), 'o', 'MarkerSize', 8, 'MarkerFaceColor', h.Color, 'MarkerEdgeColor', h.Color);
+                    plot(ax2, d_i_x_mean(1), d_i_y_mean(1), 'o', 'MarkerSize', 8, 'MarkerFaceColor', h.Color, 'MarkerEdgeColor', h.Color);
+                    plot(ax3, d_lambda_mean(1), d_a_mean(1), 'o', 'MarkerSize', 8, 'MarkerFaceColor', h.Color, 'MarkerEdgeColor', h.Color);
+                else
+                    lw = 1.5;
+
+                    h = plot(ax1, d_e_x_mean, d_e_y_mean,'Color',"#D95319", 'LineWidth', lw);
+                    plot(ax2, d_i_x_mean, d_i_y_mean,'Color', "#D95319", 'LineWidth', lw);
+                    plot(ax3, d_lambda_mean, d_a_mean,'Color', "#D95319", 'LineWidth', lw);
+                end
+
+                % Save handle for legend
+                legend_handles_mean(end+1) = h;
+            end
+        end
+
+        hold(ax1, 'off');
+        hold(ax2, 'off');
+        hold(ax3, 'off');
+
+        lgd = legend(legend_handles_mean, custom_legends, 'Orientation', 'horizontal');
+        lgd.Units = 'normalized';
+        lgd.Position = [0.35, 0.02, 0.3, 0.03]; 
+        lgd.FontSize = 10;
+
+        saveas(gcf, sprintf('figures/PS4/ROE_projections_mean_no_drift_%s.png', deputy_type));
     end
 end

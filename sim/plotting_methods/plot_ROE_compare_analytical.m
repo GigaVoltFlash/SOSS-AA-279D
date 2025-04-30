@@ -22,7 +22,7 @@ function plot_ROE_compare_analytical(roe_results, roe_analytical_results, tstart
     );
 
     rel_fields = {'d_a_mean', 'd_lambda_mean', 'd_e_x_mean', 'd_e_y_mean', 'd_i_x_mean', 'd_i_y_mean'};
-    rel_labels = {'\Delta a [m]', '\Delta \lambda [m]', '\Delta e_x [m]', '\Delta e_y [m]', '\Delta i_x [m]', '\Delta i_y [m]'};
+    rel_labels = {'\delta a [m]', '\delta \lambda [m]', '\delta e_x [m]', '\delta e_y [m]', '\delta i_x [m]', '\delta i_y [m]'};
 
     % === Now for each Deputy separately (SV2, SV3) ===
     for deputy_idx = 1:length(all_deputies)

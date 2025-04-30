@@ -7,25 +7,25 @@ function plot_ROE_space_compare_analytical(roe_results, roe_analytical_results, 
     hold(ax1, 'on');
     axis equal;
     grid on;
-    xlabel('\Delta e_x [m]');
-    ylabel('\Delta e_y [m]');
-    title('Relative Eccentricity Vector (Mean)');
+    xlabel('\delta e_x [m]');
+    ylabel('\delta e_y [m]');
+    % title('Relative Eccentricity Vector (Mean)');
 
     ax2 = subplot(1,3,2);
     hold(ax2, 'on');
     axis equal;
     grid on;
-    xlabel('\Delta i_x [m]');
-    ylabel('\Delta i_y [m]');
-    title('Relative Inclination Vector (Mean)');
+    xlabel('\delta i_x [m]');
+    ylabel('\delta i_y [m]');
+    % title('Relative Inclination Vector (Mean)');
 
     ax3 = subplot(1,3,3);
     hold(ax3, 'on');
     axis equal;
     grid on;
-    xlabel('\Delta \lambda [m]');
-    ylabel('\Delta a [m]');
-    title('Relative Mean Longitude vs Semi-Major Axis (Mean)');
+    xlabel('\delta \lambda [m]');
+    ylabel('\delta a [m]');
+    % title('Relative Mean Longitude vs Semi-Major Axis (Mean)');
 
     deputy_name = deputy_mapping.initial2.(deputy_type);
 
