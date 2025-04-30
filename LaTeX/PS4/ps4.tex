@@ -1,10 +1,140 @@
 \section{Problem Set 4}
 \subsection{These are Relative Orbits!}
 
-\subsubsection{Initial Conditions for the Chief}
+\subsubsection{Initial Conditions for the Chief} 
+The osculating initial conditions for the chief are the same as outlined in Table \ref{tab:abs_oe}. We chose to remain with the same initial chief conditions since they are well within the range of the HCW equations, with an eccentricity much less than 1. 
 
+\subsubsection{Initial Conditions for the Deputy} \label{sec:ic_for_pset4}
 
-\subsubsection{Initial Conditions for the Deputy}
+We set the new initial conditions for the deputy based on the following given values. Since we are only considering one set of provided initial conditions in this section of the report, we only consider a single deputy (SV2), as the results for SV3 would be identical if given the same initial conditions.
 
+\[
+a_c (\delta a, \delta \lambda, \delta e_x, \delta e_y, \delta i_x, \delta i_y) = (0,\ 100,\ 50,\ 100,\ 30,\ 200)~\text{m}
+\]
 
 \subsubsection{Numerical Integration of Chief and Deputy}
+From these initial conditions, we can perform a numerical integration of the equations of motion for the chief and deputy with position and velocity as state variables. This process is outlined in Section \ref{sec:rel_FODE_num_int}. The simulation was repeated two times with the same initial conditions: with and without J2 effects. Then the osculating and mean absolute and relative quasi-non-singular orbital elements were computed. The numerical integration was done with osculating inputs and outputs, thus Brower's Theory was used to convert the osculating quantities to mean quantities. 
+
+Figure \ref{fig:osc_OE} shows the osculating quasi-non-singular orbital elements, while Figure \ref{fig:mean_OE} shows the mean quasi-non-singular orbital elements. As expected, both the osculating and mean elements showcase the secular effects of J2 on both the components of the eccentricity vector and RAAN. There is also a drift in true longitude, but it is so small that it is not observable on these figures. The equations governing these drifts and a discussion around them can be found in Section \ref{sec:osc_mean_J2}.
+
+Also as expected, the osculating quantities also showcase periodic effects of J2 on eccentricity, inclination, and semi-major axis. Note that there are minor offsets between the mean and osculating quantities with J2 effects in semi-major axis, eccentricity, and inclination, which are introduced by the approximate inverse transformation done in Brower's Theory during the conversion. Without J2 effects, the mean and osculating quantities line up exactly, because by definition, they are equivalent when there are no perturbations. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS4/OE_abs_osc_SV2.png}
+    \caption{Osculating quasi-non-singular orbital elements}
+    \label{fig:osc_OE}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS4/OE_abs_mean_SV2.png}
+    \caption{Mean quasi-non-singular orbital elements}
+    \label{fig:mean_OE}
+\end{figure}
+
+Similarly, Figure \ref{fig:osc_ROE} shows the osculating relative quasi-non-singular orbital elements, while Figure \ref{fig:mean_ROE} shows the mean relative quasi-non-singular orbital elements. Again, as expected, J2 effects are observed in $\delta \lambda$, the phase of the eccentricity vector, and $\delta i_y$
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS4/ROE_osc_SV2.png}
+    \caption{Osculating relative quasi-non-singular orbital elements}
+    \label{fig:osc_ROE}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS4/ROE_mean_SV2.png}
+    \caption{Mean relative quasi-non-singular orbital elements}
+    \label{fig:mean_ROE}
+\end{figure}
+
+\subsubsection{J2 perturbations in RTN Frame}
+
+
+
+\subsubsection{J2 perturbations in ROE space}
+
+\subsubsection{Maneuver to remove J2 secular effects}
+
+In the quasi-nonsingular relative orbital elements, there are drifts seen in the eccentricity vector $\delta e$, the inclination vector $\delta i$ (specifically the y-component $\delta i_y$), and the mean longitude $\delta \lambda$. The differential J2 effects for near-circular orbits is given by
+\begin{align}
+    \frac{d \varphi'}{d u} &= \frac{3}{2} \gamma (5\cos^2(i_c) - 1) \\
+    \frac{d \delta i_y}{d u} &= 3\gamma \sin^2(i_c) \delta i_x \label{eq:drift_in_rel_i} \\
+    \frac{d \delta \lambda}{d u} &= -\frac{21}{2}\left(\gamma \sin(2i_c)\delta i_x 
++ \frac{1}{7} \delta a\right) \label{eq:drift_in_lambda_rel}\\
+    \text{where} \quad \gamma  &= \frac{J_2 R_E^2}{2 a^2 (1 - e)^2}
+\end{align}
+Here, the $\varphi$ is the angle of the eccentricity vector $\delta e$, i.e. $\varphi = \tan^{-1}\left(\frac{\delta e_y}{\delta e_x}\right)$. So, we see that the drift in the eccentricity vector is circular rather than secular. Therefore, to eliminate the secular drift we just need to eliminate the secular effects in the inclination vector and the mean longitude.
+
+From Equation \ref{eq:drift_in_rel_i}, we see that one way to remove this differential effect in the inclination vector is by setting $\delta i_x = 0$. From Equation \ref{eq:quasi_nonsign_roe}, $\delta i_x = 0 \implies i_t = i_o$, or in other words the deputy satellite and the chief satellite have the same orbital inclination. 
+
+To completely remove the drift in the mean longitude based on Equation \ref{eq:drift_in_lambda_rel}, we would need to not only set $\delta i_x = 0$ but also  $\delta a = 0$. 
+
+Based on the given initial conditions in Section \ref{sec:ic_for_pset4}, we assume that the $\delta a = 0$ already. So the maneuver would mainly be to remove the inclination difference. 
+
+The optimal location (minimum $\Delta v$) to produce an orbital inclination change is at the ascending node of the orbit, i.e. when $u_M = TODO$, and with the TODO TODO TODO. Direction is perpendicular?
+
+TODO: Could also do a more in-depth derivation from the STM for the delta lambda terms.
+
+\subsubsection{Simulation with new initial conditions that don't have secular effects}
+
+We set the initial condition $\delta i_x = 0$ to remove secular effects. With this, we get the relative orbital elements over time shown in Figure \ref{fig:rel_roe_no_drift}.
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.5\linewidth]{}
+    \caption{Relative orbital elements with initial conditions set to remove the }
+    \label{fig:rel_roe_no_drift}
+\end{figure}
+
+\subsubsection{Analytical Solution for J2 on Relative Orbital Elements}
+
+\begin{align*}
+\Phi^{J_2}_{\text{qns}}(\alpha_c(t_i), \tau) &=
+\begin{bmatrix}
+1 & 0 & 0 & 0 & 0 & 0 \\
+-\left( \frac{3}{2}n + \frac{7}{2} \kappa E P \right)\tau & 1 & \kappa e_{x_i} F G P \tau & \kappa e_{y_i} F G P \tau & -\kappa F S \tau & 0 \\
+\frac{7}{2} \kappa e_{y_f} Q \tau & 0 & \cos(\dot{\omega} \tau) - 4\kappa e_{x_i} e_{y_f} G Q \tau & -\sin(\dot{\omega} \tau) - 4\kappa e_{y_i} e_{y_f} G Q \tau & 5\kappa e_{y_f} S \tau & 0 \\
+-\frac{7}{2} \kappa e_{x_f} Q \tau & 0 & \sin(\dot{\omega} \tau) + 4\kappa e_{x_i} e_{x_f} G Q \tau & \cos(\dot{\omega} \tau) + 4\kappa e_{y_i} e_{x_f} G Q \tau & -5\kappa e_{x_f} S \tau & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 \\
+\frac{7}{2} \kappa S \tau & 0 & -4 \kappa e_{x_i} G S \tau & -4 \kappa e_{y_i} G S \tau & 2 \kappa T \tau & 1
+\end{bmatrix}
+\begin{bmatrix}
+\delta a \\
+\delta \lambda \\
+\delta e_x \\
+\delta e_y \\
+\delta i_x \\
+\delta i_y
+\end{bmatrix}
+\end{align*}
+
+\vspace{1em}
+
+\noindent
+\textbf{Eccentricity dependent parameters:}
+\begin{align*}
+\eta &= \sqrt{1 - e^2} &
+\kappa &= \frac{3}{4} \frac{J_2 R_E^2 \sqrt{\mu}}{a^{7/2} \eta^4} &
+E &= 1 + \eta \\
+F &= 4 + 3\eta &
+G &= \frac{1}{\eta^2}
+\end{align*}
+
+\vspace{1em}
+
+\noindent
+\textbf{Inclination dependent parameters:}
+\begin{align*}
+P &= 3\cos^2(i) - 1 &
+Q &= 5\cos^2(i) - 1 &
+R &= \cos(i) \\
+S &= \sin(2i) &
+T &= \sin^2(i) &
+U &= \sin(i) \\
+V &= \tan(i/2) &
+W &= \cos^2(i/2)
+\end{align*}
+
+\cite{koenig2017new}

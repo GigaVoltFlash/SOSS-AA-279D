@@ -109,7 +109,7 @@ With these differential equations and the initial conditions in RTN, the relativ
 All the above operations are also repeated for the third satellite, SV3/Docker, for which the initial conditions are given in Section \ref{sec:rel_init_oe}.
 The results of the propagation are shown in Figures \ref{fig:rel_3d_traj}, \ref{fig:rel_3d_proj}, \ref{fig:rel_pos_vel_rtn_sv2}, and \ref{fig:rel_pos_vel_rtn_sv3}.
 
-\subsubsection{Computing Relative Orbits using FODE of Absolute Motion}
+\subsubsection{Computing Relative Orbits using FODE of Absolute Motion}\label{sec:rel_FODE_num_int}
 
 In this method, we perform the absolute orbit propagation of the three satellites SV1, SV2, and SV3 using just the fundamental orbital differential equations of absolute motion utilized in Section \ref{sec:fode_simulation}. Once the motion of all three satellites is calculated, the positions and velocities of the deputies SV2 and SV3 can be converted into the RTN frame of the chief using the procedure described in Section \ref{sec:nonlinear_rel_eom} in equations \ref{eq:q_eci2rtn_rel} to \ref{eq:v_rtn_rel}. This FODE propagation is done with the same numerical method (RK4) and time-steps as the nonlinear relative motion method, given in equation \ref{eq:timestep}. The results of this method are shown and compared in Figures \ref{fig:rel_3d_traj}, \ref{fig:rel_3d_proj}, \ref{fig:rel_pos_vel_rtn_sv2}, and \ref{fig:rel_pos_vel_rtn_sv3}.
 
