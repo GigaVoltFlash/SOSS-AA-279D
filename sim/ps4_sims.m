@@ -109,7 +109,7 @@ roe_results = struct();
 
 % Loop over each case
 for idx = 1:size(roe_cases,1)
-    init_case = roe_cases{idx,1};  % 'initial1' or 'initial2'
+    init_case = roe_cases{idx,1};  % 'initial1', 'initial2', or 'initial3'
     j2_case = roe_cases{idx,2};    % 'no_j2', 'with_j2'
     
     SV2_name = roe_cases{idx,3}; % 'SV2_1' or 'SV2_2'
@@ -215,7 +215,7 @@ for k = 1:size(deputy_inits,1)
                                                               'roe_analytical_j2_mean_ic', roe_output_mean_ic); % Using the initial conditions as given (0 delta a) and mean ICs (non-zero delta a)
 end
 
-plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
+% plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
 plot_ROE_compare_analytical(roe_results, roe_analytical_results, tstart, tint, tend, t_orbit);
 
 %%%%%%%%%%%%% CONVERT TO RTN %%%%%%%%%%%%%%%%

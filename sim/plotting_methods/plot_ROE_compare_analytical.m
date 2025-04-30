@@ -13,12 +13,13 @@ function plot_ROE_compare_analytical(roe_results, roe_analytical_results, tstart
     custom_legends = {'IC 2 J2 propagated','IC 2 J2 analytical'};
 
     % Deputies
-    all_deputies = {'SV2', 'SV3'};
+    all_deputies = {'SV2'};
 
     % Mapping of initial case to actual deputy names
     deputy_mapping = struct( ...
         'initial1', struct('SV2', 'SV2_1', 'SV3', 'SV3_1'), ...
-        'initial2', struct('SV2', 'SV2_2', 'SV3', 'SV3_2') ...
+        'initial2', struct('SV2', 'SV2_2', 'SV3', 'SV3_2'), ...
+        'initial3', struct('SV2', 'SV2_3', 'SV3', 'SV3_3') ...
     );
 
     rel_fields = {'d_a_mean', 'd_lambda_mean', 'd_e_x_mean', 'd_e_y_mean', 'd_i_x_mean', 'd_i_y_mean'};
@@ -76,7 +77,9 @@ function plot_ROE_compare_analytical(roe_results, roe_analytical_results, tstart
         % saveas(gcf, sprintf('figures/PS4/ROE_time_analytical_compare_mean_ICs_%s.png', deputy_type));
 
         % Plot the ROE space plots that compare the propagated and the 
-        plot_ROE_space_compare_analytical(roe_results, roe_analytical_results, deputy_mapping, deputy_type, true);
-        plot_ROE_space_compare_analytical(roe_results, roe_analytical_results, deputy_mapping, deputy_type, false);
+        plot_ROE_space_compare_analytical(roe_results, roe_analytical_results, deputy_mapping, deputy_type, true, 2);
+        plot_ROE_space_compare_analytical(roe_results, roe_analytical_results, deputy_mapping, deputy_type, false, 2);
+        plot_ROE_space_compare_analytical(roe_results, roe_analytical_results, deputy_mapping, deputy_type, true, 3);
+        plot_ROE_space_compare_analytical(roe_results, roe_analytical_results, deputy_mapping, deputy_type, false, 3);
     end
 end
