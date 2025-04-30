@@ -22,10 +22,10 @@ function plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
     abs_labels = {'a [km]', 'e_x', 'e_y', 'i [deg]', 'RAAN [deg]', 'u [deg]'};
 
     rel_fields_osc = {'d_a_osc', 'd_lambda_osc', 'd_e_x_osc', 'd_e_y_osc', 'd_i_x_osc', 'd_i_y_osc'};
-    rel_labels_osc = {'\Delta a [m]', '\Delta \lambda [m]', '\Delta e_x [m]', '\Delta e_y [m]', '\Delta i_x [m]', '\Delta i_y [m]'};
+    rel_labels_osc = {'\delta a [m]', '\delta \lambda [m]', '\delta e_x [m]', '\delta e_y [m]', '\delta i_x [m]', '\delta i_y [m]'};
 
     rel_fields_mean = {'d_a_mean', 'd_lambda_mean', 'd_e_x_mean', 'd_e_y_mean', 'd_i_x_mean', 'd_i_y_mean'};
-    rel_labels_mean = {'\Delta a [m]', '\Delta \lambda [m]', '\Delta e_x [m]', '\Delta e_y [m]', '\Delta i_x [m]', '\Delta i_y [m]'};
+    rel_labels_mean = {'\delta a [m]', '\delta \lambda [m]', '\delta e_x [m]', '\delta e_y [m]', '\delta i_x [m]', '\delta i_y [m]'};
 
     % Plot for each deputy
     for deputy_idx = 1:length(all_deputies)
@@ -343,8 +343,8 @@ function plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
         hold(ax1, 'on');
         axis equal;
         grid on;
-        xlabel('\Delta e_x [m]');
-        ylabel('\Delta e_y [m]');
+        xlabel('\delta e_x [m]');
+        ylabel('\delta e_y [m]');
         %title('Relative Eccentricity Vector');
 
         % Plot relative inclination vector (d_i_x vs d_i_y)
@@ -352,8 +352,8 @@ function plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
         hold(ax2, 'on');
         axis equal;
         grid on;
-        xlabel('\Delta i_x [m]');
-        ylabel('\Delta i_y [m]');
+        xlabel('\delta i_x [m]');
+        ylabel('\delta i_y [m]');
         %title('Relative Inclination Vector');
 
         % Plot relative mean longitude vs semi-major axis (d_lambda vs d_a)
@@ -361,8 +361,8 @@ function plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
         hold(ax3, 'on');
         axis equal;
         grid on;
-        xlabel('\Delta \lambda [m]');
-        ylabel('\Delta a [m]');
+        xlabel('\delta \lambda [m]');
+        ylabel('\delta a [m]');
         %title('Relative Mean Longitude vs Semi-Major Axis');
 
         legend_handles_osc = [];
@@ -423,24 +423,24 @@ function plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
         hold(ax1, 'on');
         axis equal;
         grid on;
-        xlabel('\Delta e_x [m]');
-        ylabel('\Delta e_y [m]');
+        xlabel('\delta e_x [m]');
+        ylabel('\delta e_y [m]');
         %title('Relative Eccentricity Vector (Mean)');
 
         ax2 = subplot(1,3,2);
         hold(ax2, 'on');
         axis equal;
         grid on;
-        xlabel('\Delta i_x [m]');
-        ylabel('\Delta i_y [m]');
+        xlabel('\delta i_x [m]');
+        ylabel('\delta i_y [m]');
         %title('Relative Inclination Vector (Mean)');
 
         ax3 = subplot(1,3,3);
         hold(ax3, 'on');
         axis equal;
         grid on;
-        xlabel('\Delta \lambda [m]');
-        ylabel('\Delta a [m]');
+        xlabel('\delta \lambda [m]');
+        ylabel('\delta a [m]');
         %title('Relative Mean Longitude vs Semi-Major Axis (Mean)');
 
         legend_handles_mean = [];
