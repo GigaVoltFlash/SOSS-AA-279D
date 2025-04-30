@@ -24,7 +24,6 @@ d_lambda_SV2_init_2 = 100; % m % -124
 d_e_x_SV2_init_2 = 50; % m
 d_e_y_SV2_init_2 = 100; % m
 d_i_x_SV2_init_2 = 30; % m % 79
-d_i_x_SV2_init_2_zeroed = 0;
 d_i_y_SV2_init_2 = 200; % m % 1005
 
 % Applying similar elements for SV3
@@ -33,7 +32,6 @@ d_lambda_SV3_init_2 = -100; % m % -793
 d_e_x_SV3_init_2 = 50; % m
 d_e_y_SV3_init_2 = 100; % m
 d_i_x_SV3_init_2 = 30; % m
-d_i_x_SV3_init_2_zeroed = 0;
 d_i_y_SV3_init_2 = 200; % m % 827
 
 % Define deputy initial conditions for ROE2ECI
@@ -42,6 +40,8 @@ deputy_inits = {
     'SV3_1', d_a_SV3_init_1, d_lambda_SV3_init_1, d_e_x_SV3_init_1, d_e_y_SV3_init_1, d_i_x_SV3_init_1, d_i_y_SV3_init_1;
     'SV2_2', d_a_SV2_init_2, d_lambda_SV2_init_2, d_e_x_SV2_init_2, d_e_y_SV2_init_2, d_i_x_SV2_init_2, d_i_y_SV2_init_2;
     'SV3_2', d_a_SV3_init_2, d_lambda_SV3_init_2, d_e_x_SV3_init_2, d_e_y_SV3_init_2, d_i_x_SV3_init_2, d_i_y_SV3_init_2;
+    'SV2_3', d_a_SV2_init_2, d_lambda_SV2_init_2, d_e_x_SV2_init_2, d_e_y_SV2_init_2, 0,                d_i_y_SV2_init_2;
+    'SV3_3', d_a_SV3_init_2, d_lambda_SV3_init_2, d_e_x_SV3_init_2, d_e_y_SV3_init_2, 0,                d_i_y_SV3_init_2;
 };
 
 % Preallocate structs
@@ -99,6 +99,8 @@ roe_cases = {
     'initial1', 'with_j2', 'SV2_1', 'SV3_1';
     'initial2', 'no_j2', 'SV2_2', 'SV3_2';
     'initial2', 'with_j2', 'SV2_2', 'SV3_2';
+    'initial3', 'no_j2', 'SV2_3', 'SV3_3';
+    'initial3', 'with_j2', 'SV2_3', 'SV3_3';
 };
 
 roe_results = struct();
@@ -180,7 +182,9 @@ deputy_mapping = struct( ...
     'SV2_1', 'initial1', ...
     'SV3_1', 'initial1', ...
     'SV2_2', 'initial2', ...
-    'SV3_2', 'initial2' ...
+    'SV3_2', 'initial2', ...
+    'SV2_3', 'initial3', ...
+    'SV3_3', 'initial3' ...
 );
 % Loop through deputy initializations
 for k = 1:size(deputy_inits,1)
@@ -194,17 +198,19 @@ for k = 1:size(deputy_inits,1)
 
     condition = deputy_mapping.(deputy_name);
 
-    % deputy_ic = [d_a, d_lambda, d_e_x, d_e_y, d_i_x, d_i_y];
+    deputy_ic_given = [d_a, d_lambda, d_e_x, d_e_y, d_i_x, d_i_y];
     % TODO: FIGURE OUT WHAT IS HAPPENING HERE
     deputy_output = roe_results.(condition).with_j2.(deputy_name);
-    deputy_ic = [deputy_output.d_a_mean(1), deputy_output.d_lambda_mean(1), deputy_output.d_e_x_mean(1), deputy_output.d_e_y_mean(1), deputy_output.d_i_x_mean(1), deputy_output.d_i_y_mean(1)];
+    deputy_ic_mean = [deputy_output.d_a_mean(1), deputy_output.d_lambda_mean(1), deputy_output.d_e_x_mean(1), deputy_output.d_e_y_mean(1), deputy_output.d_i_x_mean(1), deputy_output.d_i_y_mean(1)];
 
     chief_name = 'SV1'; % Chief is always SV1
     t_series = sim_results.(chief_name).('no_j2').t; % Pulling a random t vector
     SV1_oe_init = [a_SV1_init, e_SV1_init, i_SV1_init, RAAN_SV1_init, w_SV1_init];
-    roe_output = roe_stm_j2(t_series, deputy_ic, SV1_oe_init);
+    roe_output_given_ic = roe_stm_j2(t_series, deputy_ic_given, SV1_oe_init);
+    roe_output_mean_ic = roe_stm_j2(t_series, deputy_ic_mean, SV1_oe_init);
 
-    roe_analytical_results.(condition).(deputy_name) = struct('roe_analytical_j2', roe_output);
+    roe_analytical_results.(condition).(deputy_name) = struct('roe_analytical_j2_given_ic', roe_output_given_ic, ...
+                                                              'roe_analytical_j2_mean_ic', roe_output_mean_ic); % Using the initial conditions as given (0 delta a) and mean ICs (non-zero delta a)
 end
 
 plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
