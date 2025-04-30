@@ -505,8 +505,8 @@ function plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
         hold(ax1, 'on');
         axis equal;
         grid on;
-        xlabel('\Delta e_x [m]');
-        ylabel('\Delta e_y [m]');
+        xlabel('\delta e_x [m]');
+        ylabel('\delta e_y [m]');
         %title('Relative Eccentricity Vector');
 
         % Plot relative inclination vector (d_i_x vs d_i_y)
@@ -514,8 +514,8 @@ function plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
         hold(ax2, 'on');
         axis equal;
         grid on;
-        xlabel('\Delta i_x [m]');
-        ylabel('\Delta i_y [m]');
+        xlabel('\delta i_x [m]');
+        ylabel('\delta i_y [m]');
         %title('Relative Inclination Vector');
 
         % Plot relative mean longitude vs semi-major axis (d_lambda vs d_a)
@@ -523,8 +523,8 @@ function plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
         hold(ax3, 'on');
         axis equal;
         grid on;
-        xlabel('\Delta \lambda [m]');
-        ylabel('\Delta a [m]');
+        xlabel('\delta \lambda [m]');
+        ylabel('\delta a [m]');
         %title('Relative Mean Longitude vs Semi-Major Axis');
 
         legend_handles_osc = [];
