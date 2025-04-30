@@ -13,11 +13,13 @@ a_c (\delta a, \delta \lambda, \delta e_x, \delta e_y, \delta i_x, \delta i_y) =
 \]
 
 \subsubsection{Numerical Integration of Chief and Deputy}
-From these initial conditions, we can perform a numerical integration of the equations of motion for the chief and deputy with position and velocity as state variables. This process is outlined in Section \ref{sec:rel_FODE_num_int}. The simulation was repeated two times with the same initial conditions: with and without J2 effects. Then the osculating and mean absolute and relative quasi-non-singular orbital elements were computed. The numerical integration was done with osculating inputs and outputs, thus Brower's Theory was used to convert the osculating quantities to mean quantities. 
+From these initial conditions, we can perform a numerical integration of the equations of motion for the chief and deputy with position and velocity as state variables. This process is outlined in Section \ref{sec:rel_FODE_num_int}. The simulation was repeated two times with the same initial conditions: with and without J2 effects. Then the osculating and mean absolute and relative quasi-non-singular orbital elements for the deputy (SV2) were computed and plotted. The numerical integration was done with osculating inputs and outputs, thus Brower's Theory was used to convert the osculating quantities to mean quantities. 
 
 Figure \ref{fig:osc_OE} shows the osculating quasi-non-singular orbital elements, while Figure \ref{fig:mean_OE} shows the mean quasi-non-singular orbital elements. As expected, both the osculating and mean elements showcase the secular effects of J2 on both the components of the eccentricity vector and RAAN. There is also a drift in true longitude, but it is so small that it is not observable on these figures. The equations governing these drifts and a discussion around them can be found in Section \ref{sec:osc_mean_J2}.
 
 Also as expected, the osculating quantities also showcase periodic effects of J2 on eccentricity, inclination, and semi-major axis. Note that there are minor offsets between the mean and osculating quantities with J2 effects in semi-major axis, eccentricity, and inclination, which are introduced by the approximate inverse transformation done in Brower's Theory during the conversion. Without J2 effects, the mean and osculating quantities line up exactly, because by definition, they are equivalent when there are no perturbations. 
+
+Similarly, Figure \ref{fig:osc_ROE} shows the osculating relative quasi-non-singular orbital elements, while Figure \ref{fig:mean_ROE} shows the mean relative quasi-non-singular orbital elements. Again, as expected, J2 effects are observed in $\delta \lambda$, the phase of the eccentricity vector, and $\delta i_y$. More discussion on the equations governing these effects and the observed behavior can be found in Section \ref{sec:J2_RTN_frame}.
 
 \begin{figure}[H]
     \centering
@@ -33,8 +35,6 @@ Also as expected, the osculating quantities also showcase periodic effects of J2
     \label{fig:mean_OE}
 \end{figure}
 
-Similarly, Figure \ref{fig:osc_ROE} shows the osculating relative quasi-non-singular orbital elements, while Figure \ref{fig:mean_ROE} shows the mean relative quasi-non-singular orbital elements. Again, as expected, J2 effects are observed in $\delta \lambda$, the phase of the eccentricity vector, and $\delta i_y$
-
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{sim/figures/PS4/ROE_osc_SV2.png}
@@ -49,27 +49,69 @@ Similarly, Figure \ref{fig:osc_ROE} shows the osculating relative quasi-non-sing
     \label{fig:mean_ROE}
 \end{figure}
 
-\subsubsection{J2 perturbations in RTN Frame}
+\subsubsection{J2 perturbations in RTN Frame}\label{sec:J2_RTN_frame}
+The relative position can also be plotted in the RTN frame. Figure \ref{fig:RTN_3D} shows the relative position in the 3D RTN frame. Figure \ref{fig:RTN_projections} shows the relative position projected into the RTN planes.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS4/RTN_3D_SV2.png}
+    \caption{Relative position in RTN 3D}
+    \label{fig:RTN_3D}
+\end{figure}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS4/RTN_projections_SV2.png}
+    \caption{Relative position in RTN projections}
+    \label{fig:RTN_projections}
+\end{figure}
 
-\subsubsection{J2 perturbations in ROE space}
+To understand whether the results are according to our expectations, we need to understand how the relative orbit geometry relates to relative orbital elements. Figure \ref{fig:rel_geometry} shows a figure from the lecture slides. From this, we can see that $\delta a$ determines the center of the relative motion ellipse in the radial direction. $\delta \lambda$ determines the center of the relative motion ellipse in the tangential direction. $\delta e$, which is the L2 norm of $\delta e_x$ and $\delta e_y$, determines the size of this ellipse in the tangential and radial directions. $\delta i$, which is the L2 norm of $\delta i_x$ and $\delta i_y$, determines the size of the ellipse in the normal direction. 
 
-\subsubsection{Maneuver to remove J2 secular effects}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{LaTeX/Figures/RelOrbitGeometry.jpg}
+    \caption{Relative orbit geometry}
+    \label{fig:rel_geometry}
+\end{figure}
 
-In the quasi-nonsingular relative orbital elements, there are drifts seen in the eccentricity vector $\delta e$, the inclination vector $\delta i$ (specifically the y-component $\delta i_y$), and the mean longitude $\delta \lambda$. The differential J2 effects for near-circular orbits is given by
+Now with that understanding, we look at the effects of J2 on the relative orbital elements. In the quasi-nonsingular relative orbital elements, there are drifts seen in the eccentricity vector $\delta e$, the inclination vector $\delta i$ (specifically the y-component $\delta i_y$), and the mean longitude $\delta \lambda$. The differential J2 effects for near-circular orbits are given by:
 \begin{align}
-    \frac{d \varphi'}{d u} &= \frac{3}{2} \gamma (5\cos^2(i_c) - 1) \\
+    \frac{d \varphi}{d u} &= \frac{3}{2} \gamma (5\cos^2(i_c) - 1) \\
     \frac{d \delta i_y}{d u} &= 3\gamma \sin^2(i_c) \delta i_x \label{eq:drift_in_rel_i} \\
     \frac{d \delta \lambda}{d u} &= -\frac{21}{2}\left(\gamma \sin(2i_c)\delta i_x 
 + \frac{1}{7} \delta a\right) \label{eq:drift_in_lambda_rel}\\
     \text{where} \quad \gamma  &= \frac{J_2 R_E^2}{2 a^2 (1 - e)^2}
 \end{align}
-Here, the $\varphi$ is the angle of the eccentricity vector $\delta e$, i.e. $\varphi = \tan^{-1}\left(\frac{\delta e_y}{\delta e_x}\right)$. So, we see that the drift in the eccentricity vector is circular rather than secular. Therefore, to eliminate the secular drift we just need to eliminate the secular effects in the inclination vector and the mean longitude.
+Here, the $\varphi$ is the angle of the eccentricity vector $\delta e$, i.e. $\varphi = \tan^{-1}\left(\frac{\delta e_y}{\delta e_x}\right)$.
+
+Thus, based on these equations and our initial ROE ($\delta a = 0$, $\delta i_x \neq 0$), we expect drifts $\delta i$ and $\delta \lambda$, but not in the magnitude $\delta e$, since only the phase of the relative eccentricity vector is changing, not the magnitude. $\delta i$ has a drift, because J2 only effects the $\delta i_y$ component of the relative inclination vector. From the drift in $\delta \lambda$, we expect to see a drift of the ellipse in the tangential direction in the RTN frame, which is observed. From the drift in $\delta i$ we expect to see a drift of the ellipse in the normal direction in the RTN frame, which, while not very significant, is also observed. Finally, from the drift in the phase of $\delta e$, we expect to see the ellipse starting to rotate as its "relative perigee" drifts circularly. This too is observed in the RTN frame. Thus, the results in the RTN frame are as expected given the initial relative orbital elements. 
+
+
+\subsubsection{J2 perturbations in ROE space}
+The osculating and mean quasi-non-singular orbital elements can be plotted in a different way to better examine their behavior with and without J2, as shown in Figure \ref{fig:osc_ROE_proj} and Figure \ref{fig:mean_ROE_proj}. Again, the osculating and mean results line up well for the secular drifts, with the osculating also showing short-term periodic behavior. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS4/ROE_projections_osc_SV2.png}
+    \caption{Osculating relative quasi-non-singular orbital elements}
+    \label{fig:osc_ROE_proj}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS4/ROE_projections_mean_SV2.png}
+    \caption{Mean relative quasi-non-singular orbital elements}
+    \label{fig:mean_ROE_proj}
+\end{figure}
+
+These results line up with the behavior observed in the relative position in RTN and the initial relative orbital elements. As discussed in the previous section, the eccentricity vector is starting to trace out a circle as its phase drifts. Only a small part of this circle is observed here because we simulated for 15 orbits or about 1 day, while it takes 100-200 days to complete the full rotation in phase. The drift in $\delta i_y$ matches the drift in the normal direction in RTN observed previously and matches the governing equations in the previous section. The same goes for the drift in $\delta \lambda$. 
+
+\subsubsection{Maneuver to remove J2 secular effects}\label{sec:J2_maneuver}
+From the equations in Section \ref{sec:J2_RTN_frame}, we see that the drift in the eccentricity vector is periodic circular rather than secular. Therefore, to eliminate the secular drift we just need to eliminate the secular effects in the inclination vector and the mean longitude. The circular periodic drift in the eccentricity could also be eliminated by choosing a critical inclination for the deputy. 
 
 From Equation \ref{eq:drift_in_rel_i}, we see that one way to remove this differential effect in the inclination vector is by setting $\delta i_x = 0$. From Equation \ref{eq:quasi_nonsign_roe}, $\delta i_x = 0 \implies i_t = i_o$, or in other words the deputy satellite and the chief satellite have the same orbital inclination. 
 
-To completely remove the drift in the mean longitude based on Equation \ref{eq:drift_in_lambda_rel}, we would need to not only set $\delta i_x = 0$ but also  $\delta a = 0$. 
+To completely remove the drift in the mean longitude based on Equation \ref{eq:drift_in_lambda_rel}, we would need to not only set $\delta i_x = 0$ but also  $\delta a = 0$. Although Equation \ref{eq:drift_in_lambda_rel} only shows the Keplerian drift caused by $\delta a$, there is also a component of J2 drift that is a result of $\delta a$ changes. Since 
 
 Based on the given initial conditions in Section \ref{sec:ic_for_pset4}, we assume that the $\delta a = 0$ already. So the maneuver would mainly be to remove the inclination difference. 
 
@@ -84,9 +126,11 @@ We set the initial condition $\delta i_x = 0$ to remove secular effects. With th
 \begin{figure}[htpb]
     \centering
     \includegraphics[width=0.5\linewidth]{}
-    \caption{Relative orbital elements with initial conditions set to remove the }
+    \caption{Relative mean orbital elements with initial conditions set to remove the secular effects}
     \label{fig:rel_roe_no_drift}
 \end{figure}
+
+We see that, compared to the osculating orbital elements seen in Figure \ref{} TODO. 
 
 \subsubsection{Analytical Solution for J2 on Relative Orbital Elements}
 
