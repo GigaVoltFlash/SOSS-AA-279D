@@ -111,28 +111,37 @@ From the equations in Section \ref{sec:J2_RTN_frame}, we see that the drift in t
 
 From Equation \ref{eq:drift_in_rel_i}, we see that one way to remove this differential effect in the inclination vector is by setting $\delta i_x = 0$. From Equation \ref{eq:quasi_nonsign_roe}, $\delta i_x = 0 \implies i_t = i_o$, or in other words the deputy satellite and the chief satellite have the same orbital inclination. 
 
-To completely remove the drift in the mean longitude based on Equation \ref{eq:drift_in_lambda_rel}, we would need to not only set $\delta i_x = 0$ but also  $\delta a = 0$. Although Equation \ref{eq:drift_in_lambda_rel} only shows the Keplerian drift caused by $\delta a$, there is also a component of J2 drift that is a result of $\delta a$ changes. Since 
+To completely remove the drift in the mean longitude based on Equation \ref{eq:drift_in_lambda_rel}, we would need to not only set $\delta i_x = 0$ but also  $\delta a = 0$. Although Equation \ref{eq:drift_in_lambda_rel} only shows the Keplerian drift caused by $\delta a$, there is also a component of J2 drift that is a result of a non-zero $\delta a$ (not shown here, but is implied by the state-transition matrix provided in \cite{koenig2017new} and Section \ref{sec:j2_analytical_roe}. 
 
-Based on the given initial conditions in Section \ref{sec:ic_for_pset4}, we assume that the $\delta a = 0$ already. So the maneuver would mainly be to remove the inclination difference. 
+Based on the given initial conditions in Section \ref{sec:ic_for_pset4}, we assume that the $\delta a = 0$ already. So the maneuver would mainly be to remove the inclination difference. We will see in following sections that the $\delta a = 0$ assumption does not hold over al time for our case, and that even after setting $\delta i_x = 0$, we see a drift in $\delta \lambda$.
 
 The optimal location (minimum $\Delta v$) to produce an orbital inclination change is at the ascending node of the orbit, i.e. when $u_M = TODO$, and with the TODO TODO TODO. Direction is perpendicular?
 
-TODO: Could also do a more in-depth derivation from the STM for the delta lambda terms.
-
 \subsubsection{Simulation with new initial conditions that don't have secular effects}
 
-We set the initial condition $\delta i_x = 0$ to remove secular effects. With this, we get the relative orbital elements over time shown in Figure \ref{fig:rel_roe_no_drift}.
+We set the initial condition $\delta i_x = 0$ to remove secular effects. With this, we get the relative orbital elements over time shown in Figure \ref{fig:rel_roe_no_drift_mean} (mean ROE) and \ref{fig:rel_roe_no_drift_osc} (osculating ROE).
 
 \begin{figure}[htpb]
     \centering
-    \includegraphics[width=0.5\linewidth]{}
+    \includegraphics[width=0.8\linewidth]{sim/figures/PS4/ROE_projections_mean_no_drift_SV2.png}
     \caption{Relative mean orbital elements with initial conditions set to remove the secular effects}
-    \label{fig:rel_roe_no_drift}
+    \label{fig:rel_roe_no_drift_mean}
 \end{figure}
 
-We see that, compared to the osculating orbital elements seen in Figure \ref{} TODO. 
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.8\linewidth]{sim/figures/PS4/ROE_projections_mean_no_drift_SV2.png}
+    \caption{Relative osculating orbital elements with initial conditions set to remove the secular effects}
+    \label{fig:rel_roe_no_drift_osc}
+\end{figure}
 
-\subsubsection{Analytical Solution for J2 on Relative Orbital Elements}
+We see that there are a few differences when comparing these to the osculating orbital elements seen in Figure \ref{fig:osc_ROE_proj} and the mean orbital elements seen in \ref{fig:mean_ROE_proj}. Specifically, the drift in the $\delta i_y$ is significantly smaller, with any remaining error attributed to higher order osculating effects. Second, we see that the 
+
+\subsubsection{Analytical Solution for J2 on Relative Orbital Elements} \label{sec:j2_analytical_roe}
+
+We first look at the initial conditions described in Section \ref{sec:ic_for_pset4} where $\delta i_x \neq 0$.
+
+TODO explanations for the STM.
 
 \begin{align*}
 \Phi^{J_2}_{\text{qns}}(\alpha_c(t_i), \tau) &=
@@ -182,3 +191,42 @@ W &= \cos^2(i/2)
 \end{align*}
 
 \cite{koenig2017new}
+
+It is important to note here that the analytical state transition matrix is a result of making first-order approximations (including the assumption that $\delta a$ remains constant). Therefore, this analytical result does not fully capture osculation behavior caused by J2 perturbations. If we just use the osculating intial conditions specified in Section \ref{sec:ic_for_pset4}, we get the result in Figure \ref{fig:roe_analytical_compare_osc}. Clearly, the results don't align completely.
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.8\linewidth]{sim/figures/PS4/ROE_analytical_compare_given_IC2_SV2.png}
+    \caption{Comparison of the (mean) propagated and analytical relative orbital elements, using the osculating initial conditions for the analytical result.}
+\label{fig:roe_analytical_compare_osc}
+\end{figure}
+
+Most noticeable is the divergence in the $\delta \lambda$. The propagated $\delta \lambda$ is in fact going in the opposite direction as the expected $\delta \lambda$ drift due to J2 effects and a zero $\delta a$. This can be attributed to the osculating effects that are not captured in the analytical result. This error is primarily seen in the $\delta \lambda$ plot, although there are also a small offset in the $\delta e$ and $\delta i$ plots.
+
+Now, instead of using the given osculating initial conditions to test our analytical result, we can use the initial conditions converted to mean relative orbital elements. If we now use those when calculating the analytical, we see that the results match much better, as seen in Figure \ref{fig:roe_analytical_compare_mean}. In this case, the $\delta \lambda$ also watches very well.
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.8\linewidth]{sim/figures/PS4/ROE_analytical_compare_mean_IC2_SV2.png}
+    \caption{Comparison of the propagated and analytical relative orbital elements, but using the mean initial conditions for the analytical result.}
+\label{fig:roe_analytical_compare_mean}
+\end{figure}
+
+We can similarly also analyze the results from setting the initial conditions to be the set from Section \ref{sec:J2_maneuver}. Figure \ref{fig:roe_analytical_compare_osc_zeroed} is the result of setting the initial conditions to the given osculating values, and Figure \ref{fig:roe_analytical_compare_mean_zeroed} is the result of setting the initial conditions to the mean values. Once again, the result is the same as before where the analytical solution agrees with the propagated result better (including capturing the $\delta \lambda$ drift caused by the non-constant $\delta a$) when we use the mean initial conditions.
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.8\linewidth]{sim/figures/PS4/ROE_analytical_compare_given_IC3_SV2.png}
+    \caption{Comparison of the (mean) propagated and analytical relative orbital elements, using the osculating initial conditions with $\delta i_x = 0$ for the analytical result.}
+\label{fig:roe_analytical_compare_osc_zeroed}
+\end{figure}
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.8\linewidth]{sim/figures/PS4/ROE_analytical_compare_mean_IC3_SV2.png}
+    \caption{Comparison of the (mean) propagated and analytical relative orbital elements, using the mean initial conditions with $\delta i_x = 0$ for the analytical result.}
+\label{fig:roe_analytical_compare_mean_zeroed}
+\end{figure}
+
+
+The takeaway from this is that there are osculating effects on the relative orbital elements that cannot be ignored, so using mean relative orbital elements initial conditions is required to get the analytical solution to match the propagated mean relative orbital elements result.
