@@ -93,6 +93,9 @@ for k = 1:length(sc_names)
     sim_results.(sc).with_j2.v = state_with_j2(:,4:6);
 end
 
+%%%%%% DELTA-V FOR MANEUVER %%%%%%
+delta_v = 2*sqrt(mu_earth/a_SV1_init)*sind(d_i_x_SV2_init_2/2);
+sprintf('Delta V required to match the inclinations %d', delta_v)
 %%%%%%% CALCULATE OSC AND MEAN OE %%%%%%%%%%%
 
 % Define cases
@@ -201,7 +204,6 @@ for k = 1:size(deputy_inits,1)
     condition = deputy_mapping.(deputy_name);
 
     deputy_ic_given = [d_a, d_lambda, d_e_x, d_e_y, d_i_x, d_i_y];
-    % TODO: FIGURE OUT WHAT IS HAPPENING HERE
     deputy_output = roe_results.(condition).with_j2.(deputy_name);
     deputy_ic_mean = [deputy_output.d_a_mean(1), deputy_output.d_lambda_mean(1), deputy_output.d_e_x_mean(1), deputy_output.d_e_y_mean(1), deputy_output.d_i_x_mean(1), deputy_output.d_i_y_mean(1)];
 
