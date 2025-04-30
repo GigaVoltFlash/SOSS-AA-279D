@@ -85,9 +85,6 @@ function plot_ROE_compare_analytical(roe_results, roe_analytical_results, tstart
         ylabel('\Delta a [m]');
         title('Relative Mean Longitude vs Semi-Major Axis (Mean)');
 
-        % Preallocate handles
-        legend_handles_mean = [];
-
         curve_idx = 0;
         for init_idx = 1:length(cases_to_plot)
             curve_idx = curve_idx + 1;

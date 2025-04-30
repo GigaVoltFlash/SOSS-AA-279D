@@ -24,6 +24,7 @@ d_lambda_SV2_init_2 = 100; % m % -124
 d_e_x_SV2_init_2 = 50; % m
 d_e_y_SV2_init_2 = 100; % m
 d_i_x_SV2_init_2 = 30; % m % 79
+d_i_x_SV2_init_2_zeroed = 0;
 d_i_y_SV2_init_2 = 200; % m % 1005
 
 % Applying similar elements for SV3
@@ -32,6 +33,7 @@ d_lambda_SV3_init_2 = -100; % m % -793
 d_e_x_SV3_init_2 = 50; % m
 d_e_y_SV3_init_2 = 100; % m
 d_i_x_SV3_init_2 = 30; % m
+d_i_x_SV3_init_2_zeroed = 0;
 d_i_y_SV3_init_2 = 200; % m % 827
 
 % Define deputy initial conditions for ROE2ECI
@@ -206,7 +208,7 @@ for k = 1:size(deputy_inits,1)
 end
 
 plot_OE_ROE_mean_osc(roe_results, tstart, tint, tend, t_orbit)
-%plot_ROE_compare_analytical(roe_results, roe_analytical_results, tstart, tint, tend, t_orbit);
+plot_ROE_compare_analytical(roe_results, roe_analytical_results, tstart, tint, tend, t_orbit);
 
 %%%%%%%%%%%%% CONVERT TO RTN %%%%%%%%%%%%%%%%
 % Convert the absolute ECI positions of the chief and deputies and convert to RTN.
