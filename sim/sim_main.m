@@ -16,7 +16,8 @@ constants;
 run_PS1 = false;
 run_PS2 = false;
 run_PS3 = false;
-run_PS4 = true;
+run_PS4 = false;
+run_PS5 = true;
 
 % Load SV1 information
 load_SV1;
@@ -40,6 +41,10 @@ end
 if run_PS4
     ps4_sims;
 end
+if run_PS5
+    ps5_sims;
+end
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLOTTING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
