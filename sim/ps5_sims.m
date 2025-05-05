@@ -20,6 +20,20 @@ d_i_y_SV3_init_1 = 800; % m % 827
 
 plot_rmin_contour(a_SV1_init*1e3, [10, 250, 1000]);
 
+% SIM IN RTN?
+% Need a high fidelity sim with J2 perturbations that we can input
+% different control modes into.
+% Features of this simulation
+%       * Take in functions for the different modes that define control.
+%       * Apply specific delta v maneuvers at times specified
+%       * Output RTN space throughout simulation but also in ROE space (or
+%       maybe do conversion post)
+%       * Be able to simulate 1 to 4 modes (as in turn, off particular
+%       modes)
+%       * Intelligently activate the different modes based on a state
+%       machine (i.e. or just hard-code when we want specific maneuvers).
+
+
 %delta_r_min = 250;         % Desired minimum distance = 50 m
 delta_e = 0.000005;         % Example delta e
 delta_i = 0.000036;

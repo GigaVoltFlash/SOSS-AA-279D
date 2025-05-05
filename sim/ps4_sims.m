@@ -94,7 +94,7 @@ for k = 1:length(sc_names)
 end
 
 %%%%%% DELTA-V FOR MANEUVER %%%%%%
-delta_v = 2*sqrt(mu_earth/a_SV1_init)*sind(d_i_x_SV2_init_2/2);
+delta_v = 2*sqrt(mu_earth/a_SV1_init)*sin(d_i_x_SV2_init_2/(2000*a_SV1_init)) * 1000; % delta_v in mps
 sprintf('Delta V required to match the inclinations %d', delta_v)
 %%%%%%% CALCULATE OSC AND MEAN OE %%%%%%%%%%%
 
@@ -210,8 +210,8 @@ for k = 1:size(deputy_inits,1)
     chief_name = 'SV1'; % Chief is always SV1
     t_series = sim_results.(chief_name).('no_j2').t; % Pulling a random t vector
     SV1_oe_init = [a_SV1_init, e_SV1_init, i_SV1_init, RAAN_SV1_init, w_SV1_init];
-    roe_output_given_ic = roe_stm_j2(t_series, deputy_ic_given, SV1_oe_init);
-    roe_output_mean_ic = roe_stm_j2(t_series, deputy_ic_mean, SV1_oe_init);
+    [STMs, roe_output_given_ic] = roe_stm_j2(t_series, deputy_ic_given, SV1_oe_init);
+    [STMs, roe_output_mean_ic] = roe_stm_j2(t_series, deputy_ic_mean, SV1_oe_init);
 
     roe_analytical_results.(condition).(deputy_name) = struct('roe_analytical_j2_given_ic', roe_output_given_ic, ...
                                                               'roe_analytical_j2_mean_ic', roe_output_mean_ic); % Using the initial conditions as given (0 delta a) and mean ICs (non-zero delta a)
