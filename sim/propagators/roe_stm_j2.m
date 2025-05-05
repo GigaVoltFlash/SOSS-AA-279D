@@ -1,4 +1,4 @@
-function [roe_output] = roe_stm_j2(t, qns_roe_init, SV1_oe_init)
+function [STMs, roe_output] = roe_stm_j2(t, qns_roe_init, SV1_oe_init)
     % Inputs in degrees
     % Input t is the all the time-steps that we want to propagate the ROE states by
     % qns_roe_init is the initial conditions of the deputy in quasi-nonsingular relative orbital elements
@@ -31,6 +31,7 @@ function [roe_output] = roe_stm_j2(t, qns_roe_init, SV1_oe_init)
     
     n_t = length(t);
     roe_output = zeros(n_t, 6);
+    STMs = zeros(n_t, 6, 6);
     roe_output(1, :) = qns_roe_init;
 
     for iter = 1:n_t
@@ -43,7 +44,7 @@ function [roe_output] = roe_stm_j2(t, qns_roe_init, SV1_oe_init)
             -7/2*kappa*exf*Q*tau,         0, sin(omega_dot*tau)-4*kappa*exi*exf*G*Q*tau, cos(omega_dot*tau)-4*kappa*eyi*exf*G*Q*tau,  -5*kappa*exf*S*tau, 0;...
             0,                            0, 0,                                           0,                                            1,                  0;...
             7/2*kappa*S*tau,              0, -4*kappa*exi*G*S*tau,                        -4*kappa*eyi*G*S*tau,                         2*kappa*T*tau,      1];
-        
+        STMs(iter, :, :) = STM;
         roe_output(iter, :) = STM * qns_roe_init';
     end
 end
