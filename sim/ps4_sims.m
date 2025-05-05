@@ -94,7 +94,7 @@ for k = 1:length(sc_names)
 end
 
 %%%%%% DELTA-V FOR MANEUVER %%%%%%
-delta_v = 2*sqrt(mu_earth/a_SV1_init)*sind(d_i_x_SV2_init_2/2);
+delta_v = 2*sqrt(mu_earth/a_SV1_init)*sin(d_i_x_SV2_init_2/(2000*a_SV1_init)) * 1000; % delta_v in mps
 sprintf('Delta V required to match the inclinations %d', delta_v)
 %%%%%%% CALCULATE OSC AND MEAN OE %%%%%%%%%%%
 
