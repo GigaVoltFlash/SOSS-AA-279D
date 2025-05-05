@@ -13,9 +13,12 @@ function states = evaluate_ya(t, a, e, M_init, K)
         M = deg2rad(M_init) + n*t(i);
         %M = mod(M, 2*pi);
         
-        E = Newton_Raphson(M, e, 1e-5); % in radians
-        f = 2*atan2(sqrt(1+e)*tan(E/2),sqrt(1-e)); % in radians
-        f = mod(f,2*pi);
+        %E = Newton_Raphson(M, e, 1e-5); % in radians
+        %f = 2*atan2(sqrt(1+e)*tan(E/2),sqrt(1-e)); % in radians
+        %f = mod(f,2*pi);
+        E = mean2ecc(M,e,1e-10);
+        f = ecc2true(E,e);
+
         eta = sqrt(1-e^2);
         tau = n*t(i)/eta^3; 
         k = 1 + e*cos(f);

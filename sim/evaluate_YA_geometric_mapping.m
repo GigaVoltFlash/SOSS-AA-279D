@@ -11,9 +11,11 @@ function states = evaluate_YA_geometric_mapping(t, a, ex, ey, i, w, M_init, d_a,
     for idx = 1:N
         M = deg2rad(M_init) + n * t(idx);
         %M = mod(M, 2*pi);
-        E = Newton_Raphson(M, e, 1e-5);
-        f = 2 * atan2(sqrt(1 + e) * tan(E / 2), sqrt(1 - e));
-        f = mod(f,2*pi);
+        %E = Newton_Raphson(M, e, 1e-5);
+        %f = 2 * atan2(sqrt(1 + e) * tan(E / 2), sqrt(1 - e));
+        %f = mod(f,2*pi);
+        E = mean2ecc(M,e,1e-10);
+        f = ecc2true(E,e);
         u = w + f;  % True longitude
         %u = f;
 

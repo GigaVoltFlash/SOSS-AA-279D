@@ -19,3 +19,14 @@ d_i_x_SV3_init_1 = 0; % m
 d_i_y_SV3_init_1 = 800; % m % 827
 
 plot_rmin_contour(a_SV1_init*1e3, [10, 250, 1000]);
+
+%delta_r_min = 250;         % Desired minimum distance = 50 m
+delta_e = 0.000005;         % Example delta e
+delta_i = 0.000036;
+
+delta_r_min_calc = sqrt(2)*a_SV1_init*1e3*abs(delta_e*delta_i)/...
+    sqrt(delta_e^2 + delta_i^2 + abs(delta_e+delta_i)*abs(delta_e-delta_i));
+disp(delta_r_min_calc)
+
+%delta_i = solve_delta_i(a_SV1_init*1e3, delta_r_min, delta_e);
+%fprintf('|delta i| = %.6f\n', delta_i);
