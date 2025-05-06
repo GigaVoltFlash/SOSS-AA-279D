@@ -11,6 +11,7 @@ function plot_RT_RN_projections(SV2_rel_pos, SV3_rel_pos, title_string,fig_path)
     plot(y2, x2, 'r', 'LineWidth', 1.5);
     plot(0, 0, 'ko', 'MarkerFaceColor', 'k'); % Origin
     grid on;
+    axis equal;
     ylabel('Radial [km]'); xlabel('Tangential [km]');
     title('R-T Plane Projection');
     legend('SV2 / Watcher', 'SV3 / Docker', 'SV1 / Chief');
@@ -22,6 +23,7 @@ function plot_RT_RN_projections(SV2_rel_pos, SV3_rel_pos, title_string,fig_path)
     plot(z2, x2, 'r', 'LineWidth', 1.5);
     plot(0, 0, 'ko', 'MarkerFaceColor', 'k'); % Origin
     grid on;
+    axis equal;
     ylabel('Radial [km]'); xlabel('Normal [km]');
     title('R-N Plane Projection');
     legend('SV2 / Watcher', 'SV3 / Docker', 'SV1 / Chief');
@@ -32,6 +34,7 @@ function plot_RT_RN_projections(SV2_rel_pos, SV3_rel_pos, title_string,fig_path)
     plot(y2, z2, 'r', 'LineWidth', 1.5);
     plot(0, 0, 'ko', 'MarkerFaceColor', 'k'); % Origin
     grid on;
+    axis equal;
     ylabel('Normal [km]'); xlabel('Tangential [km]');
     title('N-T Plane Projection');
     legend('SV2 / Watcher', 'SV3 / Docker', 'SV1 / Chief');

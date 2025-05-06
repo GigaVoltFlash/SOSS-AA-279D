@@ -4,8 +4,8 @@ function plot_rmin_contour(a, level_set_values)
     %   level_set_values = vector of r_min level set values to isolate in 2D
 
     % Define ranges
-    delta_e_vals = linspace(1e-5, 2e-4, 300);  % 0.00001 to 0.001
-    delta_i_vals = linspace(1e-5, 2e-4, 300);
+    delta_e_vals = linspace(1e-7, 2e-4, 300);  % 0.00001 to 0.001
+    delta_i_vals = linspace(1e-7, 2e-4, 300);
 
     % Meshgrid
     [DE, DI] = meshgrid(delta_e_vals, delta_i_vals);
@@ -15,7 +15,7 @@ function plot_rmin_contour(a, level_set_values)
     Denominator = sqrt(DE.^2 + DI.^2 + abs(DE + DI) .* abs(DE - DI));
     R_min = Numerator ./ Denominator;
 
-    %% 3D surface plot
+    % 3D surface plot
     figure;
     surf(DE, DI, R_min, 'EdgeColor', 'none');
     xlabel('|\delta e|');
@@ -41,12 +41,12 @@ function plot_rmin_contour(a, level_set_values)
     hold off;
     legend('r_{min} Surface', 'Level Set Contours', 'Location', 'northeast');
 
-    %% Separate 2D level set plots
+    % Separate 2D level set plots
     for i = 1:length(level_set_values)
         figure;
-        contour(DE, DI, R_min, [level_set_values(i) level_set_values(i)], 'LineWidth', 2);
-        xlabel('|\delta e|');
-        ylabel('|\delta i|');
+        contour(a*DE, a*DI, R_min, [level_set_values(i) level_set_values(i)], 'LineWidth', 2);
+        xlabel('a|\delta e|');
+        ylabel('a|\delta i|');
         title(sprintf('Level Set: \\delta r_{min} = %.1f m at a = %.0f km', ...
               level_set_values(i), a/1e3));
         grid on;
