@@ -8,6 +8,9 @@ addpath("mean_osc\");
 addpath("transformations\");
 addpath("propagators\");
 addpath("eoms\");
+addpath('..\gnc\control_modes\');
+addpath('..\gnc\methods\');
+
 
 % Load all constants from the constants file
 constants;

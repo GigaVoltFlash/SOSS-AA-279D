@@ -26,7 +26,7 @@ t_series = tstart:tint:tend;
 SV1_OE_init = [a_SV1_init, e_SV1_init, i_SV1_init, RAAN_SV1_init, w_SV1_init, M_SV1_init];
 
 
-for mode = 1:4
+for mode = 1:1
     SV2_ROE = SV2_modes(mode, :);
     SV3_ROE = SV3_modes(mode, :);
 
@@ -39,12 +39,26 @@ for mode = 1:4
     state_abs_SV2_init = [r_SV2_init; v_SV2_init];
     state_abs_SV3_init = [r_SV3_init; v_SV3_init];
 
-    fig_path = sprintf('figures/PS5/mode_%d_RTN.png', mode);
-    title_str = sprintf('ROE Mode %d: SV2 & SV3 Relative Motion', mode);
+    %fig_path = sprintf('figures/PS5/mode_%d_RTN.png', mode);
+    %title_str = sprintf('ROE Mode %d: SV2 & SV3 Relative Motion', mode);
 
-    simulate_and_plot_relative_motion(t_series, SV2_ROE, state_abs_SV2_init, ...
-                                      SV3_ROE, state_abs_SV3_init, SV1_OE_init, ...
-                                      state_init, fig_path, title_str);
+    %simulate_and_plot_relative_motion(t_series, SV2_ROE, state_abs_SV2_init, ...
+   %                                   SV3_ROE, state_abs_SV3_init, SV1_OE_init, ...
+   %                                   state_init, fig_path, title_str);
+
+    roe_initial = SV3_modes(1,:)/a_SV1_init; % must be unscaled!
+    roe_final = SV3_modes(2,:)/a_SV1_init;
+    init_time = tstart;
+    final_time = t_orbit;
+    
+    [delta_v_vals, delta_v_times] = mode2_control(roe_initial, roe_final, init_time, final_time, SV1_OE_init);
+   
+    fig_path = sprintf('figures/PS5/mode_%d_RTN_maneuvers.png', mode);
+    title_str = sprintf('ROE Mode %d: SV2 & SV3 Relative Motion with manuever', mode);
+   
+    simulate_and_plot_relative_motion_with_maneuvers(t_series, SV2_ROE, state_abs_SV2_init, ...
+        SV3_ROE, state_abs_SV3_init, SV1_OE_init, state_init, ...
+        fig_path, title_str, delta_v_times, delta_v_vals)
 end
 
 

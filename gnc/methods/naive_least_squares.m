@@ -4,7 +4,7 @@
 % a reconfiguration
 function [delta_v_vals] = naive_least_squares(t_maneuvers, roe_init, roe_final, SV1_oe_init, t_final)
     m = length(t_maneuvers);
-    total_delta_roe = roe_final - roe_init; % Total roe change
+    total_delta_roe = (roe_final - roe_init)'; % Total roe change
     Matrix_block = zeros(6, 3*m);
 
     for i=1:m
@@ -12,8 +12,10 @@ function [delta_v_vals] = naive_least_squares(t_maneuvers, roe_init, roe_final, 
         STM = calc_STM_for_control(t_val, t_final, SV1_oe_init);
         Gamma = calc_Gamma_for_control(t_val, SV1_oe_init);
         Matrix_block(:, 3*(i-1)+1:3*i) = STM * Gamma;
-
-    delta_v_vals = pinv(Matrix_block) * total_delta_roe;
+    end
+ 
+    delta_v_vals = reshape(pinv(Matrix_block) * total_delta_roe,m,3);
+    
 end
 
 % Old version that did waypoints. We can also do this, and use closed form to find the in-between maneuvers.
