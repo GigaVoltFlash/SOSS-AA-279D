@@ -16,7 +16,7 @@ function STM = calc_STM_for_control(T_opt, tf, SV1_oe_init)
     n = sqrt(mu_earth/a^3);
     omega_dot = kappa * Q;
 
-    tau = tf - T_opt;
+    tau = tf - T_opt; % delta_u / (n + kappa*(eta*P + Q) ?
 
     STM = [1,                            0, 0,                  0,                   0,              0;...
            -(3/2*n + 7/2*kappa*E*P)*tau, 1, 0,                  0,                   -kappa*F*S*tau, 0;...

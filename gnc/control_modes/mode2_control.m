@@ -14,12 +14,12 @@ function [delta_v_vals, delta_v_times] = mode2_control(roe_initial, roe_final, i
 
     % Steps here:
     % 1. ####### Calculate the guidance law to get from start to finish #######
-    n_man = 3 % number of maneuvers we want to do
+    n_man = 3; % number of maneuvers we want to do
 
     % Picking the guidance law times relative to the initial time
-    delta_v_times = linspace(init_time, final_time, n_man+1) % Should give me equally spaced time-steps from start to end times?
-    delta_v_times = delta_v_times(2:)
-    delta_v_vals = naive_least_squares(delta_v_times, roe_initial, roe_final, SV1_OE_init)
+    delta_v_times = linspace(init_time, final_time, n_man+1); % Should give me equally spaced time-steps from start to end times?
+    %delta_v_times = delta_v_times(2:end);
+    delta_v_vals = naive_least_squares(delta_v_times, roe_initial, roe_final, SV1_OE_init);
 
 end
 
