@@ -3,7 +3,7 @@
 % Anshuk Chigullapalli 
 
 %%%%% DEFINE ROE FOR EACH MODE %%%%%%% 
-%plot_rmin_contour(a_SV1_init*1e3, [10, 250, 1000]);
+plot_rmin_contour(a_SV1_init*1e3, [10, 250, 1000]);
 
 
 

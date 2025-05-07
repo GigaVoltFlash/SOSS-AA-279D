@@ -40,16 +40,19 @@ function plot_rmin_contour(a, level_set_values)
     end
     hold off;
     legend('r_{min} Surface', 'Level Set Contours', 'Location', 'northeast');
+    saveas(gcf, 'figures/PS5/min_dist_contour.png');
 
     % Separate 2D level set plots
-    for i = 1:length(level_set_values)
-        figure;
-        contour(a*DE, a*DI, R_min, [level_set_values(i) level_set_values(i)], 'LineWidth', 2);
-        xlabel('a|\delta e|');
-        ylabel('a|\delta i|');
-        title(sprintf('Level Set: \\delta r_{min} = %.1f m at a = %.0f km', ...
-              level_set_values(i), a/1e3));
-        grid on;
-        axis equal;
-    end
+    % for i = 1:length(level_set_values)
+    %     figure;
+    %     contour(a*DE, a*DI, R_min, [level_set_values(i) level_set_values(i)], 'LineWidth', 2);
+    %     xlabel('a|\delta e|');
+    %     ylabel('a|\delta i|');
+    %     title(sprintf('Level Set: \\delta r_{min} = %.1f m at a = %.0f km', ...
+    %           level_set_values(i), a/1e3));
+    %     grid on;
+    %     axis equal;
+    % end
+
+    
 end
