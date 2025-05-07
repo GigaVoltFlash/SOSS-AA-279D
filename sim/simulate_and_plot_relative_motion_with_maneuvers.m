@@ -88,8 +88,8 @@ function simulate_and_plot_relative_motion_with_maneuvers(t, t_orbit, SV2_roe_in
 
     [d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3] = ECI2ROE_array_mean(r_SV1, v_SV1, r_SV3, v_SV3, true);
     plot_ROE_planes_with_modes(full_times, t_orbit, d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3,SV3_modes,...
-        num_orbits_modes, num_orbits_station_keep,'figures/PS5/ROE_planes.png', 'figures/PS5/ROE_over_time.png', 'figures/PS5/ROE_error_over_time.png');
+        num_orbits_modes, num_orbits_station_keep,'figures/PS5/ROE_planes_modes.png', 'figures/PS5/ROE_over_time_modes.png', 'figures/PS5/ROE_error_over_time_modes.png');
     plot_delta_v_timeline(delta_v_times, delta_v_vals, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
-        'figures/PS5/delta_v_timeline.png');
+        'figures/PS5/delta_v_timeline_modes.png');
 
 end
