@@ -26,7 +26,7 @@ t_series = tstart:tint:tend;
 SV1_OE_init = [a_SV1_init, e_SV1_init, i_SV1_init, RAAN_SV1_init, w_SV1_init, M_SV1_init];
 
 
-for mode = 1:1
+for mode = 1:2
     SV2_ROE = SV2_modes(mode, :);
     SV3_ROE = SV3_modes(mode, :);
 
@@ -53,9 +53,9 @@ for mode = 1:1
     roe_initial = SV3_modes(mode,:)/a_SV1_init; % must be unscaled!
     roe_final = SV3_modes(mode+1,:)/a_SV1_init;
     init_time = tstart;
-    final_time = 0.5*t_orbit;
+    final_time = 2*t_orbit;
     
-    [delta_v_vals, delta_v_times] = mode2_control(roe_initial, roe_final, init_time, final_time, SV1_OE_init);
+    [delta_v_vals, delta_v_times] = mode2_control(roe_initial, roe_final, init_time, final_time, SV1_OE_init, u_SV1_init);
    
     fig_path = sprintf('figures/PS5/mode_%d_RTN_maneuvers.png', mode);
     title_str = sprintf('ROE Mode %d: SV2 & SV3 Relative Motion with manuever', mode);

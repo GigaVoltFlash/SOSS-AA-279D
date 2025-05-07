@@ -2,7 +2,7 @@
 % For a given set of times, this function uses naive least squares to find a set of delta v maneuvers 
 % that brings you close to the change in ROE that is desired. We can try and use this for the approach, or for
 % a reconfiguration
-function [delta_v_vals] = naive_least_squares(t_maneuvers, roe_init, roe_final, SV1_oe_init, t_0, t_final)
+function [delta_v_vals] = naive_least_squares(t_maneuvers, roe_init, roe_final, SV1_oe_init, u_SV1_init, t_0, t_final)
     m = length(t_maneuvers);
     STM_from_init = calc_STM_for_control(t_0, t_final, SV1_oe_init);
     no_control_roe_final = STM_from_init * roe_init';
@@ -12,7 +12,7 @@ function [delta_v_vals] = naive_least_squares(t_maneuvers, roe_init, roe_final, 
     for i=1:m
         t_val = t_maneuvers(i);
         STM = calc_STM_for_control(t_val, t_final, SV1_oe_init);
-        Gamma = calc_Gamma_for_control(t_val, SV1_oe_init);
+        Gamma = calc_Gamma_for_control(t_val, SV1_oe_init, u_SV1_init);
         Matrix_block(:, 3*(i-1)+1:3*i) = STM * Gamma;
     end
  

@@ -10,7 +10,6 @@ function [delta_v_vals, delta_v_times] = mode3_control(roe_initial, roe_final, S
     % USE CLOSED-FORM SOLUTION
     t0 = 0;
     tf = 100; % No idea, just putting something for now.
-    [delta_v_vals, delta_v_times] = closed_form_control(roe_initial, roe_final, SV1_OE_init, t0, tf);
-
+    [delta_v_vals, delta_v_times] = closed_form_control(roe_initial, roe_final, SV1_OE_init, t0, tf);    
 
 end
