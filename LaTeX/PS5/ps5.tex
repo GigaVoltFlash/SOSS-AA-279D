@@ -1,0 +1,80 @@
+\section{Problem Set 5}
+\subsection{Control Objectives}
+\subsubsection{Operational Modes}
+The ultimate goal of our formation is to demonstrate on-orbit servicing of an uncontrollable target spacecraft with a swarm of one docking satellite and one observing satellite. Specifically, the Target spacecraft (SV1) has no maneuvering capabilities as it has run out of propellant, and our formation is aiming to refuel it. As such, SV1 will act as the origin of the RTN frame and remain there throughout all of our operational modes. The Watcher spacecraft (SV2) has sensing capabilities, including optical cameras such as those in the NASA Starling mission, which will be used to inspect the Target and estimate its pose for servicing purposes. The Docker spacecraft (SV3) also has optical sensors that will aid in this inspection, but also play a crucial role in proximity and docking operations. Our formation aims to demonstrate a significant advance in on-orbit pose estimation and characterization of objects, along with improved docking operations through the use of multiple spacecraft with a variety of sensor modalities. 
+
+In order to achieve this, the significant operational modes of our formation are as follows: 
+
+\begin{enumerate}
+\item \textbf{Station Keeping Mode} - Initial checkout of Target spacecraft with both Watcher and Docker less than a kilometer and more than 250 meters away at closest approach
+\item \textbf{Approach Mode} - Docker approaches the Target while Watcher watches from the same distance. This mode runs until the Docker is approximately 10 meters away from the Target
+\item \textbf{Proximity Operations Mode} - Docker completes final approach Target while Watcher watches
+\item \textbf{Docked Mode} - Docker docks and services Target while Watcher watches
+\end{enumerate}
+
+\subsubsection{Formation Keeping Control Requirements}
+Allowable separations are defined in each mode by definition
+
+Maximum separation is set by sensor range (optical camera optimized for <1km, focal point, etc)
+
+Bounded motion from relative e-i alignment and choice of ROEs
+
+Actuation: want low-thrust, high precision, impulse bit on order of mm/s, short burns to not disturb attitude but also allow for precise control
+
+relative position knowledge: Watcher should be less than a meter, Docker should less than a centimeter in order to allow for successful docking and servicing --> velocity estimation on order of mm/s
+
+for close proximity operations --> high control frequency of 10Hz
+
+
+
+\subsubsection{Reconfiguration Control Requirements}
+Maintain separation requirements for passive safety
+
+Docker must not block watcher line of sight
+
+station keeping --> 2 orbits
+approach --> 5 orbits
+proximity ops --> 1 orbits
+docked --> 
+Mode 2 --> most time
+
+Any others??
+
+
+\subsubsection{Choice of Actuators}
+For RPO need fine and accurate thrust control, with high thust amounts (Isp less important --> cold gas thrusters (don't want to do nasty hydrazine)
+
+For station keeping, phasing and approach need high efficiency --> Electric propulsion (Hall effect thruster). High thrust not required.
+
+
+
+\subsubsection{Absolute and Relative Orbit Dynamics Models}
+nonlinear, two-body ROE based dynamics models will be used, we will need some onboard calculations to be performed so cannot use compute intensive models
+
+Absolute orbit dynamics are not as important as there is not much of the mission interfacing with Earth-based sensors or services. 
+
+
+
+\subsection{Impulsive Control Law}
+
+\subsubsection{Control Method Considerations}
+
+Only for mode 2:
+* We will do higher-level guidance with a highly accurate state transition matrix (STMs) at a low rate so as to find intermediate waypoints
+* We will go between those waypoints with lower-level control (simpler STM, calculate delta v at different points in the RTN frame).
+
+If we only have modifications in the $\delta i_y$ and $\delta e_y$, then we won't need very complex waypoints, or maneuvers.
+
+With just $\delta i_y \neq 0$ and $\delta i_x = 0$, 
+
+With just $\delta e_y \neq 0$ and $\delta e_x = 0$ always, we would only have variations in the $\Delta \delta e_y$, which means that the maneuvers for this change will always happen at $u = \pm 90^\circ$, so at the maximum/minimum latitude points. Just FYI noting this down.
+     Doing a tangential burn would change our delta lambda I believe, so I think there is a way to keep this within a dead-band.
+     Will i 
+
+
+
+\subsubsection{In-Class Method}
+
+\subsubsection{Justificiation and Implementation of Control}
+
+\subsubsection{Results and Analysis of Control Performance}
