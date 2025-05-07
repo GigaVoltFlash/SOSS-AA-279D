@@ -40,11 +40,15 @@ for mode = 1:1
     state_abs_SV3_init = [r_SV3_init; v_SV3_init];
 
     fig_path = sprintf('figures/PS5/mode_%d_RTN.png', mode);
-    title_str = sprintf('ROE Mode %d: SV2 & SV3 Relative Motion', mode);
+    title_str = sprintf('Mode %d: SV2 & SV3 Relative Motion in RTN', mode);
+    fig_path2 = sprintf('figures/PS5/mode_%d_ROE_Planes.png', mode);
+    title_str2 = sprintf('Mode %d: SV2 & SV3 Relative Motion in ROE Planes', mode);
+    fig_path3 = sprintf('figures/PS5/mode_%d_ROE_Time.png', mode);
+    title_str3 = sprintf('Mode %d: SV2 & SV3 Relative Motion in ROE Time History', mode);
 
-    simulate_and_plot_relative_motion(t_series, SV2_ROE, state_abs_SV2_init, ...
+    simulate_and_plot_relative_motion(t_series, t_orbit, SV2_ROE, state_abs_SV2_init, ...
                                       SV3_ROE, state_abs_SV3_init, SV1_OE_init, ...
-                                      state_init, fig_path, title_str);
+                                      state_init, fig_path, title_str, fig_path2, title_str2, fig_path3, title_str3);
 
     roe_initial = SV3_modes(mode,:)/a_SV1_init; % must be unscaled!
     roe_final = SV3_modes(mode+1,:)/a_SV1_init;
