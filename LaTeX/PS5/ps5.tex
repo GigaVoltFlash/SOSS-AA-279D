@@ -12,6 +12,28 @@ In order to achieve this, the significant operational modes of our formation are
 \item \textbf{Docked Mode} - Docker docks and services Target while Watcher watches
 \end{enumerate}
 
+\subsubsection{Operational Mode ROEs}
+The absolute motion of our spacecraft is not the focus, as our formation is purely concerned with servicing a satellite. As such, all of the operational modes are defined as deputy ROEs as follows. 
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|rrrrrr|rrrrrr|}
+\hline
+\textbf{Mode} & \multicolumn{6}{c|}{\textbf{SV2 (m)}} & \multicolumn{6}{c|}{\textbf{SV3 (m)}} \\
+\cline{2-13}
+ & $d_a$ & $d_\lambda$ & $d_{e_x}$ & $d_{e_y}$ & $d_{i_x}$ & $d_{i_y}$ 
+ & $d_a$ & $d_\lambda$ & $d_{e_x}$ & $d_{e_y}$ & $d_{i_x}$ & $d_{i_y}$ \\
+\hline
+1 & 0 & 0 & 0 & 300 & 0 & 300 & 0 & 0 & 0 & 250 & 0 & -250 \\
+2 & 0 & 0 & 0 & 300 & 0 & 300 & 0 & 0 & 0 & 100 & 0 & -100 \\
+3 & 0 & 0 & 0 & 300 & 0 & 300 & 0 & 0 & 0 & 10  & 0 & -10 \\
+4 & 0 & 0 & 0 & 300 & 0 & 300 & 0 & 0 & 0 & 1   & 0 & -1 \\
+\hline
+\end{tabular}
+\caption{Relative Orbital Element Modes for SV2 and SV3 (scaled by $a_c$)}
+\label{tab:roe_modes}
+\end{table}
+
 \subsubsection{Formation Keeping Control Requirements}
 Allowable separations are defined in each mode by definition
 
