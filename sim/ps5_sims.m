@@ -46,8 +46,8 @@ for mode = 1:1
    %                                   SV3_ROE, state_abs_SV3_init, SV1_OE_init, ...
    %                                   state_init, fig_path, title_str);
 
-    roe_initial = SV3_modes(1,:)/a_SV1_init; % must be unscaled!
-    roe_final = SV3_modes(2,:)/a_SV1_init;
+    roe_initial = SV3_modes(mode,:)/a_SV1_init; % must be unscaled!
+    roe_final = SV3_modes(mode+1,:)/a_SV1_init;
     init_time = tstart;
     final_time = t_orbit;
     
