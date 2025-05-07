@@ -7,32 +7,43 @@ function simulate_and_plot_relative_motion(t, SV2_roe_init, state_abs_SV2_init, 
     %   fig_path      = full path to save figure (e.g., 'figs/formation_projection.png')
     %   title_str     = string to display in the plot title
 
+    J2_flag = true;
+
     % Propagate chief
-    [~, chief_state] = rk4_eom_ECI(t, SV1_state_init, true); % with J2
+    [~, chief_state] = rk4_eom_ECI(t, SV1_state_init, J2_flag); % with J2
     r_SV1 = chief_state(:,1:3);
     v_SV1 = chief_state(:,4:6);
     
-    % Propagate both deputies 
-    % NEED TO FIX
+    % Propagate both deputies in ROE and ECI
     [~, roe_SV2] = roe_stm_j2(t, SV2_roe_init, SV1_oe_init);
     [~, roe_SV3] = roe_stm_j2(t, SV3_roe_init, SV1_oe_init);
 
-    [~, state_SV2] = rk4_eom_ECI(t, state_abs_SV2_init, true); % with J2
-    [~, state_SV3] = rk4_eom_ECI(t, state_abs_SV3_init, true); % with J2
+    [~, state_SV2] = rk4_eom_ECI(t, state_abs_SV2_init, J2_flag); % with J2
+    [~, state_SV3] = rk4_eom_ECI(t, state_abs_SV3_init, J2_flag); % with J2
     r_SV2 = state_SV2(:,1:3);
     v_SV2 = state_SV2(:,4:6);
     r_SV3 = state_SV3(:,1:3);
     v_SV3 = state_SV3(:,4:6);
 
-    % Convert ROEs to RTN coordinates (in kilometers)
+    % RTN positions from FODE
     SV2_rel_pos = zeros(length(t), 3);
     SV3_rel_pos = zeros(length(t), 3);
-    
-    for i = 1:length(t)
-        % Unpack ROEs for each deputy
-        x_roe_SV2 = roe_SV2(i, :)';
-        x_roe_SV3 = roe_SV3(i, :)';
 
+    % ROE from FODE
+    
+    
+    [d_a_osc_SV2, d_lambda_osc_SV2, d_e_x_osc_SV2, d_e_y_osc_SV2, d_i_x_osc_SV2, d_i_y_osc_SV2, ...
+     d_a_mean_SV2, d_lambda_mean_SV2, d_e_x_mean_SV2, d_e_y_mean_SV2, d_i_x_mean_SV2, d_i_y_mean_SV2] = ...
+        compute_OE_ROE_mean_osc(r_SV1, v_SV1, r_SV2, v_SV2, J2_flag);
+    [d_a_osc_SV3, d_lambda_osc_SV3, d_e_x_osc_SV3, d_e_y_osc_SV3, d_i_x_osc_SV3, d_i_y_osc_SV3, ...
+     d_a_mean_SV3, d_lambda_mean_SV3, d_e_x_mean_SV3, d_e_y_mean_SV3, d_i_x_mean_SV3, d_i_y_mean_SV3] = ...
+        compute_OE_ROE_mean_osc(r_SV1, v_SV1, r_SV3, v_SV3, J2_flag);
+    ROE_SV2_FODE = [d_a_mean_SV2, d_lambda_mean_SV2, d_e_x_mean_SV2, d_e_y_mean_SV2, d_i_x_mean_SV2, d_i_y_mean_SV2];
+    ROE_SV3_FODE = [d_a_mean_SV3, d_lambda_mean_SV3, d_e_x_mean_SV3, d_e_y_mean_SV3, d_i_x_mean_SV3, d_i_y_mean_SV3];
+
+
+    for i = 1:length(t)     
+        % Unpack ECI states for each sc at each timestep
         x_r_SV1 = r_SV1(i,:)';
         x_v_SV1 = v_SV1(i,:)';
         x_r_SV2 = r_SV2(i,:)';
@@ -40,15 +51,28 @@ function simulate_and_plot_relative_motion(t, SV2_roe_init, state_abs_SV2_init, 
         x_r_SV3 = r_SV3(i,:)';
         x_v_SV3 = v_SV3(i,:)';
 
-        [a_o, e_o, i_o, RAAN_o, w_o, M_o] = ECI2OE(x_r_SV1, x_v_SV1);
-        oe_SV1 = [a_o, e_o, i_o, RAAN_o, w_o, M_o];
+        SV2_rel_pos(i, :) = ECI2RTN_rel(x_r_SV1', x_v_SV1', x_r_SV2', x_v_SV2');
+        SV3_rel_pos(i, :) = ECI2RTN_rel(x_r_SV1', x_v_SV1', x_r_SV3', x_v_SV3');
+
+        % Compute ROEs from ECI states
+        % [d_a_osc_SV2, d_lambda_osc_SV2, d_e_x_osc_SV2, d_e_y_osc_SV2, d_i_x_osc_SV2, d_i_y_osc_SV2, ...
+        %  d_a_mean_SV2, d_lambda_mean_SV2, d_e_x_mean_SV2, d_e_y_mean_SV2, d_i_x_mean_SV2, d_i_y_mean_SV2] = ...
+        %     compute_OE_ROE_mean_osc(x_r_SV1', x_v_SV1', x_r_SV2', x_v_SV2', J2_flag);
+        % [d_a_osc_SV3, d_lambda_osc_SV3, d_e_x_osc_SV3, d_e_y_osc_SV3, d_i_x_osc_SV3, d_i_y_osc_SV3, ...
+        %  d_a_mean_SV3, d_lambda_mean_SV3, d_e_x_mean_SV3, d_e_y_mean_SV3, d_i_x_mean_SV3, d_i_y_mean_SV3] = ...
+        %     compute_OE_ROE_mean_osc(x_r_SV1', x_v_SV1', x_r_SV3', x_v_SV3', J2_flag);
+
+
+
+
+        %[a_o, e_o, i_o, RAAN_o, w_o, M_o] = ECI2OE(x_r_SV1, x_v_SV1);
+        %oe_SV1 = [a_o, e_o, i_o, RAAN_o, w_o, M_o];
 
         % Convert QNS ROEs to relative RTN position
         %SV2_rel_pos(i, :) = ROE2RTN(x_roe_SV2, oe_SV1,x_r_SV1,x_v_SV1);
         %SV3_rel_pos(i, :) = ROE2RTN(x_roe_SV3, oe_SV1,x_r_SV1,x_v_SV1);
         % For now, just propagating regularly, not using J2 STM
-        SV2_rel_pos(i, :) = ECI2RTN_rel(x_r_SV1', x_v_SV1', x_r_SV2', x_v_SV2');
-        SV3_rel_pos(i, :) = ECI2RTN_rel(x_r_SV1', x_v_SV1', x_r_SV3', x_v_SV3');
+        
 
 
     end
