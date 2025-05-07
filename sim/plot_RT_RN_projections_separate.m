@@ -14,7 +14,7 @@ function plot_RT_RN_projections_separate(SV2_rel_pos, SV3_rel_pos, RT, RN, NT, t
         ylabel('Radial [m]'); xlabel('Tangential [m]');
         %title('R-T Plane Projection');
         legend('SV2 / Watcher', 'SV3 / Docker', 'SV1 / Chief');
-        sgtitle([title_string ' — R-T Plane']);
+        %sgtitle([title_string ' — R-T Plane']);
         saveas(gcf, [fig_path_base '_RT.png']);
     end
 
@@ -29,7 +29,7 @@ function plot_RT_RN_projections_separate(SV2_rel_pos, SV3_rel_pos, RT, RN, NT, t
         ylabel('Radial [m]'); xlabel('Normal [m]');
         %title('R-N Plane Projection');
         legend('SV2 / Watcher', 'SV3 / Docker', 'SV1 / Chief');
-        sgtitle([title_string ' — R-N Plane']);
+        %sgtitle([title_string ' — R-N Plane']);
         saveas(gcf, [fig_path_base '_RN.png']);
     end
 
@@ -44,7 +44,7 @@ function plot_RT_RN_projections_separate(SV2_rel_pos, SV3_rel_pos, RT, RN, NT, t
         ylabel('Normal [m]'); xlabel('Tangential [m]');
         %title('N-T Plane Projection');
         legend('SV2 / Watcher', 'SV3 / Docker', 'SV1 / Chief');
-        sgtitle([title_string ' — N-T Plane']);
+        %sgtitle([title_string ' — N-T Plane']);
         saveas(gcf, [fig_path_base '_NT.png']);
     end
 end

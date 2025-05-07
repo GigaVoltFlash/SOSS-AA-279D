@@ -68,8 +68,8 @@ for mode = 1:2
     %    fig_path, title_str, delta_v_times, delta_v_vals)
 end
 
-num_orbits_modes = [2,2,2,2];
-num_orbits_station_keep = [0,5,0,0];
+num_orbits_modes = [0,2,2,2];
+num_orbits_station_keep = [0,3,3,3];
 
 SV2_ROE = SV2_modes(1, :);
 SV3_ROE = SV3_modes(1, :);
@@ -83,6 +83,6 @@ SV3_ROE(1), SV3_ROE(2), SV3_ROE(3), SV3_ROE(4), SV3_ROE(5), SV3_ROE(6));
 state_abs_SV2_init = [r_SV2_init; v_SV2_init];
 state_abs_SV3_init = [r_SV3_init; v_SV3_init];
 
-sim_and_plot_control_modes(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
+sim_and_plot_control_modes_old(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
                                      SV1_OE_init, u_SV1_init, state_abs_SV2_init, state_abs_SV3_init , ...
-                                     state_init, t_orbit, t_series, tint, 'figures/PS5/control_mode_test.png', 'Here we go');
+                                     state_init, t_orbit, t_series, tint);

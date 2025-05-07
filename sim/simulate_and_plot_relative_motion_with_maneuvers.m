@@ -1,6 +1,6 @@
 function simulate_and_plot_relative_motion_with_maneuvers(t, t_orbit, SV2_roe_init, state_abs_SV2_init, ...
     SV3_roe_init, state_abs_SV3_init, SV1_oe_init, SV1_state_init, ...
-    fig_path, title_str, delta_v_times, delta_v_vals)
+    delta_v_times, delta_v_vals, SV3_modes, num_orbits_modes, num_orbits_station_keep)
 
     % % Propagate chief (with J2)
     % [~, chief_state] = rk4_eom_ECI(t, SV1_state_init, true);
@@ -84,8 +84,12 @@ function simulate_and_plot_relative_motion_with_maneuvers(t, t_orbit, SV2_roe_in
 
     % --- Plot ---
     RT = true; RN = true; NT = true;
-    plot_RT_RN_projections_separate(SV2_rel_pos, SV3_rel_pos, RT, RN, NT, title_str, fig_path);
+    plot_RT_RN_projections_separate(SV2_rel_pos, SV3_rel_pos, RT, RN, NT, 'RTN Control Modes', 'figures/PS5/RTN_control_modes.png');
 
     [d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3] = ECI2ROE_array_mean(r_SV1, v_SV1, r_SV3, v_SV3, true);
-    plot_ROE_planes(full_times, t_orbit, d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3, 'figures/PS5/ROE_planes.png', 'figures/PS5/ROE_over_time.png');
+    plot_ROE_planes_with_modes(full_times, t_orbit, d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3,SV3_modes,...
+        num_orbits_modes, num_orbits_station_keep,'figures/PS5/ROE_planes.png', 'figures/PS5/ROE_over_time.png', 'figures/PS5/ROE_error_over_time.png');
+    plot_delta_v_timeline(delta_v_times, delta_v_vals, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
+        'figures/PS5/delta_v_timeline.png');
+
 end
