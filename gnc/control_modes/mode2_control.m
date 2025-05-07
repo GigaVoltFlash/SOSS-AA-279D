@@ -2,9 +2,6 @@
 % Tycho Bogdanowitsch
 % Anshuk Chigullapalli 
 
-% Mode 2 control is for the Docker (SV3)'s approach towards SV1
-% Since this mode is a large maneuver, we use naive least squares to break it down into smaller maneuvers
-% Each of these maneuvers is then achieved using s
 function [delta_v_vals, delta_v_times] = mode2_control(roe_initial, roe_final, init_time, final_time, SV1_OE_init, u_SV1_init)
     n_man = 3; % number of maneuvers we want to do
 

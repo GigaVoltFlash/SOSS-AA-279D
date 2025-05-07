@@ -135,10 +135,8 @@ function sim_and_plot_control_modes(SV2_modes, SV3_modes, num_orbits_modes, num_
         if mode < num_modes
             t_sk_duration = num_orbits_station_keep(mode) * t_orbit;
             t_end_sk = t_start + t_sk_duration;
-
-            % Call station-keeping control
-            %[dv_SV2_sk, times_SV2_sk] = station_keeping_control(SV2_roe_curr, SV2_roe_curr, t_start, t_end_sk, SV1_OE_init, u_SV1_init);
-            %[dv_SV3_sk, times_SV3_sk] = station_keeping_control(SV3_roe_curr, SV3_roe_curr, t_start, t_end_sk, SV1_OE_init, u_SV1_init);
+            %[dv_SV2_sk, times_SV2_sk] = mode_station_keeping(SV2_roe_curr, SV2_roe_curr, t_start, t_end_sk, SV1_OE_init, u_SV1_init);
+            %[dv_SV3_sk, times_SV3_sk] = mode_station_keeping(SV3_roe_curr, SV3_roe_curr, t_start, t_end_sk, SV1_OE_init, u_SV1_init);
 
             % Append
             %SV2_dv_vals = [SV2_dv_vals; dv_SV2_sk];
