@@ -1,4 +1,4 @@
-function simulate_and_plot_relative_motion_with_maneuvers(t, SV2_roe_init, state_abs_SV2_init, ...
+function simulate_and_plot_relative_motion_with_maneuvers(t, t_orbit, SV2_roe_init, state_abs_SV2_init, ...
     SV3_roe_init, state_abs_SV3_init, SV1_oe_init, SV1_state_init, ...
     fig_path, title_str, delta_v_times, delta_v_vals)
 
@@ -87,5 +87,5 @@ function simulate_and_plot_relative_motion_with_maneuvers(t, SV2_roe_init, state
     plot_RT_RN_projections_separate(SV2_rel_pos, SV3_rel_pos, RT, RN, NT, title_str, fig_path);
 
     [d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3] = ECI2ROE_array_mean(r_SV1, v_SV1, r_SV3, v_SV3, true);
-    plot_ROE_planes(d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3, 'figures/PS5_ROE_planes.png');
+    plot_ROE_planes(full_times, t_orbit, d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3, 'figures/PS5/ROE_planes.png', 'figures/PS5/ROE_over_time.png');
 end
