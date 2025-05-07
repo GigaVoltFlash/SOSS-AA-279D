@@ -7,7 +7,7 @@
 
 
 
-% d_a, d_lambda, d_e_x, d_e_y, d_i_x, d_i_y
+% (d_a, d_lambda, d_e_x, d_e_y, d_i_x, d_i_y)*a_c in meters
 SV2_modes = [
     0, 0, 0,   300, 0, 300;
     0, 0, 0,   300, 0, 300;
@@ -24,6 +24,7 @@ SV3_modes = [
 
 t_series = tstart:tint:tend;
 SV1_OE_init = [a_SV1_init, e_SV1_init, i_SV1_init, RAAN_SV1_init, w_SV1_init, M_SV1_init];
+a_chief_meters = a_SV1_init*1e3;
 
 
 for mode = 1:2
@@ -46,12 +47,14 @@ for mode = 1:2
     fig_path3 = sprintf('figures/PS5/mode_%d_ROE_Time.png', mode);
     title_str3 = sprintf('Mode %d: SV2 & SV3 Relative Motion in ROE Time History', mode);
 
-    simulate_and_plot_relative_motion(t_series, t_orbit, SV2_ROE, state_abs_SV2_init, ...
-                                      SV3_ROE, state_abs_SV3_init, SV1_OE_init, ...
-                                      state_init, fig_path, title_str, fig_path2, title_str2, fig_path3, title_str3);
+    %simulate_and_plot_relative_motion(t_series, t_orbit, SV2_ROE, state_abs_SV2_init, ...
+    %                                  SV3_ROE, state_abs_SV3_init, SV1_OE_init, ...
+    %                                  state_init, fig_path, title_str, fig_path2, title_str2, fig_path3, title_str3);
 
     roe_initial = SV3_modes(mode,:)/a_SV1_init; % must be unscaled!
     roe_final = SV3_modes(mode+1,:)/a_SV1_init;
+    %roe_initial = SV3_modes(2,:)/a_SV1_init; % must be unscaled!
+    %roe_final = SV3_modes(3,:)/a_SV1_init;
     init_time = tstart;
     final_time = 2*t_orbit;
     
@@ -65,4 +68,21 @@ for mode = 1:2
     %    fig_path, title_str, delta_v_times, delta_v_vals)
 end
 
+num_orbits_modes = [2,2,2,2];
+num_orbits_station_keep = [0,5,0,0];
 
+SV2_ROE = SV2_modes(1, :);
+SV3_ROE = SV3_modes(1, :);
+
+% Initial absolute ECI states of deputies
+[r_SV2_init, v_SV2_init]  = ROE2ECI(a_SV1_init, ex_SV1_init, ey_SV1_init, i_SV1_init, RAAN_SV1_init, u_SV1_init,...
+SV2_ROE(1), SV2_ROE(2), SV2_ROE(3), SV2_ROE(4), SV2_ROE(5), SV2_ROE(6));
+[r_SV3_init, v_SV3_init] = ROE2ECI(a_SV1_init, ex_SV1_init, ey_SV1_init, i_SV1_init, RAAN_SV1_init, u_SV1_init,...
+SV3_ROE(1), SV3_ROE(2), SV3_ROE(3), SV3_ROE(4), SV3_ROE(5), SV3_ROE(6));
+
+state_abs_SV2_init = [r_SV2_init; v_SV2_init];
+state_abs_SV3_init = [r_SV3_init; v_SV3_init];
+
+sim_and_plot_control_modes(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
+                                     SV1_OE_init, u_SV1_init, state_abs_SV2_init, state_abs_SV3_init , ...
+                                     state_init, t_orbit, t_series, tint, 'figures/PS5/control_mode_test.png', 'Here we go');
