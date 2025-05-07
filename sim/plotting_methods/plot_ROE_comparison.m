@@ -29,7 +29,7 @@ function plot_ROE_comparison(t, t_orbit, ...
     legend(ax2, label1, label2, 'Location', 'best');
     legend(ax3, label1, label2, 'Location', 'best');
 
-    sgtitle(title_str2);
+    %sgtitle(title_str2);
     saveas(gcf, fig_path2);
 
     % === Time Histories ===
@@ -52,6 +52,6 @@ function plot_ROE_comparison(t, t_orbit, ...
         legend(label1, label2, 'Location', 'best');
     end
 
-    sgtitle(title_str3);
+    %sgtitle(title_str3);
     saveas(gcf, fig_path3);
 end

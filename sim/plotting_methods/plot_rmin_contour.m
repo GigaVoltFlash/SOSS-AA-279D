@@ -21,7 +21,7 @@ function plot_rmin_contour(a, level_set_values)
     xlabel('|\delta e|');
     ylabel('|\delta i|');
     zlabel('\delta r_{min} [m]');
-    title(sprintf('\\delta r_{min} Surface for a = %.0f km', a/1e3));
+    %title(sprintf('\\delta r_{min} Surface for a = %.0f km', a/1e3));
     colorbar;
     grid on;
     view(45, 30);
