@@ -155,7 +155,7 @@ We see that there are a few differences when comparing these to the osculating o
 
 By taking a first-order approximation of the equations of motion for the relative orbital elements with J2 perturbations included, we can derive a state transition matrix that is completely based on the absolute orbital parameters of the chief satellite \cite{koenig2017new}. Then the relative orbit parameter set $\boldsymbol{\alpha}$ at any time $\tau$ can be found using
 \begin{align}
-    \boldsymbol{\alpha_{\tau}} = \Phi^{J_2}_{\text{qns}}(\alpha_c(t_i), \tau) \boldsymbol{\alpha_{i}}
+    \boldsymbol{\alpha_{\tau}} = \Phi^{J_2}_{\text{qns}}(\alpha_c(t_i), \tau) \boldsymbol{\alpha_{i}} \label{eq:state_transition_relation}
 \end{align}
 
 where $\Phi^{J_2}_{\text{qns}}(\alpha_c(t_i), \tau)$ is the state-transition matrix (STM) at time $\tau$, and $\boldsymbol{\alpha_{i}}$ are the initial conditions of the relative orbital elements.
@@ -170,7 +170,7 @@ The state-transition matrix for quasi-nonsingular relative orbital elements is g
 -\frac{7}{2} \kappa e_{x_f} Q \tau & 0 & \sin(\dot{\omega} \tau) + 4\kappa e_{x_i} e_{x_f} G Q \tau & \cos(\dot{\omega} \tau) + 4\kappa e_{y_i} e_{x_f} G Q \tau & -5\kappa e_{x_f} S \tau & 0 \\
 0 & 0 & 0 & 0 & 1 & 0 \\
 \frac{7}{2} \kappa S \tau & 0 & -4 \kappa e_{x_i} G S \tau & -4 \kappa e_{y_i} G S \tau & 2 \kappa T \tau & 1
-\end{bmatrix}
+\end{bmatrix} \label{eq:stm_matrix}
 \end{align}
 
 where we have the following variables
