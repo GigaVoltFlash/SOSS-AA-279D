@@ -18,7 +18,8 @@ run_PS1 = false;
 run_PS2 = false;
 run_PS3 = false;
 run_PS4 = false;
-run_PS5 = true;
+run_PS5 = false;
+run_PS6 = true; 
 
 % Load SV1 information
 load_SV1;
@@ -44,6 +45,9 @@ if run_PS4
 end
 if run_PS5
     ps5_sims;
+end
+if run_PS6
+    ps6_sims;
 end
 
 
