@@ -154,6 +154,8 @@ function sim_and_plot_stationkeeping(SV2_modes, SV3_modes, SV1_OE_init, SV2_stat
             end
         end
 
+
+        %%% APPLY DELTA V
         SV2_time_match = find(SV2_dv_times == i, 1);
         if ~isempty(SV2_time_match)
             SV2_state(4:6) = SV2_state(4:6) + dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), SV2_dv_vals(SV2_time_match, :)'/1e3);
