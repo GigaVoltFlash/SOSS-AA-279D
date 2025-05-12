@@ -90,9 +90,9 @@ function sim_and_plot_stationkeeping(SV2_modes, SV3_modes, SV1_OE_init, SV2_stat
                 SV2_des_roe = SV2_roe_nom;
                 SV2_des_roe(3:4) = SV2_de_des;
                 % perform station keeping
-                t_vals = linspace(t, t+0.5*t_orbit, 4);
+                t_vals = linspace(t, t+t_orbit, 4);
                 t_vals = t_vals(2:end);
-                delta_v_vals_sk = naive_least_squares(t_vals, SV2_roe, SV2_des_roe, SV1_oe, SV1_u_val, t, t+0.5*t_orbit);
+                delta_v_vals_sk = naive_least_squares(t_vals, SV2_roe, SV2_des_roe, SV1_oe, SV1_u_val, t, t+t_orbit);
                 delta_v_idxs_sk = zeros(size(t_vals));
                 for j = 1:length(t_vals)
                     [~, delta_v_idxs_sk(j)] = min(abs(full_times - t_vals(j)));
@@ -107,9 +107,9 @@ function sim_and_plot_stationkeeping(SV2_modes, SV3_modes, SV1_OE_init, SV2_stat
                 SV2_di_des = [SV2_roe_nom(5);SV2_roe_nom(6) - sign(SV2_roe(5))*SV2_delta_di_max];
                 SV2_des_roe(5:6) = SV2_di_des;
                 % perform station keeping 
-                t_vals = linspace(t, t+0.5*t_orbit, 2);
+                t_vals = linspace(t, t+t_orbit, 2);
                 t_vals = t_vals(2:end);
-                delta_v_vals_sk = naive_least_squares(t_vals, SV2_roe, SV2_des_roe, SV1_oe, SV1_u_val, t, t+0.5*t_orbit);
+                delta_v_vals_sk = naive_least_squares(t_vals, SV2_roe, SV2_des_roe, SV1_oe, SV1_u_val, t, t+t_orbit);
                 delta_v_idxs_sk = zeros(size(t_vals));
                 for j = 1:length(t_vals)
                     [~, delta_v_idxs_sk(j)] = min(abs(full_times - t_vals(j)));
@@ -125,9 +125,9 @@ function sim_and_plot_stationkeeping(SV2_modes, SV3_modes, SV1_OE_init, SV2_stat
                 SV3_des_roe = SV3_roe_nom;
                 SV3_des_roe(3:4) = SV3_de_des;
                 % perform station keeping 
-                t_vals = linspace(t, t+0.5*t_orbit, 4);
+                t_vals = linspace(t, t+t_orbit, 4);
                 t_vals = t_vals(2:end);
-                delta_v_vals_sk = naive_least_squares(t_vals, SV3_roe, SV3_des_roe, SV1_oe, SV1_u_val, t, t+0.5*t_orbit);
+                delta_v_vals_sk = naive_least_squares(t_vals, SV3_roe, SV3_des_roe, SV1_oe, SV1_u_val, t, t+t_orbit);
                 delta_v_idxs_sk = zeros(size(t_vals));
                 for j = 1:length(t_vals)
                     [~, delta_v_idxs_sk(j)] = min(abs(full_times - t_vals(j)));
@@ -142,9 +142,9 @@ function sim_and_plot_stationkeeping(SV2_modes, SV3_modes, SV1_OE_init, SV2_stat
                 SV3_di_des = [SV3_roe_nom(5);SV3_roe_nom(6) - sign(SV3_roe(5))*SV3_delta_di_max];
                 SV3_des_roe(5:6) = SV3_di_des;
                 % perform station keeping 
-                t_vals = linspace(t, t+0.5*t_orbit, 2);
+                t_vals = linspace(t, t+t_orbit, 2);
                 t_vals = t_vals(2:end);
-                delta_v_vals_sk = naive_least_squares(t_vals, SV3_roe, SV3_des_roe, SV1_oe, SV1_u_val, t, t+0.5*t_orbit);
+                delta_v_vals_sk = naive_least_squares(t_vals, SV3_roe, SV3_des_roe, SV1_oe, SV1_u_val, t, t+t_orbit);
                 delta_v_idxs_sk = zeros(size(t_vals));
                 for j = 1:length(t_vals)
                     [~, delta_v_idxs_sk(j)] = min(abs(full_times - t_vals(j)));
