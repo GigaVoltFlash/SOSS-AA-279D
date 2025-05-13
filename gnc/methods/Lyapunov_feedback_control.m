@@ -1,32 +1,109 @@
-function control_vec = Lyapunov_feedback_control(A_matrix, ROE, BINV, ERROR, OE_CHIEF, PFEED, myDrag)
+function control_vec = Lyapunov_feedback_control(roe_curr, roe_desired, oe_chief, N, k)
     % Inputs:
-    % A_matrix: 5x5 matrix
-    % ROE: 5x1 vector
-    % BINV: 2x5 matrix (stored column-wise)
-    % ERROR: 5x1 vector
-    % OE_CHIEF: 6x1 vector
-    % PFEED: 5x5 matrix
-    % myDrag: 5x1 vector
+    % roe_curr: current ROE
+    % roe_desired: desired ROE
+    % oe_chief: current chief absolute OE
+    % N:  4?                   % Must be even and > 2
+    % k:   1000?              % Large scalar for scaling
     
     % Output:
-    % out_dep: 3x1 control output
+    % control_vec: 3x1 control output
 
-    % Extract scalar normalization factor
-    oe_norm = OE_CHIEF(1);  % Corresponds to oe_chief(0) in C
+    J2 = 1.08263e-3;
+    R_earth = 6378.13; % km
+    mu_earth = 3.986e5; % km^3/s^2
 
-    % Normalize inputs
-    roe = ROE ./ oe_norm;
-    drag = myDrag ./ oe_norm;
-    error = ERROR ./ oe_norm;
+    a_c = oe_chief(1); e_c = oe_chief(2); i_c = deg2rad(oe_chief(3));
+    RAAN_c = deg2rad(oe_chief(4)); omega_c = deg2rad(oe_chief(5)); nu_c = deg2rad(oe_chief(6));
 
-    % Extract matrices
-    Aplant = reshape(A_matrix, 5, 5);     % Assuming row-major flattening
-    P = reshape(PFEED, 5, 5);
-    Binv = reshape(BINV, 2, 5);
+    delta_roe = (roe_curr-roe_desired)./a_c; % Unscale ROE
 
+    % Find the A Matrix (Steindorf Eq A.2)
+    eta = sqrt(1 - e_c^2);
+    gamma = (3/4) * J2 * R_earth^2 * sqrt(mu_earth);
+    kappa = gamma / (a_c^(7/2) * eta^4);
+    
+    ex = e_c * cos(omega_c);
+    ey = e_c * sin(omega_c);
+    
+    Q = 5 * cos(i_c)^2 - 1;
+    S = sin(2 * i_c);
+    T = sin(i_c)^2;
+    G = 1 / eta^2;    
+
+    A = zeros(6, 6);
+    
+    A(2,1) = (7/2) * ey * Q;
+    A(2,2) = -4 * ex * ey * G * Q;
+    A(2,3) = -(1 + 4 * ey^2 * G) * Q;
+    A(2,4) = 5 * ey * S;
+    
+    A(3,1) = -(7/2) * ex * Q;
+    A(3,3) = (1 + 4 * ex^2 * G) * Q;
+    A(3,4) =  4 * ex * ey * G * Q;
+    A(3,5) = -5 * ex * S;
+    
+    A(5,1) = (7/2) * S;
+    A(5,2) = -4 * ex * G * S;
+    A(5,3) = -4 * ey * G * S;
+    A(5,4) = 2 * T;
+
+    A = kappa * A;
+
+    % Compote B Matrix
+    f = nu_c;
+    theta = f + omega_c;
+    n = sqrt(mu / a_c^3);
+    
+    cosf = cos(f);
+    costh = cos(theta);
+    sinf = sin(f);
+    sinth = sin(theta);
+    tan_i = tan(i_c);
+    
+    denom = 1 + e_c * cosf;
+    
+    B = zeros(6, 2);
+    
+    B(1,1) = (2 / eta) * denom;
+    B(2,1) = eta * ((2 + e_c * cosf) * costh + ex) / denom;
+    B(2,2) = eta * ((ey / tan_i) + (sinth / denom));
+    B(3,1) = eta * ((2 + e_c * cosf) * sinth + ey) / denom;
+    B(3,2) = -eta * ((ex / tan_i) - (sinth / denom));
+    B(4,1) = 0;
+    B(4,2) = eta * costh / denom;
+    B(5,1) = 0;
+    B(5,2) = eta * sinth / denom;
+    
+    B = B / (a_c * n);
+
+    % Compute P Matrix
+    M = true2mean(nu_c); % rad
+
+    u = M + omega_c;
+
+    delta_d_e_y = delta_roe(4);
+    delta_d_e_x = delta_roe(3);
+    delta_d_i_y = delta_roe(6);
+    delta_d_i_x = delta_roe(5);
+
+    u_ip = atan2(delta_d_e_y, delta_d_e_x); % Optimal in-plane argument
+    u_oop = atan2(delta_d_i_y, delta_d_i_x); % Optimal out-of-plane argument
+    
+    J = u - u_ip;
+    H = u - u_oop;
+    
+    P_diag = [cos(J)^N, ...
+              cos(J)^N, ...
+              cos(J)^N, ...
+              cos(H)^N, ...
+              cos(H)^N, ...
+              cos(H)^N];
+
+    P = diag(P_diag) / k;
+    
     % Compute control input
-    u_2 = -Binv * (Aplant * roe + drag + P * error);
+    u_2 = -pinv(B) * (A * delta_roe + P * delta_roe);
 
-    % Output
     control_vec = [0; u_2(:)];  % 3x1 vector: [0; u_2(1); u_2(2)]
 end
