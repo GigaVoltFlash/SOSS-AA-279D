@@ -1,25 +1,27 @@
 function control_vec = Lyapunov_feedback_control(roe_curr, roe_desired, oe_chief, N, k)
     % Inputs:
-    % roe_curr: current ROE
-    % roe_desired: desired ROE
+    % roe_curr: current ROE unscaled by a_c
+    % roe_desired: desired ROE unscaled by a_c
     % oe_chief: current chief absolute OE
     % N:  4?                   % Must be even and > 2
     % k:   1000?              % Large scalar for scaling
     
     % Output:
-    % control_vec: 3x1 control output
+    % control_vec: 3x1 control output in RTN m/s^2
 
-    % Useful global constants
+    % Useful global constants (in km)
     global J2 R_earth mu_earth
 
     a_c = oe_chief(1); e_c = oe_chief(2); i_c = deg2rad(oe_chief(3));
     RAAN_c = deg2rad(oe_chief(4)); omega_c = deg2rad(oe_chief(5)); nu_c = deg2rad(oe_chief(6));
 
-    delta_roe = (roe_curr-roe_desired)./a_c; % Unscale ROE
+    a_c_meters = a_c*1e3;
+
+    delta_roe = (roe_curr-roe_desired); %./a_c; % Unscale ROE if needed
 
     % Find the A Matrix (Steindorf Eq A.2)
     eta = sqrt(1 - e_c^2);
-    gamma = (3/4) * J2 * R_earth^2 * sqrt(mu_earth);
+    gamma = (3/4) * J2 * R_earth^2 * sqrt(mu_earth); % 
     kappa = gamma / (a_c^(7/2) * eta^4);
     
     ex = e_c * cos(omega_c);
@@ -74,7 +76,7 @@ function control_vec = Lyapunov_feedback_control(roe_curr, roe_desired, oe_chief
     B(5,1) = 0;
     B(5,2) = eta * sinth / denom;
     
-    B = B / (a_c * n);
+    B = B / (a_c * n); % or in meters?
 
     % Compute P Matrix
     M = true2mean(nu_c, e_c); % rad
@@ -102,7 +104,7 @@ function control_vec = Lyapunov_feedback_control(roe_curr, roe_desired, oe_chief
     P = diag(P_diag) / k;
     
     % Compute control input
-    u_2 = -pinv(B) * (A * delta_roe' + P * delta_roe');
+    u_2 = -pinv(B) * (A * roe_curr' + P * delta_roe');
 
     control_vec = [0; u_2(:)];  % 3x1 vector: [0; u_2(1); u_2(2)]
 end

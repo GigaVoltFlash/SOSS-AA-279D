@@ -3,6 +3,10 @@ function sim_all_maneuvers_sk_continuous(SV2_modes, SV3_modes, num_orbits_modes,
     full_times = t_series(:);
     a_chief = SV1_OE_init(1);
 
+    % Factors for Lyaponuv feedback gain matrix  
+    N = 4;
+    k = 5000;
+
     switch_times = t_orbit*cumsum(reshape([num_orbits_modes; num_orbits_station_keep], 8, 1));
 
     % Initialize with same size as full time vector
@@ -35,16 +39,18 @@ function sim_all_maneuvers_sk_continuous(SV2_modes, SV3_modes, num_orbits_modes,
     dt = full_times(2) - full_times(1);
     n_steps = length(full_times);
 
-    % Initialize delta-v storage
+    % Initialize delta-v and acceleration storage
     SV2_dv_vals = zeros(length(t_series), 3);
     SV3_dv_vals = zeros(length(t_series), 3);
+    SV2_a_vals = zeros(length(t_series), 3);
+    SV3_a_vals = zeros(length(t_series), 3);
 
     withJ2 = true;
 
     for i=2:n_steps
         t = full_times(i-1);
 
-        % PRIMARY PROPAGATION
+        % PRIMARY PROPAGATION (RK4 STEPS)
         k1_SV1 = eom_ECI(t, SV1_state, withJ2);
         k2_SV1 = eom_ECI(t + dt/2, SV1_state + dt/2 * k1_SV1, withJ2);
         k3_SV1 = eom_ECI(t + dt/2, SV1_state + dt/2 * k2_SV1, withJ2);
@@ -69,16 +75,18 @@ function sim_all_maneuvers_sk_continuous(SV2_modes, SV3_modes, num_orbits_modes,
         state_SV1_all(i, :) = SV1_state';
 
         % Convert current states to ROE
-        [d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3] = ECI2ROE_array_mean(SV1_state(1:3)', SV1_state(4:6)', SV3_state(1:3)', SV3_state(4:6)', true);
         [d_a_SV2, d_lambda_SV2, d_e_x_SV2, d_e_y_SV2, d_i_x_SV2, d_i_y_SV2] = ECI2ROE_array_mean(SV1_state(1:3)', SV1_state(4:6)', SV2_state(1:3)', SV2_state(4:6)', true);
+        [d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3] = ECI2ROE_array_mean(SV1_state(1:3)', SV1_state(4:6)', SV3_state(1:3)', SV3_state(4:6)', true);
 
         [a,e,inc,RAAN,omega,nu,M] = ECI2OE(SV1_state(1:3), SV1_state(4:6));
         SV1_oe = [a,e,inc,RAAN,omega,nu,M];
         SV2_roe = [d_a_SV2, d_lambda_SV2, d_e_x_SV2, d_e_y_SV2, d_i_x_SV2, d_i_y_SV2]/a_chief;
         SV3_roe = [d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3]/a_chief;
 
-        % SV2 delta v is always determined the same way
-        SV2_dv_vals(i, :) = station_keeping_continuous(SV2_roe, SV2_roe_nom, SV2_delta_de_max, SV2_delta_di_max, SV1_oe);
+        N = 4;
+        k = 5000;
+        % SV2 control inputs are always determined the same way
+        SV2_a_vals(i, :) = station_keeping_continuous(SV2_roe, SV2_roe_nom, SV2_delta_de_max, SV2_delta_di_max, SV1_oe, N, k);
 
         % This is primarily for SV3, SV2 just continuously station keeps
         
@@ -86,22 +94,28 @@ function sim_all_maneuvers_sk_continuous(SV2_modes, SV3_modes, num_orbits_modes,
         if t < switch_times(1)
             % do nothing, already at initial situation
         elseif t < switch_times(3) && t > switch_times(2)
+            N = 14;
+            k = 3300;
             SV3_roe_nom = SV3_roe_nom_mode2; % Switches it for maneuver and station keeping
-            SV3_dv_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, 4, 1000);
+            SV3_a_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, N, k);
         elseif t < switch_times(5) && t > switch_times(4)
             SV3_roe_nom = SV3_roe_nom_mode3; % Switches it for maneuver and station keeping
-            SV3_dv_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, 4, 1000);
+            SV3_a_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, N, k);
         elseif t < switch_times(7) && t > switch_times(6)
             SV3_roe_nom = SV3_roe_nom_mode4; % Switches it for maneuver and station keeping
-            SV3_dv_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, 4, 1000);
+            SV3_a_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, N, k);
         else
             % Run station keeping 
-            SV3_dv_vals(i, :) = station_keeping_continuous(SV3_roe, SV3_roe_nom, SV3_delta_de_max, SV3_delta_di_max, SV1_oe);
+            %SV3_a_vals(i, :) = station_keeping_continuous(SV3_roe, SV3_roe_nom, SV3_delta_de_max, SV3_delta_di_max, SV1_oe, N, k);
         end
 
-        %%% APPLY ACCELERATION AS DELTA V
-        SV2_state(4:6) = SV2_state(4:6) + dt*dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), SV2_dv_vals(i, :)'/1e3);
-        SV3_state(4:6) = SV3_state(4:6) + dt*dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), SV3_dv_vals(i, :)'/1e3);
+        %%% APPLY ACCELERATION AS DELTA V 
+        % Convert a_RTN to dv_RTN by multiplying by dt
+        %SV2_dv_vals(i,:) = dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), dt*SV2_a_vals(i, :)'/1e3); % m/s^2 --> m/s --> km/s
+        SV3_dv_vals(i,:) = dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), dt*SV3_a_vals(i, :)'/1e3); % m/s^2 --> m/s --> km/s
+
+        SV2_state(4:6) = SV2_state(4:6) + SV2_dv_vals(i,:)';
+        SV3_state(4:6) = SV3_state(4:6) + SV3_dv_vals(i,:)';
 
     end
 

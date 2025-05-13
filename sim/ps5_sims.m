@@ -6,7 +6,7 @@
 plot_rmin_contour(a_SV1_init*1e3, [10, 250, 1000]);
 
 % Common initialization file for full sim with all modes
-initalize_roe_and_modes.m
+initialize_roe_and_modes;
 
 for mode = 1:2
     SV2_ROE = SV2_modes(mode, :);

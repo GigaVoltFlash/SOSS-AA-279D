@@ -16,8 +16,9 @@ t_series = tstart:tint:tend;
 SV1_OE_init = [a_SV1_init, e_SV1_init, i_SV1_init, RAAN_SV1_init, w_SV1_init, M_SV1_init];
 a_chief_meters = a_SV1_init*1e3;
 
-num_orbits_modes = [0,3,3,3];
-num_orbits_station_keep = [5,4,4,3];
+% Add up to 25 orbits
+num_orbits_modes = [0,25,0,0];
+num_orbits_station_keep = [0,0,0,0];
 
 SV2_ROE = SV2_modes(1, :);
 SV3_ROE = SV3_modes(1, :);
