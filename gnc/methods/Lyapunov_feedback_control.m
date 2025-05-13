@@ -9,9 +9,8 @@ function control_vec = Lyapunov_feedback_control(roe_curr, roe_desired, oe_chief
     % Output:
     % control_vec: 3x1 control output
 
-    J2 = 1.08263e-3;
-    R_earth = 6378.13; % km
-    mu_earth = 3.986e5; % km^3/s^2
+    % Useful global constants
+    global J2 R_earth mu_earth
 
     a_c = oe_chief(1); e_c = oe_chief(2); i_c = deg2rad(oe_chief(3));
     RAAN_c = deg2rad(oe_chief(4)); omega_c = deg2rad(oe_chief(5)); nu_c = deg2rad(oe_chief(6));
@@ -53,7 +52,7 @@ function control_vec = Lyapunov_feedback_control(roe_curr, roe_desired, oe_chief
     % Compote B Matrix
     f = nu_c;
     theta = f + omega_c;
-    n = sqrt(mu / a_c^3);
+    n = sqrt(mu_earth/ a_c^3);
     
     cosf = cos(f);
     costh = cos(theta);
@@ -78,7 +77,7 @@ function control_vec = Lyapunov_feedback_control(roe_curr, roe_desired, oe_chief
     B = B / (a_c * n);
 
     % Compute P Matrix
-    M = true2mean(nu_c); % rad
+    M = true2mean(nu_c, e_c); % rad
 
     u = M + omega_c;
 
@@ -103,7 +102,7 @@ function control_vec = Lyapunov_feedback_control(roe_curr, roe_desired, oe_chief
     P = diag(P_diag) / k;
     
     % Compute control input
-    u_2 = -pinv(B) * (A * delta_roe + P * delta_roe);
+    u_2 = -pinv(B) * (A * delta_roe' + P * delta_roe');
 
     control_vec = [0; u_2(:)];  % 3x1 vector: [0; u_2(1); u_2(2)]
 end

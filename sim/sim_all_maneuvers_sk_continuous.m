@@ -78,7 +78,7 @@ function sim_all_maneuvers_sk_continuous(SV2_modes, SV3_modes, num_orbits_modes,
         SV3_roe = [d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3]/a_chief;
 
         % SV2 delta v is always determined the same way
-        SV2_dv_vals(i) = dt*station_keeping_continuous(SV2_roe, SV2_roe_nom, SV2_delta_de_max, SV2_delta_di_max, SV1_oe);
+        SV2_dv_vals(i, :) = station_keeping_continuous(SV2_roe, SV2_roe_nom, SV2_delta_de_max, SV2_delta_di_max, SV1_oe);
 
         % This is primarily for SV3, SV2 just continuously station keeps
         
@@ -87,21 +87,21 @@ function sim_all_maneuvers_sk_continuous(SV2_modes, SV3_modes, num_orbits_modes,
             % do nothing, already at initial situation
         elseif t < switch_times(3) && t > switch_times(2)
             SV3_roe_nom = SV3_roe_nom_mode2; % Switches it for maneuver and station keeping
-            SV3_dv_vals(i) = dt*tychos_function(SV3_roe, SV3_roe_nom, SV1_oe);
+            SV3_dv_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, 4, 1000);
         elseif t < switch_times(5) && t > switch_times(4)
             SV3_roe_nom = SV3_roe_nom_mode3; % Switches it for maneuver and station keeping
-            SV3_dv_vals(i) = dt*tychos_function(SV3_roe, SV3_roe_nom, SV1_oe);
+            SV3_dv_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, 4, 1000);
         elseif t < switch_times(7) && t > switch_times(6)
             SV3_roe_nom = SV3_roe_nom_mode4; % Switches it for maneuver and station keeping
-            SV3_dv_vals(i) = dt*tychos_function(SV3_roe, SV3_roe_nom, SV1_oe);
+            SV3_dv_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, 4, 1000);
         else
             % Run station keeping 
-            SV3_dv_vals(i) = dt*station_keeping_continuous(SV3_roe, SV3_roe_nom, SV3_delta_de_max, SV3_delta_di_max, SV1_oe);
+            SV3_dv_vals(i, :) = station_keeping_continuous(SV3_roe, SV3_roe_nom, SV3_delta_de_max, SV3_delta_di_max, SV1_oe);
         end
 
         %%% APPLY ACCELERATION AS DELTA V
-        SV2_state(4:6) = SV2_state(4:6) + dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), SV2_dv_vals(i)'/1e3);
-        SV3_state(4:6) = SV3_state(4:6) + dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), SV3_dv_vals(i)'/1e3);
+        SV2_state(4:6) = SV2_state(4:6) + dt*dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), SV2_dv_vals(i, :)'/1e3);
+        SV3_state(4:6) = SV3_state(4:6) + dt*dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), SV3_dv_vals(i, :)'/1e3);
 
     end
 
