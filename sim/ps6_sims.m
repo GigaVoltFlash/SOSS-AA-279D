@@ -2,23 +2,9 @@
 % Tycho Bogdanowitsch
 % Anshuk Chigullapalli 
 
-%%%%% DEFINE ROE FOR EACH MODE %%%%%%% 
-% (d_a, d_lambda, d_e_x, d_e_y, d_i_x, d_i_y)*a_c in meters
-SV2_modes = [
-    0, 0, 0,   300, 0, 300;
-    0, 0, 0,   300, 0, 300;
-    0, 0, 0,   300, 0, 300;
-    0, 0, 0,   300, 0, 300
-];
+% Common initialization file for full sim with all modes
+initalize_roe_and_modes.m
 
-SV3_modes = [
-    0, 0, 0,   250, 0, -250;
-    0, 0, 0,   100, 0, -100;
-    0, 0, 0,   10, 0, -10;
-    0, 0, 0,    1, 0, -1
-];
-
-t_series = tstart:tint:tend;
-SV1_OE_init = [a_SV1_init, e_SV1_init, i_SV1_init, RAAN_SV1_init, w_SV1_init, M_SV1_init];
-a_chief_meters = a_SV1_init*1e3;
-
+sim_all_maneuvers_station_keeping_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
+    SV1_OE_init, state_abs_SV2_init, state_abs_SV3_init , ...
+    state_init, t_orbit, t_series,'figures/PS5/RTN_3d_projections_all_maneuvers_cont.png', '');
