@@ -17,7 +17,11 @@ function control_vec = Lyapunov_feedback_control(roe_curr, roe_desired, oe_chief
 
     a_c_meters = a_c*1e3;
 
-    delta_roe = (roe_curr-roe_desired); %./a_c; % Unscale ROE if needed
+    % using reduced model (remove d_lambda)
+    roe_curr_reduced = [roe_curr(1),roe_curr(3),roe_curr(4),roe_curr(5),roe_curr(6)];
+    roe_desired_reduced = [roe_desired(1),roe_desired(3),roe_desired(4),roe_desired(5),roe_desired(6)];
+
+    delta_roe = (roe_curr_reduced-roe_desired_reduced); %./a_c; % Unscale ROE if needed
 
     % Find the A Matrix (Steindorf Eq A.2)
     eta = sqrt(1 - e_c^2);
@@ -32,7 +36,7 @@ function control_vec = Lyapunov_feedback_control(roe_curr, roe_desired, oe_chief
     T = sin(i_c)^2;
     G = 1 / eta^2;    
 
-    A = zeros(6, 6);
+    A = zeros(5, 5);
     
     A(2,1) = (7/2) * ey * Q;
     A(2,2) = -4 * ex * ey * G * Q;
@@ -64,7 +68,7 @@ function control_vec = Lyapunov_feedback_control(roe_curr, roe_desired, oe_chief
     
     denom = 1 + e_c * cosf;
     
-    B = zeros(6, 2);
+    B = zeros(5, 2);
     
     B(1,1) = (2 / eta) * denom;
     B(2,1) = eta * ((2 + e_c * cosf) * costh + ex) / denom;
@@ -83,10 +87,10 @@ function control_vec = Lyapunov_feedback_control(roe_curr, roe_desired, oe_chief
 
     u = M + omega_c;
 
-    delta_d_e_y = delta_roe(4);
-    delta_d_e_x = delta_roe(3);
-    delta_d_i_y = delta_roe(6);
-    delta_d_i_x = delta_roe(5);
+    delta_d_e_y = delta_roe(3);
+    delta_d_e_x = delta_roe(2);
+    delta_d_i_y = delta_roe(5);
+    delta_d_i_x = delta_roe(4);
 
     u_ip = atan2(delta_d_e_y, delta_d_e_x); % Optimal in-plane argument
     u_oop = atan2(delta_d_i_y, delta_d_i_x); % Optimal out-of-plane argument
@@ -98,13 +102,13 @@ function control_vec = Lyapunov_feedback_control(roe_curr, roe_desired, oe_chief
               cos(J)^N, ...
               cos(J)^N, ...
               cos(H)^N, ...
-              cos(H)^N, ...
               cos(H)^N];
+              %cos(H)^N];
 
     P = diag(P_diag) / k;
     
     % Compute control input
-    u_2 = -pinv(B) * (A * roe_curr' + P * delta_roe');
+    u_2 = -pinv(B) * (A * roe_curr_reduced' + P * delta_roe');
 
     control_vec = [0; u_2(:)];  % 3x1 vector: [0; u_2(1); u_2(2)]
 end

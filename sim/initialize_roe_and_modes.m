@@ -6,7 +6,7 @@ SV2_modes = [
 ];
 
 SV3_modes = [
-    0, 0, 0,   250, 0, -250;
+    0, 0, 10,   250, -10, -250;
     0, 0, 0,   100, 0, -100;
     0, 0, 0,   10, 0, -10;
     0, 0, 0,    1, 0, -1
@@ -17,8 +17,8 @@ SV1_OE_init = [a_SV1_init, e_SV1_init, i_SV1_init, RAAN_SV1_init, w_SV1_init, M_
 a_chief_meters = a_SV1_init*1e3;
 
 % Add up to 25 orbits
-num_orbits_modes = [0,25,0,0];
-num_orbits_station_keep = [0,0,0,0];
+num_orbits_modes = [0,15,10,10];
+num_orbits_station_keep = [0,5,5,5];
 
 SV2_ROE = SV2_modes(1, :);
 SV3_ROE = SV3_modes(1, :);
