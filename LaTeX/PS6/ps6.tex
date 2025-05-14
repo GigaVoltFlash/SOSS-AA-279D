@@ -1,0 +1,273 @@
+\section{Problem Set 6}
+
+\subsection{Continuous Control Law}
+
+\subsubsection{Control Method Considerations}
+
+The control method considerations are the same as in Section \ref{sec:control_objectives} and Section \ref{sec:control_considerations}. Our system has four distinct operational modes, each with their own unique control accuracy and safety requirements. We also have control considerations for the maneuvers for transitioning between different modes. In this section, we utilize a continuous control input rather than impulse delta-v inputs.
+
+To provide enough time for the continuous control to act effectively, we increased the duration of each mode (maneuver times and station keeping times between maneuvers), provided in Table \ref{tab:mode_durations_cont}.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Phase} & \textbf{Number of Orbits} \\
+\hline
+Mode 2 & 15 \\
+Station-Keeping 2 & 5 \\
+Mode 3 & 10 \\
+Station-Keeping 3 & 5 \\
+Mode 4 & 10 \\
+Station Keeping 4 & 5 \\
+\hline
+\end{tabular}
+\caption{Number of orbits spent in each mode and station-keeping phase} \label{tab:mode_durations_cont}
+\end{table}
+
+Our system is still working in a near-circular orbit with two deputy spacecraft. The "Watcher/SV2" spacecraft only performs station-keeping, whereas the "Docker/SV3" performs various maneuvers to dock with the chief spacecraft. Table \ref{tab:mode_control_methods_cont} is analogous to Table \ref{tab:mode_control_methods}, but with continuous control methods considered.
+
+
+\definecolor{lightgray}{gray}{0.9}
+
+\begin{table}[H]
+    \centering
+    \caption{Control Methods by Mode of Operation}
+    \renewcommand{\arraystretch}{1.3}
+
+    \begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.13\textwidth}|%
+                                      >{\raggedright\arraybackslash}p{0.13\textwidth}|%
+                                      >{\raggedright\arraybackslash}p{0.12\textwidth}|%
+                                      >{\raggedright\arraybackslash}p{0.12\textwidth}|%
+                                      >{\raggedright\arraybackslash}p{0.12\textwidth}|%
+                                      >{\raggedright\arraybackslash}X|}
+        \rowcolor{lightgray}
+        \hline
+        \textbf{Mode of Operation} & \textbf{Tracked State} & \textbf{In-plane Control Method} & \textbf{Out-of-plane Control Method} & \textbf{Control Window} & \textbf{Reasoning} \\
+        \hline
+        General Station Keeping (SV2 always and SV3 Mode 1) & Relative orbital elements that provide passive safety & Along-track continuous control input & Cross-track continuous control input & Full duration of station-keeping (see Table \ref{tab:mode_durations}) & Very small control inputs to maintain position when needed. \\
+        \hline
+        Approach Transfer (SV3 Mode 2) & Desired Mode 2 final ROE & Along-track continuous control input & Cross-track continuous control input & 15 orbits for maneuver & Using Lyapunov-based control scheme with modifications for handling $\delta \lambda $ drift\\
+        \hline
+        Proximity Maneuvers (SV3 Mode 3) & Desired Mode 3 final ROE & Along-track continuous control input & Cross-track continuous control input & 15 orbits for maneuver & Using Lyapunov-based control scheme with modifications for handling $\delta \lambda $ drift\\
+        \hline
+        Docked Station Keeping (SV3 Mode 4) & N/A (Docked State) & No in-plane control & No out-of-plane control & Service duration & Rigid-body docking eliminates relative motion; no active control required. \\
+        \hline
+    \end{tabularx}
+    \label{tab:mode_control_methods_cont}
+\end{table}
+
+
+\subsubsection{Lyapunov Control Implementation}
+Although we had the different ideas for control methodologies for the different modes, during the duration of this submission we were only able to get one method working exactly to meet our requirements: Lyapunov control without constraints. 
+
+First, the state-space reduced model as described by Steindorf is considered \cite{steindorf2017constrained}. Since tangential thrusts are two times more efficient than radial thrusts in changing $\delta e$ and $\delta a$, the reduced model does not involve any radial thrusts. Thus, the ROE vector is reduced to exclude $\delta \lambda$, since it can only be controlled directly by radial thrusts.Note that $\delta \lambda$ can still be controlled by adjusting $\delta a$ to induce a Keplerian drift such that $\delta \lambda$ reaches a desired state at the end of the control window. This process will be desribed in full later. The reduced ROE vector is defined as: 
+\begin{align*}
+\delta \bm{\alpha} = \begin{bmatrix} \delta a, \delta e_x, \delta e_y, \delta i_x, \delta i_y \end{bmatrix}^\top
+\end{align*}
+
+From here the reduced state-space model can be defined as follows:
+\begin{equation}
+\begin{bmatrix}
+\delta \dot{\bm{\alpha}} \\
+\delta \dot{\tilde{\alpha}}
+\end{bmatrix}
+=
+A
+\begin{bmatrix}
+\delta \bm{\alpha} \\
+\delta \tilde{\bm{\alpha}}
+\end{bmatrix}
++
+\begin{bmatrix}
+B \\
+\bm{0}_{1 \times 3}
+\end{bmatrix}
+\bm{u}
+\end{equation}
+
+
+
+----- Keep going!
+
+
+The study of the control input matrix $\bm{B}$ (equation (A.7)) shows that a change of the eccentricity vector ($\delta \bm{e}$) is most efficiently achieved by applying tangential thrust only. Similarly, the difference in the semi-major axis $\delta a$ is most efficiently controlled by tangential thrust only. This suggests to control the system given by equation (3.1) without radial thrust. Note, that $\delta \lambda$ can only be controlled by radial thrust and therefore waiving radial thrust would mean the loss of full controllability. In this situation it is convenient to use a reduced model and to control $\delta \lambda$ by leveraging Keplerian dynamics. This can be done by augmenting the state-space with $\delta \dot{\lambda}$ \cite{ref8} or by changing the applied reference (see section 4.2) that will then be followed by a stabilizing feedback controller to maintain full controllability of the complete ROE set $\delta \bm{\alpha}$. The reduced model is given by
+
+
+
+where the reduced ROE vector is defined as 
+
+and the control input 
+\[
+\bm{u} = \begin{bmatrix} u_t, u_n \end{bmatrix}^\top
+\]
+is the control acceleration in along-track and normal direction of the co-rotating \textbf{RTN}-frame. The reduced plant matrix is now 
+\[
+A = A_{J2} + A_d
+\]
+(equations (A.2) and (A.4)). Note, that Keplerian dynamics have no influence on $\delta a$. The reduced control input matrix is $B$ (see equation A.8).
+
+
+The feedback controller has to stabilize the system at an applied reference $\delta \boldsymbol{\alpha}_a$. This applied reference is not necessarily the desired reference $\delta \boldsymbol{\alpha}_{\text{ref}}$. The proposed reference governor in section 6 ensures at steady-state $\delta \boldsymbol{\alpha}_a = \delta \boldsymbol{\alpha}_{\text{ref}}$, if the imposed constraints on the relative state allow. A control law which ensures the relative spacecraft state to asymptotically tend to the applied reference is given by
+
+\begin{equation}
+\mathbf{u} = -\mathbf{B}^* \left[ A \delta \boldsymbol{\alpha} + P \left( \delta \boldsymbol{\alpha} - \delta \boldsymbol{\alpha}_a \right) \right]
+\tag{4.1}
+\end{equation}
+
+The plant matrix for the differential Earth oblateness effect for the reduced model is given by
+
+\begin{equation}
+A_{J2}(\bm{\alpha}_c) = \kappa
+\begin{pmatrix}
+0 & 0 & \frac{7}{2} e_y Q & -4 e_x e_y G Q & -(1 + 4 e_y^2 G) Q & 5 e_y S & 0 & 0 \\
+0 & 0 & -\frac{7}{2} e_x Q & (1 + 4 e_x^2 G) Q & 4 e_x e_y G Q & -5 e_x S & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & \frac{7}{2} S & -4 e_x G S & -4 e_y G S & 2 T & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\end{pmatrix}
+\tag{A.2}
+\end{equation}
+
+\noindent where
+\[
+\dot{\omega} = \kappa Q; \qquad \gamma = \frac{3}{4} J_2 R_e^2 \sqrt{\mu}; \qquad \eta = \sqrt{1 - e^2}; \qquad \kappa = \frac{\gamma}{a_c^{7/2} \eta_c^4}
+\]
+
+\[
+e_x = e_c \cos(\omega_c); \qquad e_y = e_c \sin(\omega_c); \qquad E = 1 + \eta_c; \qquad F = 4 + 3 \eta_c; \qquad G = \frac{1}{\eta_c^2}
+\]
+
+\[
+P = 3 \cos(i_c)^2 - 1; \qquad Q = 5 \cos(i_c)^2 - 1; \qquad S = \sin(2 i_c); \qquad T = \sin(i_c)^2
+\]
+
+Control input matrix for quasi-nonsingular ROE of the reduced model (used in the reference governor):
+
+\begin{equation}
+\bm{B}(\bm{\alpha}_c) = \frac{1}{a n}
+\begin{pmatrix}
+\frac{2}{\eta}(1 + e \cos f) & 0 \\
+\eta \frac{(2 + e \cos f) \cos \theta + e_x}{1 + e \cos f} & \frac{\eta e_y}{\tan i} \cdot \frac{\sin \theta}{1 + e \cos f} \\
+\eta \frac{(2 + e \cos f) \sin \theta + e_y}{1 + e \cos f} & -\frac{\eta e_x}{\tan i} \cdot \frac{\sin \theta}{1 + e \cos f} \\
+0 & \eta \frac{\cos \theta}{1 + e \cos f} \\
+0 & \eta \frac{\sin \theta}{1 + e \cos f}
+\end{pmatrix}
+\tag{A.8}
+\end{equation}
+
+where \( f \) is the true anomaly and \( \theta = f + \omega \).
+
+Let the system described by equation (3.2) be subject to the control law given in (4.1) with $P$ being positive definite. A Lyapunov function candidate is given by
+
+\begin{equation}
+V(\delta \boldsymbol{\alpha}_a, \delta \boldsymbol{\alpha}) = \frac{1}{2} (\delta \boldsymbol{\alpha} - \delta \boldsymbol{\alpha}_a)^\top (\delta \boldsymbol{\alpha} - \delta \boldsymbol{\alpha}_a) 
+= \frac{1}{2} \Delta \boldsymbol{\alpha}^\top \Delta \boldsymbol{\alpha}
+\tag{4.2}
+\end{equation}
+
+By taking the derivative of eq. (4.2) and substituting eq. (4.1) into eq. (4.2), one can prove that eq. (4.2) indeed is a Lyapunov function:
+
+\begin{align}
+\dot{V}(\delta \boldsymbol{\alpha}_a, \delta \boldsymbol{\alpha}) 
+&= \Delta \boldsymbol{\alpha}^\top \Delta \dot{\boldsymbol{\alpha}} \notag \\
+&= \Delta \boldsymbol{\alpha}^\top \left( \dot{\delta \boldsymbol{\alpha}} - \dot{\delta \boldsymbol{\alpha}}_a \right) \notag \\
+&= \Delta \boldsymbol{\alpha}^\top \left( A(\alpha_c) \delta \boldsymbol{\alpha} + B(\alpha_c) \mathbf{u} - 0 \right) \notag \\
+&= \Delta \boldsymbol{\alpha}^\top \left( A(\alpha_c) \delta \boldsymbol{\alpha} + B(\alpha_c) \left( -\mathbf{B}^* \left[ A \delta \boldsymbol{\alpha} + P(\delta \boldsymbol{\alpha} - \delta \boldsymbol{\alpha}_a) \right] \right) \right) \notag \\
+&= -\Delta \boldsymbol{\alpha}^\top P \Delta \boldsymbol{\alpha}
+\tag{4.3}
+\end{align}
+
+which is negative definite. Note, that $\delta \boldsymbol{\alpha}_a$ is changed during reconfigurations ($\delta \boldsymbol{\alpha}_a \ne 0$). However, for slow reconfigurations (low-thrust) and for steady state ($\delta \boldsymbol{\alpha}_a = \delta \boldsymbol{\alpha}_{\text{ref}}$), one can consider $\delta \boldsymbol{\alpha}_a$ to be constant.
+
+The matrix \( P \) is defined as:
+
+\[
+P = \frac{1}{k} \begin{pmatrix}
+\cos(J)^N & 0 & 0 & 0 & 0 & 0 \\
+0 & \cos(J)^N & 0 & 0 & 0 & 0 \\
+0 & 0 & \cos(J)^N & 0 & 0 & 0 \\
+0 & 0 & 0 & \cos(H)^N & 0 & 0 \\
+0 & 0 & 0 & 0 & \cos(H)^N & 0 \\
+0 & 0 & 0 & 0 & 0 & \cos(H)^N \\
+\end{pmatrix}
+\tag{4.4}
+\]
+
+where \( k \in \mathbb{R}^{+} \) is an arbitrary large scaling scalar, 
+\( J = u - \bar{u}_{ip} \), \( H = u - \bar{u}_{oop} \), and 
+\( u = M + \omega \) is the mean argument of latitude. 
+The exponent \( N \in \mathbb{N} \) such that \( N \bmod 2 = 0 \land N > 2 \) 
+defines to which extent the control inputs are centered around the fuel optimal 
+locations (argument of latitudes) to control the in-plane 
+\((\delta a, \delta e)\) motion at \( \bar{u}_{ip} \), and the out-of-plane 
+\((\delta i)\) motion at \( \bar{u}_{oop} \).
+
+The optimal locations for near-circular orbits to apply thrust are given by:
+
+\[
+\bar{u}_{ip} = \text{atan2} \left( \Delta \delta e_y, \Delta \delta e_x \right)
+\tag{4.5}
+\]
+\[
+\bar{u}_{oop} = \text{atan2} \left( \Delta \delta i_y, \Delta \delta i_x \right)
+\tag{4.6}
+\]
+
+
+
+This is our control solution, and is applied in the FODE simulation described in the following section.
+
+\textbf{\textit{Setup Formulation}} \\
+The setup of the formation reconfigurations and what we want to solve are highlighted in Section \ref{sec:control_objectives}.
+
+\textbf{\textit{Comparing delta-v}} \\
+The comparison of the least-squares method with the lower-bound delta-v $\Delta v_{lb}$ is provided in Table \ref{tab:dv_comparison}.
+
+
+\subsubsection{Justificiation and Implementation of Control}
+
+\textbf{\textit{Dynamics Model for Ground Truth Simulation}}
+
+For our ground-truth simulation model, we utilized a FODE simulation model that is described in Section \ref{sec:fode_simulation}. This model gives us a high-fidelity model in which it is simple to incorporate J2 perturbations and drag models (although the drag models have not been implemented yet). The states of the satellites are stored and propagated in ECI co-ordinates. 
+
+Based on the time-index of the simulation, it is decided whether station-keeping or maneuevering to the specified ROEs of the next mode is required. Then, the lyapunov control scheme is utilized to calculate required acceleration control inputs in the tangential and normal directions. These are then applied as an approximate change in velocity to the ECI state vector being propagated. The full structure of this code is shown in Algorithm \ref{alg:continuous_control_sim}
+\begin{align}
+    \Delta v_t = u_t \Delta t
+\end{align}
+
+\begin{algorithm}[H]
+\caption{FODE Simulation with Continuous Control}
+\begin{algorithmic}[1]
+
+\State Initialize time array, chief semi-major axis, and empty state histories
+\State Get maneuver control block times
+\State Extract nominal ROE for SV2 and SV3
+
+\For{each time step $t_i$ in $t_{\text{series}}$}
+    \State Propagate SV1, SV2, SV3 states using RK4
+    \State Convert SV2 and SV3 states to ROE w.r.t. SV1
+
+    \State Compute control input to station-keep SV2
+    \If{$t_i$ belongs to a maneuver block}
+        \State Get desired final ROE values for SV3
+        \State Compute control input to maneuver SV3
+    \Else
+        \State Compute control input to station-keep SV3
+    \EndIf
+    \State Convert control inputs to a change in $\Delta v$ in the ECI frame
+    \State Apply control input
+\EndFor
+\State Convert SV2 and SV3 final states to RTN position relative to SV1
+\State Plot desired data in RTN and ROE frames.
+\EndProcedure
+\end{algorithmic}
+\end{algorithm} \label{alg:continuous_control_sim}
+
+\textbf{\textit{Selection of Dynamics Model for Continuous Controller}} \\
+The naive least-squares utilizes the STM for near-circular orbits detailed in Equation \ref{eq:stm_matrix} to propagate the state. Control maneuvers calculate $\delta v$ in the RTN frame, the input and reference ROEs use quasi-nonsingular relative orbital elements.
+
+\textbf{\textit{Actuator Implementation, Sensor and Disturbance Models}} \\
+For this submission, considerations of the delta-v budget, actuator implementation, sensor models, and disturbance models (apart from J2) are ignored. These other practical considerations will be incorporated in future submissions.
+
+\subsubsection{Results and Analysis of Continuous Control Performance} \label{sec:analysis_of_control_cont}

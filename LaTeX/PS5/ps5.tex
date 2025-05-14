@@ -37,9 +37,10 @@ The absolute motion of our spacecraft is not the focus, as our formation is pure
 
 These ROE values were chosen to meet the minimum separation requirements outlined above, by using the following equation:
 
-\begin{align*}
-R_{\min} &= \frac{\sqrt{2} \cdot a \cdot |\delta e \cdot \delta i|}{\text{\sqrt{(\delta e)^2 + (\delta i)^2 + |\delta e + \delta i| \cdot |\delta e - \delta i|}}
-\end{align*}
+\begin{align}
+R_{\min} &= \frac{\sqrt{2} \cdot a \cdot |\delta e \cdot \delta i|}%
+{\sqrt{(\delta e)^2 + (\delta i)^2 + |\delta e + \delta i| \cdot |\delta e - \delta i|}}
+\end{align} \label{eqn:roe_spacing}
 
 Plotting this equation in 3D shows that the minimum distance is dominated by the minimum of the given $\delta e$ and $\delta i$, as shown by Figure \ref{fig:min_dist_contour}.
 \begin{figure}[H]
@@ -167,7 +168,7 @@ To verify that the STM is an acceptable model, it is compared in the ROE represe
 \end{figure}
 \subsection{Impulsive Control Law}
 
-\subsubsection{Control Method Considerations}
+\subsubsection{Control Method Considerations}\label{sec:control_considerations}
 
 As highlighted in Section \ref{sec:control_objectives}, our system has four distinct operational modes, each with their own unique control accuracy and safety requirements. We also have control considerations for the maneuvers for transitioning between different modes.
 
@@ -175,7 +176,7 @@ Based on the requirements detailed in the previous section, we decided on the op
 
 \definecolor{lightgray}{gray}{0.9}
 
-\begin{table}[ht]
+\begin{table}[H]
     \centering
     \caption{Control Methods by Mode of Operation}
     \renewcommand{\arraystretch}{1.3}
@@ -205,19 +206,23 @@ Based on the requirements detailed in the previous section, we decided on the op
 
 
 \subsubsection{Control Maneuver Formulations}
+
+
+
 Although we had the different ideas for control methodologies for the different modes, during the duration of this submission we were only able to get one method working exactly to meet our requirements: naive least squares. Two other methods were attempted: the relative orbit control impulse burn formulations in \cite{damicothesis}, and the closed-form control solution highlighted in \cite{chernick2021optimal}. However, the method from \cite{damicothesis} causes a drift in the $\delta \lambda$ that we were not able to close (likely with a third burn). We were also unable to complete a working implementation of the closed-form solution. Although these will be discussed in later submissions (to cover all the methods detailed in Table \ref{tab:mode_control_methods}), here we will primarily discuss the naive-least squares method.
 
+\textit{\textbf{Naive Least-Squares Method}}\\
 The naive least-squares method works on the principle that a sequence of relative orbital elements can be related to each other with a linearized model that accounts for J2 perturbations, called a state transition matrix. This STM was previously stated in Equations \ref{eq:stm_matrix} and \ref{eq:state_transition_relation}. 
 
 The change in relative orbital elements $\Delta \delta \alpha$ can also be related to the applied $\Delta v$ as \cite{chernick2021optimal}
 \begin{align}
     \boldsymbol{\Delta \delta \alpha} = \Gamma\Delta \boldsymbol{v}
-\end{align} \label{eq:delta_v_to+alpha}
+\end{align} \label{eq:delta_v_to_alpha}
 Putting these together, we have a formulation for a set of control maneuvers $\Delta v$ required to achieve a desired change in relative orbital elements.
-\begin{equation}
+\begin{align}
 \Delta \delta \boldsymbol{\alpha} = \delta \boldsymbol{\alpha}(t_f) - \Phi_{f,0} \, \delta \boldsymbol{\alpha}(t_0)
-= \sum_{k = 1}^{M} \Phi(t_k) \Gamma (t_k)  \delta \mathbf{v}_k
-\end{equation}
+= \sum_{k = 1}^{M} \Phi(t_k) \Gamma (t_k)  \delta \mathbf{v}_k 
+\end{align} \label{eq:delta_v_to_delta_alpha}
 From theoretical formulations, we adopt the standard of setting three equally-spaced in time $\Delta v$ impulses for in-plane maneuvers, or a single impulse burn $\Delta v$ for out-of-plane maneuvers.
 For near-circular orbit, the transformation matrix $\Gamma$ is given simply by
 \begin{align}
@@ -243,94 +248,173 @@ where $\Delta v$ is in the RTN frame, and $a$ is the semi-major axis of the chie
     u_k = t_{k} \left( n + \kappa \left( \eta P + Q \right) \right) + u_{0}
 \end{align}
 
-where $P, Q, \eta, \kappa$ are defined in Equation \ref{}.
+where $P, Q, \eta, \kappa$ are defined in Equation \ref{eq:stm_matrix}.
 
-The control maneuvers are solved by applying least-squares the linear system $Ax = b$ which we 
+The control maneuvers are solved by applying least-squares the linear system $M\delta v = \delta a$ which is formed by stacking all the states in the summation of Equation \ref{eq:delta_v_to_delta_alpha}.
 
+\begin{equation}
+\left[
+\Phi_1 \mathbf{\Gamma}_1 \quad
+\Phi_2 \mathbf{\Gamma}_2 \quad
+\cdots \quad
+\Phi_N \mathbf{\Gamma}_N
+\right]
+\begin{bmatrix}
+\delta \mathbf{v}_1 \\
+\delta \mathbf{v}_2 \\
+\vdots \\
+\delta \mathbf{v}_N
+\end{bmatrix}
+= M_{[6,3N]} \delta \mathbf{v}_{[3N,1]} = \Delta \delta \boldsymbol{\alpha}
+\end{equation}
 
+Using a pseudo-inverse for an analytical least-squares solution 
 
-The comparison of the least-squares method with the lower-bound delta-v $\Delta v_{lb}$ is provided in Section \ref{sec:analysis_of_control}.
+\begin{align}
+    \delta \mathbf{v} = M^\top (M M^\top)^{-1} \Delta \delta \boldsymbol{\alpha}
+\end{align}
 
+This is our control solution, and is applied in the FODE simulation described in the following section.
 
+\textbf{\textit{Setup Formulation}} \\
+The setup of the formation reconfigurations and what we want to solve are highlighted in Section \ref{sec:control_objectives}.
 
+\textbf{\textit{Comparing delta-v}} \\
+The comparison of the least-squares method with the lower-bound delta-v $\Delta v_{lb}$ is provided in Table \ref{tab:dv_comparison}.
+
+\textbf{\textit{Station-Keeping Maneuvers}}
+
+Station keeping has not been fully integrated with the rest of the maneuvers yet, however we have a separate demo where we apply station keeping to prevent a drift in the relative orbital elements.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{sim//figures//PS5/station_keeping_man_damico.png}
+    \caption{Station keeping the relative eccentricity and inclination vectors \cite{damicothesis}}
+    \label{fig:station_keeping_guide}
+\end{figure}
+
+Based on Figure \ref{fig:station_keeping_guide}, we calculate the required relative orbital elements $\delta e_{man}$ and $\delta i_{man}$ that put us on the other end of the safety window. The safety window is determined by the control requirements and Equation \ref{eqn:roe_spacing}.
 
 \subsubsection{Justificiation and Implementation of Control}
 
-For implementing our method in simulation we utilized 
-* FODE Dynamics model (segmented for control)
-* Logic 
+\textbf{\textit{Dynamics Model for Ground Truth Simulation}}
 
+For our ground-truth simulation model, we utilized a FODE simulation model that is described in Section \ref{sec:fode_simulation}. This model gives us a high-fidelity model in which it is simple to incorporate J2 perturbations and drag models (although the drag models have not been implemented yet). The states of the satellites are stored and propagated in ECI co-ordinates. 
 
-Separate from the primary simulation that implemented the different modes and maneuvers, we implemented a 
+When simulating a maneuver, the propagation is stopped, the required $\delta v$ is added to the state, and then the propagation is continued. This allows us to simulate the impulsive burns. The $\delta v$ burns, which are calculated in RTN frame as a result of the naive least-squares and converted to ECI based on the chief's state at maneuver time.
 
+Separate from the primary simulation that implemented the different modes and maneuvers, we implemented a more integrated simulation for station-keeping that continuously plans maneuvers if the eccentricity vector or inclination vector go beyond the safe region. The code structure for station keeping, which will also simulate the primary larger maneuvers in the future, is shown in Algorithm \ref{alg:station_keeping}.
 
 \begin{algorithm}[H]
-\caption{Stationkeeping Simulation and Plotting}
+\caption{Station=keeping Simulation and Plotting}
 \begin{algorithmic}[1]
-\Procedure{SimAndPlotStationkeeping}{SV2\_modes, SV3\_modes, SV1\_OE\_init, SV2\_state\_init, SV3\_state\_init, SV1\_state\_init, $t_{\text{orbit}}$, $t_{\text{series}}$, fig\_path, title\_str}
 
 \State Initialize time array, chief semi-major axis, and empty state histories
-\State Extract nominal ROE for SV2 and SV3; define stationkeeping bounds
-\State Compute desired eccentricity offsets using rotation angles
+\State Extract nominal ROE for SV2 and SV3
+\State Define station-keeping bounds
+\State Compute desired eccentricity offsets
 
 \For{each time step $t_i$ in $t_{\text{series}}$}
     \State Propagate SV1, SV2, SV3 states using RK4
     \State Convert SV2 and SV3 states to ROE w.r.t. SV1
-    \State Extract orbital elements and mean argument of latitude
 
-    \If{SV2 has not yet performed control}
+    \If{SV has not yet performed control}
         \If{eccentricity deviation exceeds threshold}
-            \State Compute and store SV2 $\Delta v$ for eccentricity control
+            \State Compute station keeping maneuver with naive least squares (3 burns)
+            \State Store SV $\Delta v$ for eccentricity control
         \EndIf
         \If{inclination deviation exceeds threshold}
-            \State Compute and store SV2 $\Delta v$ for inclination control
+            \State Compute station keeping maneuver with naive least squares (1 burn)
+            \State Store SV $\Delta v$ for inclination control
         \EndIf
     \EndIf
-
-    \If{SV3 has not yet performed control}
-        \If{eccentricity deviation exceeds threshold}
-            \State Compute and store SV3 $\Delta v$ for eccentricity control
-        \EndIf
-        \If{inclination deviation exceeds threshold}
-            \State Compute and store SV3 $\Delta v$ for inclination control
-        \EndIf
-    \EndIf
-
-    \If{a planned SV2 $\Delta v$ is scheduled now}
-        \State Apply $\Delta v$ to SV2 and remove it from queue
-    \EndIf
-    \If{a planned SV3 $\Delta v$ is scheduled now}
-        \State Apply $\Delta v$ to SV3 and remove it from queue
+    \If{a planned SV $\Delta v$ is scheduled now}
+        \State Apply $\Delta v$ to SV and remove it from queue
     \EndIf
 \EndFor
 
-\State Convert SV2 and SV3 final states to RTN position relative to SV1
-\State Plot RTN projections and ROE evolution over time
-\EndProcedure
+\State Convert SV2 and SV3 final states to RTN position relative to SV1\EndProcedure
 \end{algorithmic}
-\end{algorithm}
+\end{algorithm} \label{alg:station_keeping}
 
+\textbf{\textit{Selection of Dynamics Model for Controller}} \\
+The naive least-squares utilizes the STM for near-circular orbits detailed in Equation \ref{eq:stm_matrix} to propagate the state. Control maneuvers calculate $\delta v$ in the RTN frame, the input and reference ROEs use quasi-nonsingular relative orbital elements.
 
+\textbf{\textit{Actuator Implementation, Sensor and Disturbance Models}} \\
 For this submission, considerations of the delta-v budget, actuator implementation, sensor models, and disturbance models (apart from J2) are ignored. These other practical considerations will be incorporated in future submissions.
 
 \subsubsection{Results and Analysis of Control Performance} \label{sec:analysis_of_control}
 
-\begin{figure}
+The results of the control system are shown in the following figures. Note that these figures do not include station-keeping control in between the modes, as this will be implemented in the future. This is why there are still significant drifts in the station keeping modes from J2. 
+
+Figures \ref{fig:roe_planes_modes} and \ref{fig:roe_time_modes} show the desired and actual ROEs for each mode. $\delta a$ becomes non-zero during the maneuvers because there are along-track elements. However, at the end of each mode, the control system is able to reduce $\delta a$ to near zero. But due to $\delta a$ and $\delta i_x$ not being precisely zero throughout the control and station-keeping modes, a drift is introduced in $\delta \lambda$. $\delta e_x$ and $\delta i_x$ are always meant to be zero, but again the maneuvers introduce variations. Each control mode tries to return $\delta e_x$ and $\delta i_x$ to zero but is unable to get all the way there. These errors can be addressed by station-keeping control in between modes. $\delta e_y$ and $\delta i_y$ exhibit the most accurate behavior. The control system is able to reach the desired $\delta e_y$ and $\delta i_y$ in each mode with very little error. This is important because these are the only non-zero factors in the desired ROEs and drive passive safety. 
+
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\linewidth]{sim/figures/PS5/ROE_over_time.png}
-    \caption{Enter Caption}
-    \label{fig:enter-label}
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS5/ROE_planes_modes.png}
+    \caption{Actual and desired ROE plotted for all modes in ROE planes}
+    \label{fig:roe_planes_modes}
 \end{figure}
-\begin{figure}
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\linewidth]{sim/figures/PS5/ROE_error_over_time.png}
-    \caption{Enter Caption}
-    \label{fig:enter-label}
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS5/ROE_over_time_modes.png}
+    \caption{Actual and desired ROE plotted for all modes in ROE time history}
+    \label{fig:roe_time_modes}
 \end{figure}
-\begin{figure}
+
+Figure \ref{fig:roe_error_time_modes} reflects the same behavior in the tracking errors. The control system is able to track $\delta a, \delta e_y, and \delta i_y$ very well. The other tracking errors can be corrected either through station-keeping control or the usage of another control method. The naive least-squares method produces delta-v's that are in all directions in RTN. Other closed-form approaches, such as reachable set theory are able to specify more precise maneuvers that do not have as many unwanted side effects on other ROEs. 
+
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\linewidth]{sim/figures/PS5/delta_v_timeline.png}
-    \caption{Enter Caption}
-    \label{fig:enter-label}
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS5/ROE_error_over_time_modes.png}
+    \caption{Tracking error between actual and desired ROE plotted for all modes in ROE time history}
+    \label{fig:roe_error_time_modes}
+\end{figure}
+
+Figure \ref{fig:delta_v_modes} shows the delta-v magnitudes in the RTN directions throughout each control mode. As expected, delta-v magnitudes are on the order of mm/s. The magnitudes decrease in size as the desired change in ROE decreases throughout the modes. Additionally, the magnitudes in the normal direction are multiple times larger than those in radial or tangential. This arises from the fact that inclination maneuvers are much more expensive than eccentricity maneuvers. Since each mode changes relative eccentricity and relative inclination by the exact same magnitude, the inclination maneuver is going to have to be larger. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS5/delta_v_timeline_modes.png}
+    \caption{Actual delta-v of control maneuvers over time}
+    \label{fig:delta_v_modes}
+\end{figure}
+
+As a point of comparison, the theoretical delta-v lower bound can be calculated as follows:
+\begin{align*}
+\Delta v_{\text{ecc}} &= \frac{1}{2} \cdot n \cdot a \cdot \left\| \Delta \delta\vec{e} \right\| \\
+\Delta v_{\text{inc}} &= n \cdot a \cdot \left\| \Delta \delta\vec{i} \right\| \\
+\Delta v_{\text{lb}} &= \sqrt{\Delta v_{\text{ecc}}^2 + \Delta v_{\text{inc}}^2}
+\end{align*}
+Note that only changes in ROEs were in $\delta e$ and $\delta i$, which is why delta-v lower bound can be calculated as the norm of the along-track and cross-track delta-v's. 
+
+Table \ref{tab:dv_comparison} compares the total delta-v with the theoretical lower-bound. The actual delta-v's were approximately double the theoretical lower-bound for each mode. This suggests that there is room for improvement in optimizing the delta-v cost, which methods like reachable set theory could offer. 
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Mode} & \textbf{Total }$\Delta v$ \textbf{(m/s)} & \textbf{Lower Bound (m/s)} \\
+\hline
+2 & 0.3624 & 0.1830 \\
+3 & 0.2174 & 0.1098 \\
+4 & 0.0216 & 0.0110 \\
+\hline
+\end{tabular}
+\caption{Total delta-$v$ compared with theoretical lower bounds for each maneuver mode}
+\label{tab:dv_comparison}
+\end{table}
+
+As mentioned previously, the station-keeping mode was treated separately to the other modes for the time being. The algorithm for station keeping is provided in Algorithm \ref{alg:station_keeping}. Ultimately, the station-keeping mode will be integrated into the full control system to prevent drift in ROEs when maintaining a formation. Figures \ref{fig:roe_planes_stk} and \ref{fig:roe_time_stk} show the current performance of the station-keeping control method. While there is still some erroneous behaviors, the control method successfully prevents drift in $\delta \lambda$ which is key for our formation to stay centered around the Target. The keep-in zone was set to a 1-meter radius circle centered on the desired ROEs. The control method is generally able to keep errors to below 5 meters. In future work, the unexpected behavior towards the end of the time series will be addressed. Also, the keep-in zone of 1 meter might be too tight for the current formulation, leading to this undesired behavior. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{sim/figures/PS5/ROE_planes.png}
+    \caption{Station-keeping mode in ROE planes}
+    \label{fig:roe_planes_stk}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{sim/figures/PS5/ROE_over_time.png}
+    \caption{Station-keeping mode in ROE time history}
+    \label{fig:roe_time_stk}
 \end{figure}
 
