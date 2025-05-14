@@ -70,13 +70,13 @@ From here the reduced state-space model can be defined as follows:
 \begin{equation}
 \begin{bmatrix}
 \delta \dot{\bm{\alpha}} \\
-\delta \dot{\tilde{\alpha}}
+\delta \ddot{a}
 \end{bmatrix}
 =
 A
 \begin{bmatrix}
 \delta \bm{\alpha} \\
-\delta \tilde{\bm{\alpha}}
+\delta \dot{a}
 \end{bmatrix}
 +
 \begin{bmatrix}
@@ -84,51 +84,22 @@ B \\
 \bm{0}_{1 \times 3}
 \end{bmatrix}
 \bm{u}
+\label{eq:reduced_state_space}
 \end{equation}
 
+The reduced ROE state is augmented by the differential rate of change of the relative semi-major-axis, $\delta \dot{a}$. This is to  deal with aerodynamic drag, but that is neglected in our case. 
 
-
------ Keep going!
-
-
-The study of the control input matrix $\bm{B}$ (equation (A.7)) shows that a change of the eccentricity vector ($\delta \bm{e}$) is most efficiently achieved by applying tangential thrust only. Similarly, the difference in the semi-major axis $\delta a$ is most efficiently controlled by tangential thrust only. This suggests to control the system given by equation (3.1) without radial thrust. Note, that $\delta \lambda$ can only be controlled by radial thrust and therefore waiving radial thrust would mean the loss of full controllability. In this situation it is convenient to use a reduced model and to control $\delta \lambda$ by leveraging Keplerian dynamics. This can be done by augmenting the state-space with $\delta \dot{\lambda}$ \cite{ref8} or by changing the applied reference (see section 4.2) that will then be followed by a stabilizing feedback controller to maintain full controllability of the complete ROE set $\delta \bm{\alpha}$. The reduced model is given by
-
-
-
-where the reduced ROE vector is defined as 
-
-and the control input 
-\[
-\bm{u} = \begin{bmatrix} u_t, u_n \end{bmatrix}^\top
-\]
-is the control acceleration in along-track and normal direction of the co-rotating \textbf{RTN}-frame. The reduced plant matrix is now 
-\[
-A = A_{J2} + A_d
-\]
-(equations (A.2) and (A.4)). Note, that Keplerian dynamics have no influence on $\delta a$. The reduced control input matrix is $B$ (see equation A.8).
-
-
-The feedback controller has to stabilize the system at an applied reference $\delta \boldsymbol{\alpha}_a$. This applied reference is not necessarily the desired reference $\delta \boldsymbol{\alpha}_{\text{ref}}$. The proposed reference governor in section 6 ensures at steady-state $\delta \boldsymbol{\alpha}_a = \delta \boldsymbol{\alpha}_{\text{ref}}$, if the imposed constraints on the relative state allow. A control law which ensures the relative spacecraft state to asymptotically tend to the applied reference is given by
-
-\begin{equation}
-\mathbf{u} = -\mathbf{B}^* \left[ A \delta \boldsymbol{\alpha} + P \left( \delta \boldsymbol{\alpha} - \delta \boldsymbol{\alpha}_a \right) \right]
-\tag{4.1}
-\end{equation}
-
-The plant matrix for the differential Earth oblateness effect for the reduced model is given by
-
+The plant matrix for the reduced model with J2 effects is given by:
 \begin{equation}
 A_{J2}(\bm{\alpha}_c) = \kappa
-\begin{pmatrix}
+\begin{bmatrix}
 0 & 0 & \frac{7}{2} e_y Q & -4 e_x e_y G Q & -(1 + 4 e_y^2 G) Q & 5 e_y S & 0 & 0 \\
 0 & 0 & -\frac{7}{2} e_x Q & (1 + 4 e_x^2 G) Q & 4 e_x e_y G Q & -5 e_x S & 0 & 0 \\
 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
 0 & 0 & \frac{7}{2} S & -4 e_x G S & -4 e_y G S & 2 T & 0 & 0 \\
 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-\end{pmatrix}
-\tag{A.2}
-\end{equation}
-
+\end{bmatrix}
+\end{equation} \label{eq:continuous_control_A}
 \noindent where
 \[
 \dot{\omega} = \kappa Q; \qquad \gamma = \frac{3}{4} J_2 R_e^2 \sqrt{\mu}; \qquad \eta = \sqrt{1 - e^2}; \qquad \kappa = \frac{\gamma}{a_c^{7/2} \eta_c^4}
@@ -142,31 +113,43 @@ e_x = e_c \cos(\omega_c); \qquad e_y = e_c \sin(\omega_c); \qquad E = 1 + \eta_c
 P = 3 \cos(i_c)^2 - 1; \qquad Q = 5 \cos(i_c)^2 - 1; \qquad S = \sin(2 i_c); \qquad T = \sin(i_c)^2
 \]
 
-Control input matrix for quasi-nonsingular ROE of the reduced model (used in the reference governor):
+The control input matrix for the reduced model is given by:
 
 \begin{equation}
 \bm{B}(\bm{\alpha}_c) = \frac{1}{a n}
-\begin{pmatrix}
+\begin{bmatrix}
 \frac{2}{\eta}(1 + e \cos f) & 0 \\
 \eta \frac{(2 + e \cos f) \cos \theta + e_x}{1 + e \cos f} & \frac{\eta e_y}{\tan i} \cdot \frac{\sin \theta}{1 + e \cos f} \\
 \eta \frac{(2 + e \cos f) \sin \theta + e_y}{1 + e \cos f} & -\frac{\eta e_x}{\tan i} \cdot \frac{\sin \theta}{1 + e \cos f} \\
 0 & \eta \frac{\cos \theta}{1 + e \cos f} \\
 0 & \eta \frac{\sin \theta}{1 + e \cos f}
-\end{pmatrix}
-\tag{A.8}
-\end{equation}
+\end{bmatrix}
+\end{equation} \label{eq:continuous_control_B}
 
 where \( f \) is the true anomaly and \( \theta = f + \omega \).
 
-Let the system described by equation (3.2) be subject to the control law given in (4.1) with $P$ being positive definite. A Lyapunov function candidate is given by
+And the control input is given by:
+\begin{equation}
+\bm{u} = \begin{bmatrix} u_t, u_n \end{bmatrix}^\top
+\end{equation}
+which represents the control acceleration in along-track and normal directions of the co-rotating RTN frame.
+
+For continuous control, a feedback controller can be implemented to stabilize the system at a desired reference, $\delta \boldsymbol{\alpha}_a$. A control law that ensures the relative state to asymptotically tend towards the desired reference is given by: 
+
+\begin{equation}
+\mathbf{u} = -\mathbf{B}^* \left[ A \delta \boldsymbol{\alpha} + P \left( \delta \boldsymbol{\alpha} - \delta \boldsymbol{\alpha}_a \right) \right]
+\label{eq:feedback_continuous}
+\end{equation}
+
+To ensure that this control law achieves asymptotic stability, a Lyapunov function which is positive definite and whose time derivative is negative definite is chosen. Let the reduced state-space system described by Equation \ref{eq:reduced_state_space} be subject to the control law given in Equation \ref{eq:feedback_continuous} with $P$ being positive definite. A Lyapunov function candidate is given by:
 
 \begin{equation}
 V(\delta \boldsymbol{\alpha}_a, \delta \boldsymbol{\alpha}) = \frac{1}{2} (\delta \boldsymbol{\alpha} - \delta \boldsymbol{\alpha}_a)^\top (\delta \boldsymbol{\alpha} - \delta \boldsymbol{\alpha}_a) 
 = \frac{1}{2} \Delta \boldsymbol{\alpha}^\top \Delta \boldsymbol{\alpha}
-\tag{4.2}
+\label{eq:Lyapunov_candidate}
 \end{equation}
 
-By taking the derivative of eq. (4.2) and substituting eq. (4.1) into eq. (4.2), one can prove that eq. (4.2) indeed is a Lyapunov function:
+By taking the derivative of Equation \ref{eq:Lyapunov_candidate} and substituting Equation \ref{eq:feedback_continuous} into Equation \ref{eq:Lyapunov_candidate}, it can be proven that Equation \ref{eq:Lyapunov_candidate} is a Lyapunov function:
 
 \begin{align}
 \dot{V}(\delta \boldsymbol{\alpha}_a, \delta \boldsymbol{\alpha}) 
@@ -178,58 +161,48 @@ By taking the derivative of eq. (4.2) and substituting eq. (4.1) into eq. (4.2),
 \tag{4.3}
 \end{align}
 
-which is negative definite. Note, that $\delta \boldsymbol{\alpha}_a$ is changed during reconfigurations ($\delta \boldsymbol{\alpha}_a \ne 0$). However, for slow reconfigurations (low-thrust) and for steady state ($\delta \boldsymbol{\alpha}_a = \delta \boldsymbol{\alpha}_{\text{ref}}$), one can consider $\delta \boldsymbol{\alpha}_a$ to be constant.
+which is negative definite.
 
 The matrix \( P \) is defined as:
 
 \[
-P = \frac{1}{k} \begin{pmatrix}
+P = \frac{1}{k} \begin{bmatrix}
 \cos(J)^N & 0 & 0 & 0 & 0 & 0 \\
 0 & \cos(J)^N & 0 & 0 & 0 & 0 \\
 0 & 0 & \cos(J)^N & 0 & 0 & 0 \\
 0 & 0 & 0 & \cos(H)^N & 0 & 0 \\
 0 & 0 & 0 & 0 & \cos(H)^N & 0 \\
-0 & 0 & 0 & 0 & 0 & \cos(H)^N \\
-\end{pmatrix}
-\tag{4.4}
+\end{bmatrix}
 \]
 
 where \( k \in \mathbb{R}^{+} \) is an arbitrary large scaling scalar, 
 \( J = u - \bar{u}_{ip} \), \( H = u - \bar{u}_{oop} \), and 
 \( u = M + \omega \) is the mean argument of latitude. 
 The exponent \( N \in \mathbb{N} \) such that \( N \bmod 2 = 0 \land N > 2 \) 
-defines to which extent the control inputs are centered around the fuel optimal 
-locations (argument of latitudes) to control the in-plane 
-\((\delta a, \delta e)\) motion at \( \bar{u}_{ip} \), and the out-of-plane 
-\((\delta i)\) motion at \( \bar{u}_{oop} \).
+defines to which extent the control inputs are centered around the fuel optimal locations to control the in-plane \((\delta a, \delta e)\) motion at \( \bar{u}_{ip} \), and the out-of-plane \((\delta i)\) motion at \( \bar{u}_{oop} \).
 
 The optimal locations for near-circular orbits to apply thrust are given by:
 
 \[
 \bar{u}_{ip} = \text{atan2} \left( \Delta \delta e_y, \Delta \delta e_x \right)
-\tag{4.5}
 \]
 \[
 \bar{u}_{oop} = \text{atan2} \left( \Delta \delta i_y, \Delta \delta i_x \right)
-\tag{4.6}
 \]
 
+The parameters $N$ and $k$ are used to tune the controller response. 
 
+\textbf{\textit{Indirect Control of $\delta\lambda$}}
 
-This is our control solution, and is applied in the FODE simulation described in the following section.
+Direct control of $\delta \lambda$ would require the additional degree of freedom of radial burns, which can be very inefficient for $\Delta v$ usage. Instead, $\delta \lambda$ can be corrected indirectly by using along-track burns and applying an intermediate $\delta a_{des}$, and allowing for Keplerian dynamics to drift $\delta \lambda$ by a desired amount \cite{steindorf2017constrained}.
 
-\textbf{\textit{Setup Formulation}} \\
-The setup of the formation reconfigurations and what we want to solve are highlighted in Section \ref{sec:control_objectives}.
-
-\textbf{\textit{Comparing delta-v}} \\
-The comparison of the least-squares method with the lower-bound delta-v $\Delta v_{lb}$ is provided in Table \ref{tab:dv_comparison}.
-
+The rate of change of 
 
 \subsubsection{Justificiation and Implementation of Control}
 
 \textbf{\textit{Dynamics Model for Ground Truth Simulation}}
 
-For our ground-truth simulation model, we utilized a FODE simulation model that is described in Section \ref{sec:fode_simulation}. This model gives us a high-fidelity model in which it is simple to incorporate J2 perturbations and drag models (although the drag models have not been implemented yet). The states of the satellites are stored and propagated in ECI co-ordinates. 
+For our ground-truth simulation model, we utilized a FODE simulation model that is described in Section \ref{sec:fode_simulation} (utilizing RK4). This model gives us a high-fidelity model in which it is simple to incorporate J2 perturbations and drag models (although the drag models have not been implemented yet). The states of the satellites are stored and propagated in ECI co-ordinates. 
 
 Based on the time-index of the simulation, it is decided whether station-keeping or maneuevering to the specified ROEs of the next mode is required. Then, the lyapunov control scheme is utilized to calculate required acceleration control inputs in the tangential and normal directions. These are then applied as an approximate change in velocity to the ECI state vector being propagated. The full structure of this code is shown in Algorithm \ref{alg:continuous_control_sim}
 \begin{align}
@@ -265,9 +238,77 @@ Based on the time-index of the simulation, it is decided whether station-keeping
 \end{algorithm} \label{alg:continuous_control_sim}
 
 \textbf{\textit{Selection of Dynamics Model for Continuous Controller}} \\
-The naive least-squares utilizes the STM for near-circular orbits detailed in Equation \ref{eq:stm_matrix} to propagate the state. Control maneuvers calculate $\delta v$ in the RTN frame, the input and reference ROEs use quasi-nonsingular relative orbital elements.
+The Lyapunov-based control uses a reduced-order model as an approximation of the true dynamics that can be utilized for control design. This reduced order model is captured in the $A$ and $B$ matrices provided in Equation \ref{eq:continuous_control_A} and \ref{eq:continuous_control_B}. Control maneuvers calculate a control input $u_t$ in the RTN frame (which is converted to ECI when being applied to FODE states), and the input and reference ROEs use quasi-nonsingular relative orbital elements.
 
 \textbf{\textit{Actuator Implementation, Sensor and Disturbance Models}} \\
 For this submission, considerations of the delta-v budget, actuator implementation, sensor models, and disturbance models (apart from J2) are ignored. These other practical considerations will be incorporated in future submissions.
 
 \subsubsection{Results and Analysis of Continuous Control Performance} \label{sec:analysis_of_control_cont}
+
+The results of the Lyapunov-based unconstrained continuous control scheme are shown in the following figures. These plots include all modes of the Watcher and Docker satellites, which involve maneuvers between desired ROEs and station-keeping.
+
+Figures \ref{fig:roe_planes_modes} and \ref{fig:roe_time_modes} show the desired and actual ROEs for each mode. 
+
+UPDATE THIS TO TALK ABOUT DESIRED d_A --> d_LAMBDA
+
+$\delta a$ becomes non-zero during the maneuvers because there are along-track elements. However, at the end of each mode, the control system is able to reduce $\delta a$ to near zero. But due to $\delta a$ and $\delta i_x$ not being precisely zero throughout the control and station-keeping modes, a drift is introduced in $\delta \lambda$. 
+
+GOOD FROM HERE ON
+
+$\delta e_x$ and $\delta i_x$ are always meant to be zero, but again the maneuvers introduce variations. Each control mode tries to return $\delta e_x$ and $\delta i_x$ to zero but is unable to get all the way there. These errors can be addressed by allowing for more orbits to converge and more robust station-keeping control in between modes. Right now the continuous station-keeping control is designed to hold the state that it is started at. 
+
+$\delta e_y$ and $\delta i_y$ exhibit the most accurate behavior. The control system is able to reach the desired $\delta e_y$ and $\delta i_y$ in each mode with very little error. This is important because these are the only non-zero factors in the desired ROEs and drive passive safety. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS6/ROE_planes_modes_SV3.png}
+    \caption{Actual and desired ROE plotted for all modes in ROE planes, SV3}
+    \label{fig:roe_planes_modes}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS6/ROE_over_time_modes_SV3.png}
+    \caption{Actual and desired ROE plotted for all modes in ROE time history, SV3}
+    \label{fig:roe_time_modes}
+\end{figure}
+
+Figure \ref{fig:roe_error_time_modes} reflects the same behavior in the tracking errors. The control system is able to track all of the desired ROEs very well. The remaining tracking errors can be mitigated either through allowing for more time to conerge, adjusting values of $k$ and $N$, or an enhanced station keeping method. Other methods, such as Lyapunov with constraints or convex optimization, can also be explored, but do not appear to be necessary for the desired behavior in this system. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS6/ROE_error_over_time_modes_SV3.png}
+    \caption{Tracking error between actual and desired ROE plotted for all modes in ROE time history}
+    \label{fig:roe_error_time_modes}
+\end{figure}
+
+Figure \ref{fig:delta_v_modes} shows the delta-v magnitudes in the RTN directions throughout each control mode. By design, there are no radial burns. As expected, delta-v magnitudes are on the order of sub mm/s. The magnitudes decrease in size as the desired change in ROE decreases throughout the modes. Additionally, there are more burns in the normal direction than in the tangential direction. This arises from the fact that inclination maneuvers are much more expensive than eccentricity maneuvers. Since each mode changes relative eccentricity and relative inclination by the exact same magnitude, the inclination maneuver is going to have to be larger. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS6/delta_v_timeline_modes_SV3.png}
+    \caption{Actual delta-v of control maneuvers over time}
+    \label{fig:delta_v_modes}
+\end{figure}
+
+As a point of comparison, the theoretical delta-v lower bound can be calculated as follows:
+\begin{align*}
+\Delta v_{\text{ecc}} &= \frac{1}{2} \cdot n \cdot a \cdot \left\| \Delta \delta\vec{e} \right\| \\
+\Delta v_{\text{inc}} &= n \cdot a \cdot \left\| \Delta \delta\vec{i} \right\| \\
+\Delta v_{\text{lb}} &= \sqrt{\Delta v_{\text{ecc}}^2 + \Delta v_{\text{inc}}^2}
+\end{align*}
+Note that only changes in ROEs were in $\delta e$ and $\delta i$, which is why delta-v lower bound can be calculated as the norm of the along-track and cross-track delta-v's. 
+
+Table \ref{tab:dv_comparison_continuous} compares the total delta-v with the theoretical lower-bound. The actual delta-v's were approximately double the theoretical lower-bound for each mode. This suggests that there is room for improvement in optimizing the delta-v cost, which methods like reachable set theory could offer. 
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Mode} & \textbf{Total }$\Delta v$ \textbf{(m/s)} & \textbf{Lower Bound (m/s)} \\
+\hline
+2 & 17.6259 & 0.1830 \\
+3 & 10.5896 & 0.1098 \\
+4 & 1.0535 & 0.0110 \\
+\hline
+\end{tabular}
+\caption{Total delta-$v$ for continuous control compared with theoretical lower bounds for each maneuver mode}
+\label{tab:dv_comparison_continuous}
+\end{table}

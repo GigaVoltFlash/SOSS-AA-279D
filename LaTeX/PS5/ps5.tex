@@ -134,7 +134,7 @@ Implementing the ground-truth model in open-loop shows each desired mode in the 
 \begin{figure}[H]
     \centering
     \begin{subfigure}[b]{0.32\linewidth}
-        \includegraphics[width=\linewidth]{sim/figures/PS5/mode_3_RTN.png_RT.png}
+        \includegraphics[width=\linewidth]{sim/figures/PS5/mode_3_RTN_.png_RT.pn}
         \caption{RT Projection}
         \label{fig:mode_3_rt}
     \end{subfigure}
@@ -350,14 +350,14 @@ Figures \ref{fig:roe_planes_modes} and \ref{fig:roe_time_modes} show the desired
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\linewidth]{sim/figures/PS5/ROE_planes_modes.png}
-    \caption{Actual and desired ROE plotted for all modes in ROE planes}
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS5/ROE_planes_modes_SV3.png}
+    \caption{Actual and desired ROE plotted for all modes in ROE planes, SV3}
     \label{fig:roe_planes_modes}
 \end{figure}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\linewidth]{sim/figures/PS5/ROE_over_time_modes.png}
-    \caption{Actual and desired ROE plotted for all modes in ROE time history}
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS5/ROE_over_time_modes_SV3.png}
+    \caption{Actual and desired ROE plotted for all modes in ROE time history, SV3}
     \label{fig:roe_time_modes}
 \end{figure}
 
@@ -365,7 +365,7 @@ Figure \ref{fig:roe_error_time_modes} reflects the same behavior in the tracking
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\linewidth]{sim/figures/PS5/ROE_error_over_time_modes.png}
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS5/ROE_error_over_time_modes_SV3.png}
     \caption{Tracking error between actual and desired ROE plotted for all modes in ROE time history}
     \label{fig:roe_error_time_modes}
 \end{figure}
@@ -373,7 +373,7 @@ Figure \ref{fig:roe_error_time_modes} reflects the same behavior in the tracking
 Figure \ref{fig:delta_v_modes} shows the delta-v magnitudes in the RTN directions throughout each control mode. As expected, delta-v magnitudes are on the order of mm/s. The magnitudes decrease in size as the desired change in ROE decreases throughout the modes. Additionally, the magnitudes in the normal direction are multiple times larger than those in radial or tangential. This arises from the fact that inclination maneuvers are much more expensive than eccentricity maneuvers. Since each mode changes relative eccentricity and relative inclination by the exact same magnitude, the inclination maneuver is going to have to be larger. 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\linewidth]{sim/figures/PS5/delta_v_timeline_modes.png}
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS5/delta_v_timeline_modes_SV3.png}
     \caption{Actual delta-v of control maneuvers over time}
     \label{fig:delta_v_modes}
 \end{figure}
@@ -402,19 +402,19 @@ Table \ref{tab:dv_comparison} compares the total delta-v with the theoretical lo
 \label{tab:dv_comparison}
 \end{table}
 
-As mentioned previously, the station-keeping mode was treated separately to the other modes for the time being. The algorithm for station keeping is provided in Algorithm \ref{alg:station_keeping}. Ultimately, the station-keeping mode will be integrated into the full control system to prevent drift in ROEs when maintaining a formation. Figures \ref{fig:roe_planes_stk} and \ref{fig:roe_time_stk} show the current performance of the station-keeping control method. While there is still some erroneous behaviors, the control method successfully prevents drift in $\delta \lambda$ which is key for our formation to stay centered around the Target. The keep-in zone was set to a 1-meter radius circle centered on the desired ROEs. The control method is generally able to keep errors to below 5 meters. In future work, the unexpected behavior towards the end of the time series will be addressed. Also, the keep-in zone of 1 meter might be too tight for the current formulation, leading to this undesired behavior. 
+% As mentioned previously, the station-keeping mode was treated separately to the other modes for the time being. The algorithm for station keeping is provided in Algorithm \ref{alg:station_keeping}. Ultimately, the station-keeping mode will be integrated into the full control system to prevent drift in ROEs when maintaining a formation. Figures \ref{fig:roe_planes_stk} and \ref{fig:roe_time_stk} show the current performance of the station-keeping control method. While there is still some erroneous behaviors, the control method successfully prevents drift in $\delta \lambda$ which is key for our formation to stay centered around the Target. The keep-in zone was set to a 1-meter radius circle centered on the desired ROEs. The control method is generally able to keep errors to below 5 meters. In future work, the unexpected behavior towards the end of the time series will be addressed. Also, the keep-in zone of 1 meter might be too tight for the current formulation, leading to this undesired behavior. 
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\linewidth]{sim/figures/PS5/ROE_planes.png}
-    \caption{Station-keeping mode in ROE planes}
-    \label{fig:roe_planes_stk}
-\end{figure}
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.7\linewidth]{sim/figures/PS5/ROE_planes_SV3.png}
+%     \caption{Station-keeping mode in ROE planes}
+%     \label{fig:roe_planes_stk}
+% \end{figure}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\linewidth]{sim/figures/PS5/ROE_over_time.png}
-    \caption{Station-keeping mode in ROE time history}
-    \label{fig:roe_time_stk}
-\end{figure}
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.7\linewidth]{sim/figures/PS5/ROE_over_time_SV3.png}
+%     \caption{Station-keeping mode in ROE time history}
+%     \label{fig:roe_time_stk}
+% \end{figure}
 
