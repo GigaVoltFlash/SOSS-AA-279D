@@ -156,5 +156,7 @@ function sim_all_maneuvers_sk_continuous(SV2_modes, SV3_modes, num_orbits_modes,
        true, 'figures/PS6/delta_v_timeline_modes_SV2.png');
     plot_delta_v_timeline(full_times, SV3_a_vals, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
        true, 'figures/PS6/delta_v_timeline_modes_SV3.png');
+    plot_delta_v_cumulative_timeline(full_times, SV3_a_vals, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
+       true, 'figures/PS6/delta_v_cumulative_timeline_modes_SV3.png')
     
 end
