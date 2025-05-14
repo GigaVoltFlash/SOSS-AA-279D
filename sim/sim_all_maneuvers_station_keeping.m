@@ -298,8 +298,8 @@ function sim_all_maneuvers_station_keeping(SV2_modes, SV3_modes, num_orbits_mode
     plot_ROE_planes_with_modes(full_times, t_orbit, d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3,SV3_modes,...
         num_orbits_modes, num_orbits_station_keep,'figures/PS5/ROE_planes_modes_SV3.png', 'figures/PS5/ROE_over_time_modes_SV3.png', 'figures/PS5/ROE_error_over_time_modes_SV3.png');
     plot_delta_v_timeline(full_times(SV2_dv_times_complete), SV2_dv_vals_complete, t_orbit, SV2_modes, num_orbits_modes, num_orbits_station_keep, ...
-        'figures/PS5/delta_v_timeline_modes_SV2.png');
+        false, 'figures/PS5/delta_v_timeline_modes_SV2.png');
     plot_delta_v_timeline(full_times(SV3_dv_times_complete), SV3_dv_vals_complete, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
-        'figures/PS5/delta_v_timeline_modes_SV3.png');
+        false, 'figures/PS5/delta_v_timeline_modes_SV3.png');
     
 end

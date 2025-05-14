@@ -1,4 +1,4 @@
-function control_vec = Lyapunov_feedback_control(roe_curr, roe_desired, oe_chief, N, k)
+function control_vec = Lyapunov_feedback_control(roe_curr, roe_desired, oe_chief, N, k, n_orbits)
     % Inputs:
     % roe_curr: current ROE unscaled by a_c
     % roe_desired: desired ROE unscaled by a_c
@@ -13,7 +13,7 @@ function control_vec = Lyapunov_feedback_control(roe_curr, roe_desired, oe_chief
     global J2 R_earth mu_earth
 
     a_c = oe_chief(1); e_c = oe_chief(2); i_c = deg2rad(oe_chief(3));
-    RAAN_c = deg2rad(oe_chief(4)); omega_c = deg2rad(oe_chief(5)); nu_c = deg2rad(oe_chief(6));
+    omega_c = deg2rad(oe_chief(5)); nu_c = deg2rad(oe_chief(6));
 
     a_c_meters = a_c*1e3;
 
@@ -22,7 +22,7 @@ function control_vec = Lyapunov_feedback_control(roe_curr, roe_desired, oe_chief
     roe_desired_reduced = [roe_desired(1),roe_desired(3),roe_desired(4),roe_desired(5),roe_desired(6)];
 
     delta_roe = (roe_curr_reduced-roe_desired_reduced); %./a_c; % Unscale ROE if needed
-
+    delta_dlambda = roe_curr(2) - roe_desired(2);
     % Find the A Matrix (Steindorf Eq A.2)
     eta = sqrt(1 - e_c^2);
     gamma = (3/4) * J2 * R_earth^2 * sqrt(mu_earth); % 
@@ -54,6 +54,8 @@ function control_vec = Lyapunov_feedback_control(roe_curr, roe_desired, oe_chief
     A(5,4) = 2 * T;
 
     A = kappa * A;
+    
+    
 
     % Compote B Matrix
     f = nu_c;
@@ -62,7 +64,6 @@ function control_vec = Lyapunov_feedback_control(roe_curr, roe_desired, oe_chief
     
     cosf = cos(f);
     costh = cos(theta);
-    sinf = sin(f);
     sinth = sin(theta);
     tan_i = tan(i_c);
     
@@ -98,14 +99,41 @@ function control_vec = Lyapunov_feedback_control(roe_curr, roe_desired, oe_chief
     J = u - u_ip;
     H = u - u_oop;
     
-    P_diag = [cos(J)^N, ...
+    % Calculations required for the delta lambda manipulation
+    v_opt = a_c*n*norm([delta_d_e_x, delta_d_e_y])/(2*eta);
+    delta_v_2pi = v_opt/n_orbits;
+    delta_d_a_tan = 2/(a_c*n*eta)*(1 + e_c*cos(f))*delta_v_2pi/2;
+    delta_d_a_des = 1e3*abs(delta_d_a_tan)/2;
+    delta_d_lambda_rate_des = 3/2*n*abs(delta_d_a_des);
+    tau = 1e7;
+    if delta_dlambda >= 0
+        delta_lambda_rate = -min([abs(delta_dlambda)/tau, delta_d_lambda_rate_des]);
+    else
+        delta_lambda_rate = min([abs(delta_dlambda)/tau, delta_d_lambda_rate_des]);
+    end
+
+    
+    delta_da_command =  -2/3*delta_lambda_rate/n*1e3;
+
+    if abs(delta_da_command) >= abs(delta_d_a_des)
+        P_diag = [0, ...
+              0, ...
+              0, ...
+              cos(H)^N, ...
+              cos(H)^N];
+    else
+        P_diag = [cos(J)^N, ...
               cos(J)^N, ...
               cos(J)^N, ...
               cos(H)^N, ...
               cos(H)^N];
-              %cos(H)^N];
+    end
 
     P = diag(P_diag) / k;
+    
+    % Changing delta_da for the manipulation
+    delta_roe(1) = roe_curr(1) - delta_da_command;
+
     
     % Compute control input
     u_2 = -pinv(B) * (A * roe_curr_reduced' + P * delta_roe');

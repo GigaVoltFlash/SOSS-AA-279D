@@ -20,6 +20,7 @@ function sim_all_maneuvers_sk_continuous(SV2_modes, SV3_modes, num_orbits_modes,
     SV3_roe_nom_mode2 = SV3_modes(2, :)/a_chief;
     SV3_roe_nom_mode3 = SV3_modes(3, :)/a_chief;
     SV3_roe_nom_mode4 = SV3_modes(4, :)/a_chief;
+    SV3_roe_nom = SV3_roe_nom_mode1;
 
     % Maybe pick these differently later
     SV2_delta_di_max = 0.5/a_chief;
@@ -84,25 +85,25 @@ function sim_all_maneuvers_sk_continuous(SV2_modes, SV3_modes, num_orbits_modes,
         SV3_roe = [d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3]/a_chief;
 
         % SV2 control inputs are always determined the same way
-        SV2_a_vals(i, :) = station_keeping_continuous(SV2_roe, SV2_roe_nom, SV2_delta_de_max, SV2_delta_di_max, SV1_oe, N, k);
+        SV2_a_vals(i, :) = station_keeping_continuous(SV2_roe, SV2_roe_nom, SV2_delta_de_max, SV2_delta_di_max, SV1_oe, N, k, 1/t_orbit*switch_times(end));
 
-        % This is primarily for SV3, SV2 just continuously station keeps
-        
-        SV3_roe_nom = SV3_roe_nom_mode1;
+        % This is primarily for SV3, SV2 just continuously station keeps     
         if t < switch_times(1)
             % do nothing, already at initial situation
         elseif t < switch_times(3) && t > switch_times(2)
             SV3_roe_nom = SV3_roe_nom_mode2; % Switches it for maneuver and station keeping
-            SV3_a_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, N, k);
+            SV3_a_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, N, k, num_orbits_modes(2));
         elseif t < switch_times(5) && t > switch_times(4)
             SV3_roe_nom = SV3_roe_nom_mode3; % Switches it for maneuver and station keeping
-            SV3_a_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, N, k);
+            SV3_a_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, N, k, num_orbits_modes(2));
         elseif t < switch_times(7) && t > switch_times(6)
             SV3_roe_nom = SV3_roe_nom_mode4; % Switches it for maneuver and station keeping
-            SV3_a_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, N, k);
+            SV3_a_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, N, k, num_orbits_modes(2));
         else
             % Run station keeping 
-            SV3_a_vals(i, :) = station_keeping_continuous(SV3_roe, SV3_roe_nom, SV3_delta_de_max, SV3_delta_di_max, SV1_oe, N, k);
+            % SV3_a_vals(i, :) = station_keeping_continuous(SV3_roe, SV3_roe_nom, SV3_delta_de_max, SV3_delta_di_max, SV1_oe, N, k);
+            SV3_a_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, N, k, num_orbits_station_keep(2)); % TODO: Fix this hardcoding
+            % SV3_a_vals(i, :) = [0, 0, 0];
         end
 
         %%% APPLY ACCELERATION AS DELTA V 
@@ -147,13 +148,13 @@ function sim_all_maneuvers_sk_continuous(SV2_modes, SV3_modes, num_orbits_modes,
     %plot_ROE_planes(full_times, t_orbit, d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3, 'figures/PS6/ROE_planes_SV3.png', 'figures/PS6/ROE_over_time_SV3.png');
     %plot_ROE_planes(full_times, t_orbit, d_a_SV2, d_lambda_SV2, d_e_x_SV2, d_e_y_SV2, d_i_x_SV2, d_i_y_SV2, 'figures/PS6/ROE_planes_SV2.png', 'figures/PS6/ROE_over_time_SV2.png');
 
-    %plot_ROE_planes_with_modes(full_times, t_orbit, d_a_SV2, d_lambda_SV2, d_e_x_SV2, d_e_y_SV2, d_i_x_SV2, d_i_y_SV2,SV2_modes,...
-    %    num_orbits_modes, num_orbits_station_keep,'figures/PS6/ROE_planes_modes_SV2.png', 'figures/PS6/ROE_over_time_modes_SV2.png', 'figures/PS6/ROE_error_over_time_modes_SV2.png');
+    plot_ROE_planes_with_modes(full_times, t_orbit, d_a_SV2, d_lambda_SV2, d_e_x_SV2, d_e_y_SV2, d_i_x_SV2, d_i_y_SV2,SV2_modes,...
+       num_orbits_modes, num_orbits_station_keep,'figures/PS6/ROE_planes_modes_SV2.png', 'figures/PS6/ROE_over_time_modes_SV2.png', 'figures/PS6/ROE_error_over_time_modes_SV2.png');
     plot_ROE_planes_with_modes(full_times, t_orbit, d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3,SV3_modes,...
         num_orbits_modes, num_orbits_station_keep,'figures/PS6/ROE_planes_modes_SV3.png', 'figures/PS6/ROE_over_time_modes_SV3.png', 'figures/PS6/ROE_error_over_time_modes_SV3.png');
-    %plot_delta_v_timeline(full_times, SV2_dv_vals, t_orbit, SV2_modes, num_orbits_modes, num_orbits_station_keep, ...
-    %    'figures/PS6/delta_v_timeline_modes_SV2.png');
-    %plot_delta_v_timeline(full_times, SV3_dv_vals, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
-    %    'figures/PS6/delta_v_timeline_modes_SV3.png');
+    plot_delta_v_timeline(full_times, SV2_a_vals, t_orbit, SV2_modes, num_orbits_modes, num_orbits_station_keep, ...
+       true, 'figures/PS6/delta_v_timeline_modes_SV2.png');
+    plot_delta_v_timeline(full_times, SV3_a_vals, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
+       true, 'figures/PS6/delta_v_timeline_modes_SV3.png');
     
 end
