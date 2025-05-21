@@ -58,7 +58,7 @@ Our system is still working in a near-circular orbit with two deputy spacecraft.
 \end{table}
 
 
-\subsubsection{Lyapunov Control Implementation}
+\subsubsection{Lyapunov Control Implementation}\label{sec:Lyapunov_implementation}
 Although we had the different ideas for control methodologies for the different modes, during the duration of this submission we were only able to get one method working exactly to meet our requirements: Lyapunov control without constraints. 
 
 First, the state-space reduced model as described by Steindorf is considered \cite{steindorf2017constrained}. Since tangential thrusts are two times more efficient than radial thrusts in changing $\delta e$ and $\delta a$, the reduced model does not involve any radial thrusts. Thus, the ROE vector is reduced to exclude $\delta \lambda$, since it can only be controlled directly by radial thrusts.Note that $\delta \lambda$ can still be controlled by adjusting $\delta a$ to induce a Keplerian drift such that $\delta \lambda$ reaches a desired state at the end of the control window. This process will be desribed in full later. The reduced ROE vector is defined as: 
@@ -167,11 +167,11 @@ The matrix \( P \) is defined as:
 
 \[
 P = \frac{1}{k} \begin{bmatrix}
-\cos(J)^N & 0 & 0 & 0 & 0 & 0 \\
-0 & \cos(J)^N & 0 & 0 & 0 & 0 \\
-0 & 0 & \cos(J)^N & 0 & 0 & 0 \\
-0 & 0 & 0 & \cos(H)^N & 0 & 0 \\
-0 & 0 & 0 & 0 & \cos(H)^N & 0 \\
+\cos(J)^N & 0 & 0 & 0 & 0 \\
+0 & \cos(J)^N & 0 & 0 & 0 \\
+0 & 0 & \cos(J)^N & 0 & 0 \\
+0 & 0 & 0 & \cos(H)^N & 0 \\
+0 & 0 & 0 & 0 & \cos(H)^N \\
 \end{bmatrix}
 \]
 
@@ -194,9 +194,49 @@ The parameters $N$ and $k$ are used to tune the controller response.
 
 \textbf{\textit{Indirect Control of $\delta\lambda$}}
 
-Direct control of $\delta \lambda$ would require the additional degree of freedom of radial burns, which can be very inefficient for $\Delta v$ usage. Instead, $\delta \lambda$ can be corrected indirectly by using along-track burns and applying an intermediate $\delta a_{des}$, and allowing for Keplerian dynamics to drift $\delta \lambda$ by a desired amount \cite{steindorf2017constrained}.
+Direct control of $\delta \lambda$ would require the additional degree of freedom of radial burns, which can be very inefficient for $\Delta v$ usage. Instead, $\delta \lambda$ can be corrected indirectly by using along-track burns and applying an intermediate $\delta a_{des}$, and allowing for Keplerian dynamics to drift $\delta \lambda$ by a desired amount. \cite{steindorf2017constrained}
 
-The rate of change of 
+The rate of change of the $\delta \lambda$ is based on the semi-major axis separation $\delta a$
+\begin{align}
+    \delta \dot{\lambda} = -\frac{3}{2}n_c \delta a 
+\end{align}
+We can thus modulate the $\delta a_{des}$ such that we can help converge $\delta \lambda$ to zero by the end of the maneuver period. We can thus set up a desired $\delta \dot{\lambda}$ that helps converge $\Delta \delta \lambda \rightarrow 0$
+\begin{equation}
+\delta \dot{\lambda}_a =
+\begin{cases}
+-\min \left\{ \left| \frac{\Delta \delta \lambda}{\tau} \right| , \delta \dot{\lambda}_{\text{ref}} \right\}, & \text{if } \Delta \delta \lambda \geq 0 \\
+\phantom{-}\min \left\{ \left| \frac{\Delta \delta \lambda}{\tau} \right| , \delta \dot{\lambda}_{\text{ref}} \right\}, & \text{if } \Delta \delta \lambda < 0
+\end{cases}
+\end{equation}
+
+We determine those upper bounds $\delta \dot{\lambda}_{ref}$ based on a $\delta a_{ref}$
+\begin{align}
+    \delta \dot{\lambda}_{ref} = \frac{3}{2} n_c \delta a_{ref}
+\end{align}
+
+where $\delta a_{ref}$ accounts for the shift in $\delta a$ that occurs when performing tangential burns to modify the in-plane eccentricity vector change $\Delta \delta \textbf{e}$. We thus use the following expression for $\delta a_{ref}$ as
+\begin{align}
+    \delta a_{ref} &= \left|\frac{1}{a_cn_c \eta}(1 + e \cos(f))\cdot  \frac{v_{opt}}{2\cdot n_{orbits}}\right| \\
+    v_{opt} &= \frac{a_cn_c||\Delta\delta \textbf{e}||_2}{2\eta}
+\end{align}
+
+With this, we now have all the information required to calculate $\delta \dot{\lambda}_a $, from which we can calculate the new target $\delta a_a$ that we should have the Lyapunov controller track to cause the desired shift in $\delta \lambda$.
+\begin{align}
+    \delta a_a = -\frac{2}{3}\frac{\delta \dot{\lambda}_a}{n_c}
+\end{align}
+This is then utilized as an intermediary reference $\delta a$. The new $\Delta \delta a = \delta a - \delta a_a$, rather than using a reference of $\delta a_a = 0$.
+
+There is an additional accomodation made to the matrix P to bound the maximum tracking error to be around $\delta a_{ref}$, to prevent the tracking error from increasing to an amount that then conflicts with the control burn required for eccentricity vector correction. The adjustment to matrix P is just setting terms to $0$ to stop feedback of any tracking error that gets larger than $\delta a_{ref}$.
+
+\[
+P_{|\delta a_a| \geq |\delta a_{ref}|} = \frac{1}{k} \begin{bmatrix}
+0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & \cos(H)^N & 0 \\
+0 & 0 & 0 & 0 & \cos(H)^N \\
+\end{bmatrix}
+\]
 
 \subsubsection{Justificiation and Implementation of Control}
 
@@ -245,15 +285,53 @@ For this submission, considerations of the delta-v budget, actuator implementati
 
 \subsubsection{Results and Analysis of Continuous Control Performance} \label{sec:analysis_of_control_cont}
 
-The results of the Lyapunov-based unconstrained continuous control scheme are shown in the following figures. These plots include all modes of the Watcher and Docker satellites, which involve maneuvers between desired ROEs and station-keeping.
+The results of the Lyapunov-based unconstrained continuous control scheme are shown in the following figures. These plots include all modes of the Watcher (SV2) and Docker (SV3) satellites, which involve maneuvers between desired ROEs and station-keeping.
 
-Figures \ref{fig:roe_planes_modes} and \ref{fig:roe_time_modes} show the desired and actual ROEs for each mode. 
+Figures \ref{fig:cont_control_RT}, \ref{fig:cont_control_RN}, and \ref{fig:cont_control_NT} show all the control modes in the RTN frame. Significant drifts in the tangential and normal directions are observed, but are also corrected for by the control system. This behavior will be explored further in subsequent figures.
 
-UPDATE THIS TO TALK ABOUT DESIRED d_A --> d_LAMBDA
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{sim/figures/PS6/RTN_3d_projections_all_maneuvers_cont.png_RT.png}
+    \caption{Continuous control modes in RT plane}
+    \label{fig:cont_control_RT}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{sim/figures/PS6/RTN_3d_projections_all_maneuvers_cont.png_RN.png}
+    \caption{Continuous control modes in RN plane}
+    \label{fig:cont_control_RN}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{sim/figures/PS6/RTN_3d_projections_all_maneuvers_cont.png_NT.png}
+    \caption{Continuous control modes in NT plane}
+    \label{fig:cont_control_NT}
+\end{figure}
 
-$\delta a$ becomes non-zero during the maneuvers because there are along-track elements. However, at the end of each mode, the control system is able to reduce $\delta a$ to near zero. But due to $\delta a$ and $\delta i_x$ not being precisely zero throughout the control and station-keeping modes, a drift is introduced in $\delta \lambda$. 
+For SV2, Figures \ref{fig:roe_planes_modes_cont_SV2} and \ref{fig:roe_time_modes_cont_SV2} show the desired and actual ROEs for each mode, which remain constant. The control system tries to keep all ROEs at their initial value. It does so fairly successfully as all ROEs end up within 1 meter of their desired value. These offsets are introduced due to the control system trying to keep $\delta \lambda$ as close to zero as possible through changing $\delta a$ as explain in Section \ref{sec:Lyapunov_implementation}. This has follow on effects on the relative eccentricity and inclination, although they are minor. 
 
-GOOD FROM HERE ON
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS6/ROE_planes_modes_SV2.png}
+    \caption{Actual and desired ROE plotted for all modes in ROE planes, SV2}
+    \label{fig:roe_planes_modes_cont_SV2}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS6/ROE_over_time_modes_SV2.png}
+    \caption{Actual and desired ROE plotted for all modes in ROE time history, SV2}
+    \label{fig:roe_time_modes_cont_SV2}
+\end{figure}
+
+The same trends can be seen in the errors plotted in Figure \ref{fig:roe_error_time_modes_cont_SV2}. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS6/ROE_error_over_time_modes_SV2.png}
+    \caption{Tracking error between actual and desired ROE plotted for all modes in ROE time history, SV2}
+    \label{fig:roe_error_time_modes_cont_SV2}
+\end{figure}
+
+For SV3, Figures \ref{fig:roe_planes_modes_cont_SV3} and \ref{fig:roe_time_modes_cont_SV3} show the desired and actual ROEs for each mode. $\delta a$ becomes non-zero during the maneuvers because there are along-track elements. The magnitude of $\delta a$ is chosen in order to induce a calculated rate of change in $\delta \lambda$ so that it too can reach a desired value. So $\delta \lambda$ also becomes non-zero during maneuvers, but converges back to zero by the end of the maneuver. This indirect control method is explained at the end of Section \ref{sec:Lyapunov_implementation}. 
 
 $\delta e_x$ and $\delta i_x$ are always meant to be zero, but again the maneuvers introduce variations. Each control mode tries to return $\delta e_x$ and $\delta i_x$ to zero but is unable to get all the way there. These errors can be addressed by allowing for more orbits to converge and more robust station-keeping control in between modes. Right now the continuous station-keeping control is designed to hold the state that it is started at. 
 
@@ -263,30 +341,32 @@ $\delta e_y$ and $\delta i_y$ exhibit the most accurate behavior. The control sy
     \centering
     \includegraphics[width=0.75\linewidth]{sim/figures/PS6/ROE_planes_modes_SV3.png}
     \caption{Actual and desired ROE plotted for all modes in ROE planes, SV3}
-    \label{fig:roe_planes_modes}
+    \label{fig:roe_planes_modes_cont_SV3}
 \end{figure}
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{sim/figures/PS6/ROE_over_time_modes_SV3.png}
     \caption{Actual and desired ROE plotted for all modes in ROE time history, SV3}
-    \label{fig:roe_time_modes}
+    \label{fig:roe_time_modes_cont_SV3}
 \end{figure}
 
-Figure \ref{fig:roe_error_time_modes} reflects the same behavior in the tracking errors. The control system is able to track all of the desired ROEs very well. The remaining tracking errors can be mitigated either through allowing for more time to conerge, adjusting values of $k$ and $N$, or an enhanced station keeping method. Other methods, such as Lyapunov with constraints or convex optimization, can also be explored, but do not appear to be necessary for the desired behavior in this system. 
+Figure \ref{fig:roe_error_time_modes_cont_SV3} reflects the same behavior in the tracking errors. The control system is able to track all of the desired ROEs very well. The remaining tracking errors can be mitigated either through allowing for more time to converge, adjusting values of $k$ and $N$, or an enhanced station-keeping method. Other methods, such as Lyapunov with constraints or convex optimization, can also be explored, but do not appear to be necessary for the desired behavior in this system. 
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{sim/figures/PS6/ROE_error_over_time_modes_SV3.png}
-    \caption{Tracking error between actual and desired ROE plotted for all modes in ROE time history}
-    \label{fig:roe_error_time_modes}
+    \caption{Tracking error between actual and desired ROE plotted for all modes in ROE time history, SV3}
+    \label{fig:roe_error_time_modes_cont_SV3}
 \end{figure}
 
-Figure \ref{fig:delta_v_modes} shows the delta-v magnitudes in the RTN directions throughout each control mode. By design, there are no radial burns. As expected, delta-v magnitudes are on the order of sub mm/s. The magnitudes decrease in size as the desired change in ROE decreases throughout the modes. Additionally, there are more burns in the normal direction than in the tangential direction. This arises from the fact that inclination maneuvers are much more expensive than eccentricity maneuvers. Since each mode changes relative eccentricity and relative inclination by the exact same magnitude, the inclination maneuver is going to have to be larger. 
+Figure \ref{fig:delta_v_modes_cont_SV3} shows the delta-v magnitudes in the RTN directions throughout each control mode for SV3. By design, there are no radial burns. As expected, individual delta-v magnitudes are similar to impulsive ones in magnitude and are on the scale of mm/s. However, the cumulative delta-v magnitudes for each mode are much larger due to the nature of continuous control. In this implementation, continuous control is broken into impulsive like control for each time step. So, instead of a few delta-v's being applied for the entire control mode, as seen in impulsive control, continuous control has many delta-v's for extended periods of time. These delta-v's are also oscillating as they correct for tracking errors. These characteristics make continuous control exhibit much larger total delta-v than impulsive control. 
+
+The magnitudes decrease in size as the desired change in ROE decreases throughout the modes. Additionally, there are more burns in the normal direction than in the tangential direction. This arises from the fact that inclination maneuvers are much more expensive than eccentricity maneuvers. Since each mode changes relative eccentricity and relative inclination by the exact same magnitude, the inclination maneuver is going to have to be larger. 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\linewidth]{sim/figures/PS6/delta_v_timeline_modes_SV3.png}
-    \caption{Actual delta-v of control maneuvers over time}
-    \label{fig:delta_v_modes}
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS6/delta_v_cumulative_timeline_modes_SV3.png}
+    \caption{Actual delta-v of control maneuvers over time, SV3}
+    \label{fig:delta_v_modes_cont_SV3}
 \end{figure}
 
 As a point of comparison, the theoretical delta-v lower bound can be calculated as follows:
@@ -297,8 +377,8 @@ As a point of comparison, the theoretical delta-v lower bound can be calculated 
 \end{align*}
 Note that only changes in ROEs were in $\delta e$ and $\delta i$, which is why delta-v lower bound can be calculated as the norm of the along-track and cross-track delta-v's. 
 
-Table \ref{tab:dv_comparison_continuous} compares the total delta-v with the theoretical lower-bound. The actual delta-v's were approximately double the theoretical lower-bound for each mode. This suggests that there is room for improvement in optimizing the delta-v cost, which methods like reachable set theory could offer. 
-\begin{table}[h!]
+Table \ref{tab:dv_comparison_continuous} compares the total delta-v with the theoretical lower-bound. The actual delta-v's were approximately almost two orders of magnitude larger than the theoretical lower-bound for each mode. This is due to the nature of continuous control with frequent, oscillatory burns as mentioned previously. A greater total delta-v for continuous control is acceptable since a low-thrust engine, such as a Hall Effect Thruster, has much higher specific impulse than a higher-thrust engine, such as a cold-gas thruster, which would likely be used for impulsive control. That being said, the control strategy could be improved to better optimize delta-v and thus fuel usage through the introduction of constraints in the Lyapunov formulation and exploration of convex optimization. 
+\begin{table}[H]
 \centering
 \begin{tabular}{|c|c|c|}
 \hline
