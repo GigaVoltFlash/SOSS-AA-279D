@@ -1,0 +1,82 @@
+\section{Problem Set 7}
+
+\subsection{Recap of Relative Orbital Work}
+
+\subsection{Initial Navigation System Design}
+
+\subsubsection{Choice of State Representation}
+
+\subsubsection{On-board Sensors and Measurements}
+
+Each of the deputies (SV2 and SV3) is equipped with the following sensors, which also give the raw measurements mentioned below:
+\begin{itemize}
+    \item \textbf{Vision-based sensors:} These provide relative bearing angle measurements for SV2 and SV3 relative to SV1. We assume that the sensors on SV2 and SV3 are always pointed at SV1. For close-range measurements required during SV3's docking phase, the vision-based sensors can also provide feature-rich images that may be used for more accurate position estimation. 
+    \item \textbf{GNSS antennas:} These provide GNSS measurements such as pseudoranges. For simplicity, we stick with the single-difference GNSS pseudoranges. Although, in the future, we will consider combing the pseudo-range measurements get to apply double-difference GNSS methods.
+\end{itemize}
+
+These raw measurements can be converted into useful pseudo-measurements based on standard operations for each of the sensors. 
+\begin{itemize}
+    \item The relative bearing angle measurements of the vision-based sensor, $\alpha$ and $\epsilon$, can be converted into relative position vector measurements in the rectilinear frame $\boldsymbol{x}^\mathcal{R}$. For this project, we make the simplifcation that the vision-based sensor gives us the pseudo-measurement of the relative position vector $\delta \boldsymbol{x}^\mathcal{R}$ of the deputy in the chief's RTN frame.
+    \item The psuedorange measurements acquired from the GNSS signals can be converted into absolute position measurements for the deputy satellites. For this project, we make the simplifcation that the GNSS sensors give us the psuedo-measurement of the absolute positions of the deputies in the ECI frame.
+\end{itemize}
+These pseudo-measurements are compiled into a measurement vector $y_{SV}$, for each spacecraft. For SV2, this is given by
+
+\begin{align}
+    y_{SV2} = \begin{bmatrix}
+        \delta \boldsymbol{x_{SV2}}^\mathcal{R} \\
+        \boldsymbol{x_{SV2}}^{ECI}
+    \end{bmatrix}_{6\times 1}
+\end{align}
+
+A similar measurement vector $y_{SV3}$ is built for SV3 but with the measurements of SV3. The combined full measurement vector, for both spacecraft together, is given by
+
+\begin{align}
+    y &= \begin{bmatrix}
+        y_{SV2} \\
+        y_{SV3}
+    \end{bmatrix} \\
+    &= \begin{bmatrix}
+        \delta \boldsymbol{x_{SV2}}^\mathcal{R} \\
+        \boldsymbol{x_{SV2}}^{ECI} \\
+        \delta \boldsymbol{x_{SV3}}^\mathcal{R} \\
+        \boldsymbol{x_{SV3}}^{ECI} \\
+    \end{bmatrix}_{12\times 1}
+\end{align}
+
+An important note here is that although the chief's orbital elements are part of the state we are estimating, since the chief (SV1/Target) is not under active controland is a rogue spacecraft that we want to dock with, we do not receive any measurements specific to SV1. It is imperative, however, for us to have an estimate of SV1's motion to make sense of the absolute and relative measurements of SV2 and SV3.
+
+\subsubsection{Measurement Model}
+The measurement model relates the pseudo-measurements in $y$ from the magnetometers and the GNSS antennas to the state of the spacecrafts $x$, by some non-linear function $g(\cdot)$, i.e.
+\begin{align}
+    y_{SV2} &= g_{SV2}(x_{SV1}, x_{SV2}) \\
+    y_{SV3} &= g_{SV3}(x_{SV1}, x_{SV3}) \\
+    y &= g(x)
+\end{align}
+
+Here, $g(x):\mathbb{R}^{18} \rightarrow \mathbb{R}^{12}$ is a simple concatenation of each $g_{SV2}(\cdot)$ and $g_{SV3}(\cdot)$. For the selected pseudo-measurements, the measurement model we have converts our state-space representation that includes the chief's orbital elements and the deputy spacecraft's relative orbital elements into the pseuodo-measurements of relative and absolute position vectors.
+
+The conversion from relative orbital element to relative position vectors is given by 
+
+TODO
+
+The conversion from relative orbital elements to absolute position vectors, is the same as above, but offseting by the position of the chief spacecraft SV1. This 
+
+\begin{align}
+    g(x) = \begin{bmatrix}
+        TODO
+    \end{bmatrix}
+\end{align}
+
+\subsubsection{Sensitivity Matrix}
+
+The sensitivity matrix $C_t$ is formed by taking the Jacobian of the nonlinear function $g(x)$ with the current state value $x_t$. This gives us the linearized relation between the state vector $x_t$ and the measurement vector $y_t$.
+
+\begin{align}
+    y_t = C_tx_t
+\end{align}
+
+Taking the Jacobian, we get
+
+TODO
+
+The Jacobian is evaluated with $\bar{x}_t$, i.e. the value of the state at time $t$. This makes $C_t$ time-varying. In an Extended Kalman Filter, this sensitivity matrix $C_t$ is used to find the Kalman gain and thus update the state covariance estimate.
