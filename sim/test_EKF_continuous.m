@@ -162,7 +162,7 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
         else
             % Run station keeping 
             % SV3_a_vals(i, :) = station_keeping_continuous(SV3_roe, SV3_roe_nom, SV3_delta_de_max, SV3_delta_di_max, SV1_oe, N, k);
-            SV3_a_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, N, k, num_orbits_station_keep(2)); % TODO: Fix this hardcoding
+            %SV3_a_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, N, k, num_orbits_station_keep(2)); % TODO: Fix this hardcoding
             % SV3_a_vals(i, :) = [0, 0, 0];
         end
 
