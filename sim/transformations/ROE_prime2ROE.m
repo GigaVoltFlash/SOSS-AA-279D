@@ -1,15 +1,20 @@
-function delta_alpha_qns = ROE_prime2ROE(delta_alpha_qns_prime, chief_orbital_elements)
+function delta_alpha_qns = ROE_prime2ROE(delta_alpha_qns_prime, chief_qns)
     % Inverse of ROE2ROE_prime: converts from QNS' frame back to QNS frame
+    % using chief orbital elements in quasi-nonsingular form
     %
     % Inputs:
-    %   delta_alpha_qns_prime   - 6x1 vector in QNS' frame
-    %   chief_orbital_elements  - vector with 5th element = omega_c [rad]
+    %   delta_alpha_qns_prime - 6x1 vector in QNS' frame
+    %   chief_qns             - 6x1 vector: [a, e_x, e_y, i, RAAN, u]
     %
     % Output:
-    %   delta_alpha_qns         - 6x1 vector in QNS frame
+    %   delta_alpha_qns       - 6x1 vector in QNS frame
 
-    % Extract omega_c (argument of perigee) from chief's orbital elements
-    omega_c = chief_orbital_elements(5);
+    % Extract e_x and e_y from chief's QNS elements
+    e_x_c = chief_qns(2);
+    e_y_c = chief_qns(3);
+
+    % Reconstruct omega_c from e_x and e_y
+    omega_c = atan2(e_y_c, e_x_c);
 
     % Build inverse J_qns(-omega_c)
     I2 = eye(2);

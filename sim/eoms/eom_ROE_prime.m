@@ -1,23 +1,30 @@
-function [delta_alpha_qns_prime_dot] = eom_ROE_prime(t, delta_alpha_qns_prime)
+function [delta_alpha_qns_prime_dot] = eom_ROE_prime(t, deputy_qns, chief_qns)
     % Computes δα'_qns_dot as a 6x1 vector according to Koenig Eq. 23
 
-    % Inputs: current modified ROE
+    % Inputs: current chief and deputy quasi-nonsing OE (a,e_x,e_yi,RAAN,omega,nu) in
+    % deg
 
     global mu_earth;
     global R_earth;
     global J2;
 
+    % Unpack QNS elements for deputy and chief
+    a_d = deputy_qns(1);
+    e_x_d = deputy_qns(2);
+    e_y_d = deputy_qns(3);
+    i_d = deg2rad(deputy_qns(4));
 
-    
+    a_c = chief_qns(1);
+    e_x_c = chief_qns(2);
+    e_y_c = chief_qns(3);
+    i_c = deg2rad(chief_qns(4));
 
-    a_d = deputy_oe(1);
-    a_c = chief_oe(1);
-    e_d = deputy_oe(2);
-    e_c = chief_oe(2);
-    i_d = deg2rad(deputy_oe(3));
-    i_c = deg2rad(chief_oe(3));
-    omega_d = deg2rad(deputy_oe(5));
-    omega_c = deg2rad(chief_oe(5));
+    % Reconstruct magnitudes and angles
+    e_d = sqrt(e_x_d^2 + e_y_d^2);
+    e_c = sqrt(e_x_c^2 + e_y_c^2);
+
+    omega_d = atan2(e_y_d, e_x_d);
+    omega_c = atan2(e_y_c, e_x_c);
     
     % Compute eta
     eta_d = sqrt(1 - e_d^2);

@@ -17,7 +17,7 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
     state_SV3_all = zeros(length(t_series), 6);
     
     % EKF Values
-    OE_SV1_all = zeros(length(t_series), 6);
+    OE_EKF_SV1_all = zeros(length(t_series), 6);
     OE_EKF_SV3_all = zeros(length(t_series), 6);
     ROE_EKF_SV3_all = zeros(length(t_series), 6);
 
@@ -46,17 +46,23 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
 
     % Initial states for EKF
     [a_init_SV1,e_init_SV1,i_init_SV1,RAAN_init_SV1,omega_init_SV1,nu_init_SV1] = ECI2OE(SV1_state_init(1:3), SV1_state_init(4:6));
-    SV1_OE_state = [a_init_SV1,e_init_SV1,i_init_SV1,RAAN_init_SV1,omega_init_SV1,nu_init_SV1];
-    OE_SV1_all(1,:) = SV1_OE_state;
+    M_init_SV1_rad = true2mean(deg2rad(nu_init_SV1),e_init_SV1);
+    M_init_SV1 = rad2deg(M_init_SV1_rad);
+    [a_qns_SV1, e_x_SV1, e_y_SV1, i_qns_SV1, RAAN_qns_SV1, u_SV1] = ...
+    OE2quasi_nonsing(a_init_SV1,e_init_SV1,i_init_SV1,RAAN_init_SV1,omega_init_SV1,M_init_SV1);
+    SV1_OE_state = [a_qns_SV1, e_x_SV1, e_y_SV1, i_qns_SV1, RAAN_qns_SV1, u_SV1];
+    OE_EKF_SV1_all(1,:) = SV1_OE_state; % qns
     
     [d_a_init_SV3, d_lambda_init_SV3, d_e_x_init_SV3, d_e_y_init_SV3, d_i_x_init_SV3, d_i_y_init_SV3] = ...
-        ECI2ROE_array(SV1_state_init(1:3), SV1_state_init(4:6), SV3_state_init(1:3), SV3_state_init(4:6));
-    SV3_ROE_state = [d_a_init_SV3, d_lambda_init_SV3, d_e_x_init_SV3, d_e_y_init_SV3, d_i_x_init_SV3, d_i_y_init_SV3];
-    SV3_ROE_prime_state = ROE2ROE_prime(SV3_ROE_state,SV1_OE_state);
-    ROE_EKF_SV3_all(1, :) = SV3_ROE_state;
+        ECI2ROE_array(SV1_state_init(1:3)', SV1_state_init(4:6)', SV3_state_init(1:3)', SV3_state_init(4:6)');
+    SV3_ROE_state = [d_a_init_SV3, d_lambda_init_SV3, d_e_x_init_SV3, d_e_y_init_SV3, d_i_x_init_SV3, d_i_y_init_SV3]/a_chief; % unscaling by a_chief
+    SV3_ROE_prime_state = ROE2ROE_prime(SV3_ROE_state',SV1_OE_state');
+    ROE_EKF_SV3_all(1, :) = SV3_ROE_state*a_chief; % storing scaled ROEs
     
-    SV3_OE_state = ROE2OE(a_init_SV1,e_init_SV1,i_init_SV1,RAAN_init_SV1,omega_init_SV1,nu_init_SV1,d_a_init_SV3, d_lambda_init_SV3, d_e_x_init_SV3, d_e_y_init_SV3, d_i_x_init_SV3, d_i_y_init_SV3);
-    OE_SV3_all(1,:) = SV3_OE_state;
+    [a_qns_SV3, e_x_SV3, e_y_SV3, i_qns_SV3, RAAN_qns_SV3, u_SV3] = ...
+        ROE2quasi_nonsing(a_qns_SV1, e_x_SV1, e_y_SV1, i_qns_SV1, RAAN_qns_SV1, u_SV1,d_a_init_SV3, d_lambda_init_SV3, d_e_x_init_SV3, d_e_y_init_SV3, d_i_x_init_SV3, d_i_y_init_SV3);
+    SV3_OE_state = [a_qns_SV3, e_x_SV3, e_y_SV3, i_qns_SV3, RAAN_qns_SV3, u_SV3];
+    OE_EKF_SV3_all(1,:) = SV3_OE_state; % qns
 
     % Initialize delta-v and acceleration storage
     SV2_dv_vals = zeros(length(t_series), 3);
@@ -88,18 +94,46 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
         k4_SV3 = eom_ECI(t + dt,   SV3_state + dt   * k3_SV3, withJ2);
         SV3_state = SV3_state + dt/6 * (k1_SV3 + 2*k2_SV3 + 2*k3_SV3 + k4_SV3);
 
-        % EKF Mean Propagation (ROE RK4 Steps)
-        k1_ROE_prime_SV3 = eom_ROE_prime(t, SV3_OE_state, SV1_OE_state);
-        k2_ROE_prime_SV3 = eom_ROE_prime(t + dt/2, SV3_state + dt/2 * k1_SV3, withJ2);
-        k3_ROE_prime_SV3 = eom_ROE_prime(t + dt/2, SV3_state + dt/2 * k2_SV3, withJ2);
-        k4_ROE_prime_SV3 = eom_ROE_prime(t + dt,   SV3_state + dt   * k3_SV3, withJ2);
-        SV3_state = SV3_ROE_prime_state + dt/6 * (k1_SV3 + 2*k2_SV3 + 2*k3_SV3 + k4_SV3);
+        % EKF Mean Propagation (Chief OE, and ROE Euler Integration)
+        %SV3_ROE_prime_state = ROE2ROE_prime(SV3_ROE_state',SV1_OE_state');
+        SV3_ROE_prime_state = SV3_ROE_prime_state + dt*eom_ROE_prime(t, SV3_OE_state, SV1_OE_state); % propagate ROE
+        
+        SV1_OE_state = SV1_OE_state + (dt*secular_J2(t, SV1_OE_state))'; % propagate chief OE using GVE
+        
+        SV3_ROE_state = ROE_prime2ROE(SV3_ROE_prime_state,SV1_OE_state);
 
+        % Extract updated chief QNS elements 
+        a_qns_SV1     = SV1_OE_state(1);
+        e_x_SV1       = SV1_OE_state(2);
+        e_y_SV1       = SV1_OE_state(3);
+        i_qns_SV1     = SV1_OE_state(4);
+        RAAN_qns_SV1  = SV1_OE_state(5);
+        u_SV1         = SV1_OE_state(6);
+        
+        % Extract deputy relative elements (from ROE state)
+        d_a_SV3      = SV3_ROE_state(1);
+        d_lambda_SV3 = SV3_ROE_state(2);
+        d_e_x_SV3    = SV3_ROE_state(3);
+        d_e_y_SV3    = SV3_ROE_state(4);
+        d_i_x_SV3    = SV3_ROE_state(5);
+        d_i_y_SV3    = SV3_ROE_state(6);
+        
+        % Reconstruct SV3's absolute QNS state 
+        [a_qns_SV3, e_x_SV3, e_y_SV3, i_qns_SV3, RAAN_qns_SV3, u_SV3] = ...
+            ROE2quasi_nonsing(a_qns_SV1, e_x_SV1, e_y_SV1, i_qns_SV1, RAAN_qns_SV1, u_SV1, ...
+                              d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3);
+        
+        SV3_OE_state = [a_qns_SV3, e_x_SV3, e_y_SV3, i_qns_SV3, RAAN_qns_SV3, u_SV3];
 
         % Save states to buffer
         state_SV3_all(i, :) = SV3_state';
         state_SV2_all(i, :) = SV2_state';
         state_SV1_all(i, :) = SV1_state';
+
+        % EKF buffer
+        OE_EKF_SV1_all(i, :) = SV1_OE_state';
+        OE_EKF_SV3_all(i, :) = SV3_OE_state';
+        ROE_EKF_SV3_all(i, :) = (SV3_ROE_state')*a_chief; % scaling by a_chief
 
         % Convert current states to ROE
         [d_a_SV2, d_lambda_SV2, d_e_x_SV2, d_e_y_SV2, d_i_x_SV2, d_i_y_SV2] = ECI2ROE_array_mean(SV1_state(1:3)', SV1_state(4:6)', SV2_state(1:3)', SV2_state(4:6)', true);
@@ -140,6 +174,8 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
         SV2_state(4:6) = SV2_state(4:6) + SV2_dv_vals(i,:)';
         SV3_state(4:6) = SV3_state(4:6) + SV3_dv_vals(i,:)';
 
+        delta_ROE_SV3 = delta_ROE_from_delta_v(dt*SV3_a_vals(i, :)',SV1_OE_state);
+        SV3_ROE_state = SV3_ROE_state + delta_ROE_SV3;
     end
 
     % Final SV1 propagated states
@@ -169,8 +205,20 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
     % 
     % RT = true; RN = true; NT = true;
     % plot_RT_RN_projections_separate(SV2_rel_pos, SV3_rel_pos, RT, RN, NT, '', 'figures/PS7/RTN_3d_projections_all_maneuvers_cont.png');
-    [d_a_SV2, d_lambda_SV2, d_e_x_SV2, d_e_y_SV2, d_i_x_SV2, d_i_y_SV2] = ECI2ROE_array_mean(r_SV1, v_SV1, r_SV2, v_SV2, true);
-    [d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3] = ECI2ROE_array_mean(r_SV1, v_SV1, r_SV3, v_SV3, true);
+    [d_a_SV2, d_lambda_SV2, d_e_x_SV2, d_e_y_SV2, d_i_x_SV2, d_i_y_SV2] = ECI2ROE_array_mean(r_SV1, v_SV1, r_SV2, v_SV2, true); 
+    [d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3] = ECI2ROE_array_mean(r_SV1, v_SV1, r_SV3, v_SV3, true); 
+
+    d_a_SV3_EKF      = ROE_EKF_SV3_all(:, 1);
+    d_lambda_SV3_EKF  = ROE_EKF_SV3_all(:, 2);
+    d_e_x_SV3_EKF    = ROE_EKF_SV3_all(:, 3);
+    d_e_y_SV3_EKF    = ROE_EKF_SV3_all(:, 4);
+    d_i_x_SV3_EKF    = ROE_EKF_SV3_all(:, 5);
+    d_i_y_SV3_EKF    = ROE_EKF_SV3_all(:, 6);
+
+    plot_ROE_comparison(full_times, t_orbit, ...
+    d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3, ...
+    d_a_SV3_EKF, d_lambda_SV3_EKF, d_e_x_SV3_EKF, d_e_y_SV3_EKF, d_i_x_SV3_EKF, d_i_y_SV3_EKF,  ...
+    'Ground Truth', 'EKF Mean Propagation',  '', 'figures/PS7/ROE_planes_SV3_comparison.png', '', 'figures/PS7/ROE_over_time_SV3_comparison.png')
     % %plot_ROE_planes(full_times, t_orbit, d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3, 'figures/PS6/ROE_planes_SV3.png', 'figures/PS6/ROE_over_time_SV3.png');
     % %plot_ROE_planes(full_times, t_orbit, d_a_SV2, d_lambda_SV2, d_e_x_SV2, d_e_y_SV2, d_i_x_SV2, d_i_y_SV2, 'figures/PS6/ROE_planes_SV2.png', 'figures/PS6/ROE_over_time_SV2.png');
     % 
