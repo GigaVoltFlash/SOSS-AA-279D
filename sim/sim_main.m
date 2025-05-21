@@ -19,7 +19,8 @@ run_PS2 = false;
 run_PS3 = false;
 run_PS4 = false;
 run_PS5 = false;
-run_PS6 = true; 
+run_PS6 = false; 
+run_PS7 = true;
 
 % Load SV1 information
 load_SV1;
@@ -48,6 +49,9 @@ if run_PS5
 end
 if run_PS6
     ps6_sims;
+end
+if run_PS7
+    ps7_sims;
 end
 
 
@@ -164,11 +168,5 @@ if run_PS3
     %plot_RT_RN_projections(SV2_YA_mapping_pos, SV3_YA_mapping_pos, 'YA geometric mapping relative orbits', 'figures/PS3/RTN_projections_YA_mapping.png');
    
     %plot_3D_rel_orbits_both(SV2_YA_pos,SV2_YA_mapping_pos,SV3_YA_pos,SV3_YA_mapping_pos,'figures/PS3/3D_YA_comparison.png');
-
-end
-
-if run_PS4
-
-
 
 end
