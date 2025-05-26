@@ -1,4 +1,4 @@
-function [] = plot_3D_orbits(r_ECI_1, r_ECI_2, title_1, title_2)
+function [] = plot_3D_orbits(r_ECI_1, r_ECI_2, title_1, title_2, fig_path)
     x1 = r_ECI_1(:,1);
     y1 = r_ECI_1(:,2);
     z1 = r_ECI_1(:,3);
@@ -23,4 +23,6 @@ function [] = plot_3D_orbits(r_ECI_1, r_ECI_2, title_1, title_2)
     axis equal;
     legend(title_1, title_2,'Central Body', 'Start Point', 'End Point');
     hold off;
+
+    saveas(gcf, fig_path);
 end

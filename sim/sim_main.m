@@ -20,7 +20,8 @@ run_PS3 = false;
 run_PS4 = false;
 run_PS5 = false;
 run_PS6 = false; 
-run_PS7 = true;
+run_PS7 = false;
+run_PS8 = true;
 
 % Load SV1 information
 load_SV1;
@@ -28,7 +29,7 @@ load_SV1;
 %%% PROPAGATION TIME DETAILS %%%
 tstart = 0; % Start time (s)
 t_orbit = 2*pi*sqrt(a_SV1_init^3/mu_earth);
-tend = 50*t_orbit; % End time (s)
+tend = 5*t_orbit; % End time (s)
 tint = t_orbit/500.0; % Time step (s)
 
 % Choose which simulations to run
@@ -53,6 +54,10 @@ end
 if run_PS7
     ps7_sims;
 end
+if run_PS8
+    ps8_sims;
+end
+
 
 
 

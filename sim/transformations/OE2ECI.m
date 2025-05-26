@@ -1,9 +1,26 @@
-function [r_ECI,v_ECI] = OE2ECI(a,e,i,RAAN,omega,nu)
+function [r_ECI,v_ECI] = OE2ECI(a_mean,e_mean,i_mean,RAAN_mean,omega_mean,nu_mean)
+    % Takes in mean OE, converts to osculating, and then converts to ECI
+    
     global mu_earth;
-    i = deg2rad(i);
-    RAAN = deg2rad(RAAN);
-    omega = deg2rad(omega);
-    nu = deg2rad(nu);
+    % i = deg2rad(i);
+    % RAAN = deg2rad(RAAN);
+    % omega = deg2rad(omega);
+    % nu = deg2rad(nu);
+    J2_flag = 1;
+
+    M_rad = true2mean(deg2rad(nu_mean),e_mean);
+    
+    mean_elem = [a_mean*1e3,e_mean,deg2rad(i_mean),deg2rad(RAAN_mean),deg2rad(omega_mean),M_rad];
+
+    osc_elem = mean2osc(mean_elem, J2_flag);
+
+    a = osc_elem(1)/1e3;
+    e = osc_elem(2);
+    i = osc_elem(3);
+    RAAN = osc_elem(4);
+    omega = osc_elem(5);
+    nu = mean2true(osc_elem(6),e);    
+
     r = a*(1-e^2)/(1+e*cos(nu));
     r_PQW = [r * cos(nu); r * sin(nu); 0];
 
