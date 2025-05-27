@@ -104,8 +104,8 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
     %ROEs_SV3_STM = ROEs_SV3_STM_unscaled*a_chief;
 
     % Initial measurements and definition of noise for EKF
-    RTN_sigma = 0.000001 * eye(3); % 1 m noise in each direction .000001
-    ECI_sigma = 1 * eye(3); % 100 m noise in each direction .001 or 1
+    RTN_sigma = 0.001 * eye(3); % 1 m noise in each direction .000001
+    ECI_sigma = 100 * eye(3); % 100 m noise in each direction .001 or 1
 
     [rho3, ~] = ECI2RTN_rel(SV1_state(1:3)', SV1_state(4:6)', SV3_state(1:3)', SV3_state(4:6)');
     SV3_RTN_pos = rho3';
@@ -121,13 +121,13 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
     y_pred_EKF_SV3_all(1,:) = y_actual_EKF_SV3_all(1,:);
 
     % Process and measurement noise covariances
-    Q = 10* estimate_sigma; % similar to P_0 but much smaller
+    Q = 0.1* estimate_sigma; % similar to P_0 but much smaller
     %Q(1,1) = 1e4;
     %Q(2,2) = 1e3;
     %Q(5,5) = 1e1;
     %Q(6,6) = 1e1;
 
-    R = blkdiag(RTN_sigma, ECI_sigma); % diagonal matrix with elements equal to the varianace of each measurement
+    R = 0.01*blkdiag(RTN_sigma, ECI_sigma); % diagonal matrix with elements equal to the varianace of each measurement
 
     for i=2:n_steps
         t = full_times(i-1);
@@ -183,8 +183,6 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
         % Use ROE STM for ground truth
         % [r_ECI_SV3,v_ECI_SV3] = ROE2ECI(a_o,e_x_o,e_y_o,i_o,RAAN_o,u_o, ...
         % d_a_SV3_STM,d_lambda_SV3_STM,d_e_x_SV3_STM,d_e_y_SV3_STM,d_i_x_SV3_STM,d_i_y_SV3_STM);
-
-        
 
         % Use GVE for ground truth
         [a_o,e_o,i_o,RAAN_o,w_o,nu_o, M_o] = quasi_nonsing2OE(a_o, e_x_o, e_y_o, i_o, RAAN_o, u_o); 
@@ -362,7 +360,7 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
     %plot_3D_orbits(r_SV3, y_actual_EKF_SV3_all(:,4:6), '', '', 'figures/PS8/ECI_noise_comparison.png')
     
     %[d_a_SV2, d_lambda_SV2, d_e_x_SV2, d_e_y_SV2, d_i_x_SV2, d_i_y_SV2] = ECI2ROE_array_mean(r_SV1, v_SV1, r_SV2, v_SV2, true); 
-    [d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3] = ECI2ROE_array(r_SV1, v_SV1, r_SV3, v_SV3); 
+    [d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3] = ECI2ROE_array_mean(r_SV1, v_SV1, r_SV3, v_SV3, true); 
 
     ROE_SV3_true = [d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3];
 
