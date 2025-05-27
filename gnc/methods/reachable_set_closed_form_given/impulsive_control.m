@@ -1,4 +1,4 @@
-function [t_maneuvers, manuevers, total_cost] = impulsive_control(chief_oe, initial_aroe, desired_aroe, dt, STM, CM, Rp, mu, J2)
+function [t_maneuvers, manuevers, total_cost] = impulsive_control(chief_oe, initial_aroe, desired_aroe, t0, tf, STM, CM, Rp, mu, J2)
     %{
     impulsive_control calculates the optimal maneuver times and magnitudes
     to achieve the given difference in ROE states for the provided 
@@ -16,7 +16,8 @@ function [t_maneuvers, manuevers, total_cost] = impulsive_control(chief_oe, init
                 a_c[da, dlambda, dex, dey, dix, diy]
         - desired_aroe: desired dimensionalized QNS ROE state
                 a_c[da, dlambda, dex, dey, dix, diy]
-        - dt: reconfiguration window time (s)
+        - t0: Start of reconfiguration window
+        - tf: End of reconfiguration window
         - STM: function which given the chief OE's, and a time will return
                 the STM by which to multiply ROEs to get the current ROE 
                 state
@@ -34,7 +35,10 @@ function [t_maneuvers, manuevers, total_cost] = impulsive_control(chief_oe, init
     %% Determine the change in ROE required
     % Make sure you account for any changes to the ROEs that may come from
     % the drift in J2! (STM may be helpful here)
-    aDroe = ??;
+    STM_from_init = calc_STM_for_control(t0, tf, chief_oe);
+    no_control_roe_final = STM_from_init * roe_init';
+    roe_diff = roe_final - no_control_roe_final;
+    aDroe = chief_oe(1)*roe_diff;
 
     %% Calculate the drift rates
     % Here we want to calculate the drift rates of RAAN, AOP, and M
@@ -50,7 +54,7 @@ function [t_maneuvers, manuevers, total_cost] = impulsive_control(chief_oe, init
 
     %% Calculate the reachable delta-v
     % Implement calculate_reachable_delta_v()
-    [dvmin_da, dvmin_dlambda, dvmin_de, dvmin_di] = calculate_reachable_delta_v(aDroe, chief_oe, dt, n, STM, CM);
+    [dvmin_da, dvmin_dlambda, dvmin_de, dvmin_di] = calculate_reachable_delta_v(aDroe, chief_oe, t0, tf, n, STM, CM);
 
     % Then make sure you determine the IP dominance case. To make things 
     % easier, also store the index of the dominance case (look into the max 
@@ -59,7 +63,7 @@ function [t_maneuvers, manuevers, total_cost] = impulsive_control(chief_oe, init
     % The convention here is: dvmin_dom == 1 - dominance da, 
     %                         dvmin_dom == 2 - dominance dlambda, 
     %                         dvmin_dom == 3 - dominance de
-    [dvmin, dvmin_dom] = ??;
+    [dvmin, dvmin_dom] = max(dvmin_da, dvmin_dlambda, dvmin_di); % Get the max and the argmax
 
     %% Compute the optimal maneuver times
     % Implement compute_optimal_maneuver_times_ip(), and
@@ -94,7 +98,7 @@ function [t_maneuvers, manuevers, total_cost] = impulsive_control(chief_oe, init
     total_cost = ??;
 end
 
-function [dvmin_da, dvmin_dlambda, dvmin_de, dvmin_di] = calculate_reachable_delta_v(aDroe, chief_oe, dt, n, STM, CM)
+function [dvmin_da, dvmin_dlambda, dvmin_de, dvmin_di] = calculate_reachable_delta_v(aDroe, chief_oe, t0, tf, n, STM, CM)
     %{
     calculate_reachable_delta_v calculates the reachable delta v according
     to Chernick Table 5.13 and 5.14. 
@@ -121,12 +125,17 @@ function [dvmin_da, dvmin_dlambda, dvmin_de, dvmin_di] = calculate_reachable_del
     %}
 
     % TODO dvmin - dom da
-
+    dvmin_da = abs(aDroe(1))*n/2; % From Table 5.13 in Chernick
     % TODO dmin - dom de
-
+    ecc_dv_min = norm(aDroe(3:4))*n/2;
+    
     % TODO dvmin - dom dlambda - limit to tangential burns only
+    m = -2*abs(d_delta_a0)/abs(d_delta_lambda0);
+    dvmin_dlambda = n*abs((m*aDroe(2) - aDroe(1))/(d_delta_a0)); % What's delta M here?
 
     % TODO dvmin - dom di
+    dvmin_di = norm(aDroe(5:6))*n; % Do this separately but calculate it in case we need a cross-track burn
+
 end
 
 function [T_opts_ip, m_ip] = compute_optimal_maneuver_times_ip(aDroe, chief_oe, dt, n, aop_dot, M_dot)

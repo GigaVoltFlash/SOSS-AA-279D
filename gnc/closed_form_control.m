@@ -4,6 +4,7 @@
 
 % This file has the implementation of a closed-form control solution, that is used extensively in the proximity
 % operations and potentially in the approach calculations.
+% ANSHUK CODED VERSION. SEE PROVIDED METHOD INSTEAD.
 
 function [delta_v_vals, delta_v_times] = closed_form_control(roe_initial, roe_final, SV1_oe_init, t0, tf)
     % Some relevant parameters that are useful
