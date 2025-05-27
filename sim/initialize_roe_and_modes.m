@@ -41,6 +41,6 @@ J2_flag = true;
             compute_OE_ROE_mean_osc(r_SV1_ECI_init', v_SV1_ECI_init', r_SV3_init', v_SV3_init', J2_flag);
 
 [r_SV3_mean_init, v_SV3_mean_init] = ROE2ECI(a_SV1_init, ex_SV1_init, ey_SV1_init, i_SV1_init, RAAN_SV1_init, u_SV1_init,...
-d_a_SV3_osc, d_lambda_SV3_osc, d_e_x_SV3_osc, d_e_y_SV3_osc, d_i_x_SV3_osc, d_i_y_SV3_osc);
+d_a_SV3_mean, d_lambda_SV3_mean, d_e_x_SV3_mean, d_e_y_SV3_mean, d_i_x_SV3_mean, d_i_y_SV3_mean);
 
 state_abs_SV3_mean_init = [r_SV3_mean_init; v_SV3_mean_init];

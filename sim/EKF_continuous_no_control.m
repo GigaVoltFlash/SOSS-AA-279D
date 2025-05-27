@@ -38,15 +38,22 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_state_init, SV3_state_init, 
     [a_qns_SV1, e_x_SV1, e_y_SV1, i_qns_SV1, RAAN_qns_SV1, u_SV1] = ...
     OE2quasi_nonsing(a_init_SV1,e_init_SV1,i_init_SV1,RAAN_init_SV1,omega_init_SV1,M_init_SV1);
     SV1_OE_state = [a_qns_SV1, e_x_SV1, e_y_SV1, i_qns_SV1, RAAN_qns_SV1, u_SV1];
+
+    [a_init_SV3,e_init_SV3,i_init_SV3,RAAN_init_SV3,omega_init_SV3,nu_init_SV3] = ECI2OE(SV3_state_init(1:3), SV3_state_init(4:6));
+    M_init_SV3_rad = true2mean(deg2rad(nu_init_SV3),e_init_SV3);
+    M_init_SV3 = rad2deg(M_init_SV3_rad);
+    [a_qns_SV3, e_x_SV3, e_y_SV3, i_qns_SV3, RAAN_qns_SV3, u_SV3] = ...
+    OE2quasi_nonsing(a_init_SV3,e_init_SV3,i_init_SV3,RAAN_init_SV3,omega_init_SV3,M_init_SV3);
+    SV3_OE_state = [a_qns_SV3, e_x_SV3, e_y_SV3, i_qns_SV3, RAAN_qns_SV3, u_SV3];
     
     [d_a_init_SV3, d_lambda_init_SV3, d_e_x_init_SV3, d_e_y_init_SV3, d_i_x_init_SV3, d_i_y_init_SV3] = ...
         ECI2ROE_array(SV1_state_init(1:3)', SV1_state_init(4:6)', SV3_state_init(1:3)', SV3_state_init(4:6)');
     SV3_ROE_state = [d_a_init_SV3, d_lambda_init_SV3, d_e_x_init_SV3, d_e_y_init_SV3, d_i_x_init_SV3, d_i_y_init_SV3]/a_chief; % unscaling by a_chief
     ROE_EKF_SV3_all(1, :) = SV3_ROE_state*a_chief; % storing scaled ROEs
     
-    [a_qns_SV3, e_x_SV3, e_y_SV3, i_qns_SV3, RAAN_qns_SV3, u_SV3] = ...
-        ROE2quasi_nonsing(a_qns_SV1, e_x_SV1, e_y_SV1, i_qns_SV1, RAAN_qns_SV1, u_SV1,d_a_init_SV3, d_lambda_init_SV3, d_e_x_init_SV3, d_e_y_init_SV3, d_i_x_init_SV3, d_i_y_init_SV3);
-    SV3_OE_state = [a_qns_SV3, e_x_SV3, e_y_SV3, i_qns_SV3, RAAN_qns_SV3, u_SV3];
+    % [a_qns_SV3, e_x_SV3, e_y_SV3, i_qns_SV3, RAAN_qns_SV3, u_SV3] = ...
+    %     ROE2quasi_nonsing(a_qns_SV1, e_x_SV1, e_y_SV1, i_qns_SV1, RAAN_qns_SV1, u_SV1,d_a_init_SV3, d_lambda_init_SV3, d_e_x_init_SV3, d_e_y_init_SV3, d_i_x_init_SV3, d_i_y_init_SV3);
+    % SV3_OE_state = [a_qns_SV3, e_x_SV3, e_y_SV3, i_qns_SV3, RAAN_qns_SV3, u_SV3];
 
     % Initial estimate and covariance for EKF (assuming perfect SV1
     % knowledge for now)
@@ -200,11 +207,12 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_state_init, SV3_state_init, 
 
     pre_fit_residual_SV3 = y_actual_EKF_SV3_all - y_pred_EKF_SV3_all;
     post_fit_residual_SV3 = y_actual_EKF_SV3_all - y_post_EKF_SV3_all;
+    EKF_error = x_EKF_SV3_all - ROE_SV3_true;
 
-    plot_ROE_comparison_with_cov(full_times, t_orbit, ROE_SV3_true, x_EKF_SV3_all, P_EKF_SV3_all, 'Ground Truth', 'EKF',  ...
+    plot_ROE_comparison_with_cov(full_times, t_orbit, ROE_SV3_true, x_EKF_SV3_all, P_EKF_SV3_all, 'Ground Truth', 'EKF Estimate',  ...
         '','figures/PS8/ROE_planes_SV3_comparison.png', '', 'figures/PS8/ROE_over_time_SV3_comparison.png');
     
+    plot_EKF_error(full_times, t_orbit, EKF_error, 'figures/PS8/EKF_error_SV3.png');
+    
     plot_EKF_residuals(full_times, t_orbit, pre_fit_residual_SV3, post_fit_residual_SV3, noise_SV3_all, 'figures/PS8/residuals_SV3.png');
-
-
 end

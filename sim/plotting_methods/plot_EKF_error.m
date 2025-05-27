@@ -1,4 +1,4 @@
-function plot_EKF_residuals(full_times, t_orbit, pre_fit, post_fit, noise, save_path)
+function plot_EKF_error(full_times, t_orbit, error,save_path)
     num_orbits = full_times / t_orbit;
     figure;
     hold on;
@@ -6,9 +6,7 @@ function plot_EKF_residuals(full_times, t_orbit, pre_fit, post_fit, noise, save_
     for i = 1:6
         subplot(3,2,i);
         hold on;
-        plot(num_orbits, noise(:,i), 'k:', 'LineWidth', 1.5, 'DisplayName', 'Measurement Noise');
-        plot(num_orbits, pre_fit(:,i), 'b-', 'LineWidth', 1.5, 'DisplayName', 'Pre-fit Residuals');
-        plot(num_orbits, post_fit(:,i), 'r--', 'LineWidth', 1.5, 'DisplayName', 'Post-fit Residuals');
+        plot(num_orbits, error(:,i), 'k:', 'LineWidth', 1.5, 'DisplayName', 'EKF Error');
         xlabel('Time [orbits]');
         ylabel(roe_labels(i));
         if i == 1
