@@ -12,14 +12,19 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_state_init, SV3_state_init, 
     state_SV3_all = zeros(length(t_series), 6);
     
     % EKF Values
-    ROE_EKF_SV3_all = zeros(length(t_series), 6);
+    x_EKF_SV2_all = zeros(length(t_series), 6);
+    P_EKF_SV2_all = zeros(length(t_series), 6, 6);
+    y_pred_EKF_SV2_all = zeros(length(t_series),6);
+    y_post_EKF_SV2_all = zeros(length(t_series),6);
+    y_actual_EKF_SV2_all = zeros(length(t_series), 6);
+
     x_EKF_SV3_all = zeros(length(t_series), 6);
     P_EKF_SV3_all = zeros(length(t_series), 6, 6);
     y_pred_EKF_SV3_all = zeros(length(t_series),6);
     y_post_EKF_SV3_all = zeros(length(t_series),6);
     y_actual_EKF_SV3_all = zeros(length(t_series), 6);
     
-    % noise_SV2_all = zeros(length(t_series), 6);
+    noise_SV2_all = zeros(length(t_series), 6);
     noise_SV3_all = zeros(length(t_series), 6);
 
     % Setting initial states
@@ -46,10 +51,17 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_state_init, SV3_state_init, 
     OE2quasi_nonsing(a_init_SV3,e_init_SV3,i_init_SV3,RAAN_init_SV3,omega_init_SV3,M_init_SV3);
     SV3_OE_state = [a_qns_SV3, e_x_SV3, e_y_SV3, i_qns_SV3, RAAN_qns_SV3, u_SV3];
     
+    [d_a_init_SV2, d_lambda_init_SV2, d_e_x_init_SV2, d_e_y_init_SV2, d_i_x_init_SV2, d_i_y_init_SV2] = ...
+        ECI2ROE_array(SV1_state_init(1:3)', SV1_state_init(4:6)', SV3_state_init(1:3)', SV3_state_init(4:6)');
+    SV2_ROE_state = [d_a_init_SV2, d_lambda_init_SV2, d_e_x_init_SV2, d_e_y_init_SV2, d_i_x_init_SV2, d_i_y_init_SV2]/a_chief; % unscaling by a_chief
+    
+    [a_qns_SV2, e_x_SV2, e_y_SV2, i_qns_SV2, RAAN_qns_SV2, u_SV2] = ...
+        ROE2quasi_nonsing(a_qns_SV1, e_x_SV1, e_y_SV1, i_qns_SV1, RAAN_qns_SV1, u_SV1,d_a_init_SV2, d_lambda_init_SV2, d_e_x_init_SV2, d_e_y_init_SV2, d_i_x_init_SV2, d_i_y_init_SV2);
+    SV2_OE_state = [a_qns_SV2, e_x_SV2, e_y_SV2, i_qns_SV2, RAAN_qns_SV2, u_SV2];
+
     [d_a_init_SV3, d_lambda_init_SV3, d_e_x_init_SV3, d_e_y_init_SV3, d_i_x_init_SV3, d_i_y_init_SV3] = ...
         ECI2ROE_array(SV1_state_init(1:3)', SV1_state_init(4:6)', SV3_state_init(1:3)', SV3_state_init(4:6)');
     SV3_ROE_state = [d_a_init_SV3, d_lambda_init_SV3, d_e_x_init_SV3, d_e_y_init_SV3, d_i_x_init_SV3, d_i_y_init_SV3]/a_chief; % unscaling by a_chief
-    ROE_EKF_SV3_all(1, :) = SV3_ROE_state*a_chief; % storing scaled ROEs
     
     % [a_qns_SV3, e_x_SV3, e_y_SV3, i_qns_SV3, RAAN_qns_SV3, u_SV3] = ...
     %     ROE2quasi_nonsing(a_qns_SV1, e_x_SV1, e_y_SV1, i_qns_SV1, RAAN_qns_SV1, u_SV1,d_a_init_SV3, d_lambda_init_SV3, d_e_x_init_SV3, d_e_y_init_SV3, d_i_x_init_SV3, d_i_y_init_SV3);
@@ -60,9 +72,13 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_state_init, SV3_state_init, 
     estimate_sigma = 0.1*eye(6);
     %estimate_sigma(2,2) = 1e2; 
     estimate_noise = sqrtm(estimate_sigma)*randn(6,1);
-    x_EKF_SV3_all(1,:) = ROE_EKF_SV3_all(1, :); % + estimate_noise';
+    x_EKF_SV3_all(1,:) = SV3_ROE_state*a_chief; % + estimate_noise';
     P_EKF_SV3_all(1,:,:) = estimate_sigma;
+    x_EKF_SV2_all(1,:) = SV2_ROE_state*a_chief; % + estimate_noise';
+    P_EKF_SV2_all(1,:,:) = estimate_sigma;
 
+    x_update_EKF_SV2 = x_EKF_SV2_all(1,:)';
+    P_update_EKF_SV2 = squeeze(P_EKF_SV2_all(1,:,:));
     x_update_EKF_SV3 = x_EKF_SV3_all(1,:)';
     P_update_EKF_SV3 = squeeze(P_EKF_SV3_all(1,:,:));
 
@@ -70,16 +86,25 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_state_init, SV3_state_init, 
     RTN_sigma = 0.01 * eye(3); % 1 m noise in each direction .000001
     ECI_sigma = 1000 * eye(3); % 100 m noise in each direction .001 or 1
 
+    [rho2, ~] = ECI2RTN_rel(SV1_state(1:3)', SV1_state(4:6)', SV2_state(1:3)', SV2_state(4:6)');
+    SV2_RTN_pos = rho2';
+    SV2_ECI_pos = SV2_state(1:3);
+
     [rho3, ~] = ECI2RTN_rel(SV1_state(1:3)', SV1_state(4:6)', SV3_state(1:3)', SV3_state(4:6)');
     SV3_RTN_pos = rho3';
     SV3_ECI_pos = SV3_state(1:3);
     
-    RTN_noise = sqrtm(RTN_sigma)*randn(3,1);
-    ECI_noise = sqrtm(ECI_sigma)*randn(3,1);
+    RTN_noise_SV2 = sqrtm(RTN_sigma)*randn(3,1);
+    ECI_noise_SV2 = sqrtm(ECI_sigma)*randn(3,1);
+    RTN_noise_SV3 = sqrtm(RTN_sigma)*randn(3,1);
+    ECI_noise_SV3 = sqrtm(ECI_sigma)*randn(3,1);
 
-    y_actual_EKF_SV3_all(1,1:3) = SV3_RTN_pos + RTN_noise;
-    y_actual_EKF_SV3_all(1,4:6) = SV3_ECI_pos + ECI_noise;
+    y_actual_EKF_SV2_all(1,1:3) = SV2_RTN_pos + RTN_noise_SV2;
+    y_actual_EKF_SV2_all(1,4:6) = SV2_ECI_pos + ECI_noise_SV2;
+    y_actual_EKF_SV3_all(1,1:3) = SV3_RTN_pos + RTN_noise_SV3;
+    y_actual_EKF_SV3_all(1,4:6) = SV3_ECI_pos + ECI_noise_SV3;
 
+    y_pred_EKF_SV2_all(1,:) = y_actual_EKF_SV2_all(1,:);
     y_pred_EKF_SV3_all(1,:) = y_actual_EKF_SV3_all(1,:);
 
     % Process and measurement noise covariances
@@ -95,12 +120,14 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_state_init, SV3_state_init, 
     for i=2:n_steps
         t = full_times(i-1);
 
-        % Funky propagation fixes
+        % Use GVE propagated for ground truth ECI positions
         SV1_OE_state_inter = SV1_OE_state + (dt*secular_J2(t, SV1_OE_state))'; % propagate chief qns OE using GVE
         SV1_OE_state = wrap_QNSOE(SV1_OE_state_inter); % wraps u to be within 0-360
+        SV2_OE_state_inter = SV2_OE_state + (dt*secular_J2(t, SV2_OE_state))'; % propagate SV2 qns OE using GVE (take out later)
+        SV2_OE_state = wrap_QNSOE(SV2_OE_state_inter);
         SV3_OE_state_inter = SV3_OE_state + (dt*secular_J2(t, SV3_OE_state))'; % propagate SV3 qns OE using GVE (take out later)
         SV3_OE_state = wrap_QNSOE(SV3_OE_state_inter);
-
+        
         a_o = SV1_OE_state(1);
         e_x_o = SV1_OE_state(2);
         e_y_o = SV1_OE_state(3);
@@ -108,23 +135,42 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_state_init, SV3_state_init, 
         RAAN_o = SV1_OE_state(5);
         u_o = SV1_OE_state(6);
 
-        a_t = SV3_OE_state(1);
-        e_x_t = SV3_OE_state(2);
-        e_y_t = SV3_OE_state(3);
-        i_t = SV3_OE_state(4);
-        RAAN_t = SV3_OE_state(5);
-        u_t = SV3_OE_state(6);
+        a_2 = SV2_OE_state(1);
+        e_x_2 = SV2_OE_state(2);
+        e_y_2 = SV2_OE_state(3);
+        i_2 = SV2_OE_state(4);
+        RAAN_2 = SV2_OE_state(5);
+        u_2 = SV2_OE_state(6);
 
-        % Use GVE propagated for ground truth ECI positions
+        a_3 = SV3_OE_state(1);
+        e_x_3 = SV3_OE_state(2);
+        e_y_3 = SV3_OE_state(3);
+        i_3 = SV3_OE_state(4);
+        RAAN_3 = SV3_OE_state(5);
+        u_3 = SV3_OE_state(6);
+
         [a_o,e_o,i_o,RAAN_o,w_o,nu_o, ~] = quasi_nonsing2OE(a_o, e_x_o, e_y_o, i_o, RAAN_o, u_o); 
         [r_ECI_SV1,v_ECI_SV1] = OE2ECI(a_o,e_o,i_o,RAAN_o,w_o,nu_o);
-        [a_t,e_t,i_t,RAAN_t,w_t,nu_t, ~] = quasi_nonsing2OE(a_t, e_x_t, e_y_t, i_t, RAAN_t, u_t); 
-        [r_ECI_SV3,v_ECI_SV3] = OE2ECI(a_t,e_t,i_t,RAAN_t,w_t,nu_t);
+        [a_2,e_2,i_2,RAAN_2,w_2,nu_2, ~] = quasi_nonsing2OE(a_2, e_x_2, e_y_2, i_2, RAAN_2, u_2); 
+        [r_ECI_SV2,v_ECI_SV2] = OE2ECI(a_2,e_2,i_2,RAAN_2,w_2,nu_2);
+        [a_3,e_3,i_3,RAAN_3,w_3,nu_3, ~] = quasi_nonsing2OE(a_3, e_x_3, e_y_3, i_3, RAAN_3, u_3); 
+        [r_ECI_SV3,v_ECI_SV3] = OE2ECI(a_3,e_3,i_3,RAAN_3,w_3,nu_3);
 
         SV3_state = [r_ECI_SV3', v_ECI_SV3']';
+        SV2_state = [r_ECI_SV2', v_ECI_SV2']';
         SV1_state = [r_ECI_SV1', v_ECI_SV1']';
 
         % EKF Generate Measurements
+        [rho2, ~] = ECI2RTN_rel(r_ECI_SV1', v_ECI_SV1', r_ECI_SV2', v_ECI_SV2');
+        SV2_RTN_pos = rho2';
+        SV2_ECI_pos = SV2_state(1:3);
+        RTN_noise = sqrtm(RTN_sigma)*randn(3,1); % use sigma value defined above
+        ECI_noise = sqrtm(ECI_sigma)*randn(3,1);
+        SV2_RTN_measurement = SV2_RTN_pos + RTN_noise;
+        SV2_ECI_measurement = SV2_ECI_pos + ECI_noise;
+        noise_vector_SV2 = [RTN_noise;ECI_noise];
+        y_actual_EKF_SV2 = [SV2_RTN_measurement;SV2_ECI_measurement];
+
         [rho3, ~] = ECI2RTN_rel(r_ECI_SV1', v_ECI_SV1', r_ECI_SV3', v_ECI_SV3');
         SV3_RTN_pos = rho3';
         SV3_ECI_pos = SV3_state(1:3);
@@ -135,32 +181,25 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_state_init, SV3_state_init, 
         noise_vector_SV3 = [RTN_noise;ECI_noise];
         y_actual_EKF_SV3 = [SV3_RTN_measurement;SV3_ECI_measurement];
         
-        % EKF Mean Prediction (Chief OE, and ROE Euler Integration
-        SV1_OE_sing = [a_o,e_o,i_o,RAAN_o,w_o,nu_o];
-        [STM_big,~] = roe_stm_j2(dt, x_update_EKF_SV3', SV1_OE_sing);
-        STM_curr = squeeze(STM_big);
-        x_pred_EKF_SV3 = STM_curr*x_update_EKF_SV3;
+        % Run KF for SV2
+        [x_update_EKF_SV2, P_update_EKF_SV2, y_pred_EKF_SV2, y_post_EKF_SV2] = ekf_roes(x_update_EKF_SV2, y_actual_EKF_SV2, P_update_EKF_SV2, SV1_state, SV1_OE_state, Q, R, dt);
 
-        % EKF Covariance Prediction
-        P_pred_EKF_SV3 = STM_curr * P_update_EKF_SV3 * STM_curr' + Q;
-
-        % EKF Predict Measurements
-        y_pred_EKF_SV3 = measurement_model_SV3(x_pred_EKF_SV3,SV1_OE_state);
-
-        % EKF Update
-        H = measurement_sensitivity_matrix_SV3(SV1_state(1:3)',SV1_state(4:6)',SV1_OE_state);
-        K = (P_pred_EKF_SV3*(H'))/(H*P_pred_EKF_SV3*H' + R);
-
-        x_update_EKF_SV3 = x_pred_EKF_SV3-(K*(y_actual_EKF_SV3-y_pred_EKF_SV3));
-        P_update_EKF_SV3 = (eye(6)-K*H)*P_pred_EKF_SV3*(eye(6)-K*H)' + K*R*K';
-        y_post_EKF_SV3 = measurement_model_SV3(x_update_EKF_SV3,SV1_OE_state);
-
+        % Run KF for SV3
+        [x_update_EKF_SV3, P_update_EKF_SV3, y_pred_EKF_SV3, y_post_EKF_SV3] = ekf_roes(x_update_EKF_SV3, y_actual_EKF_SV3, P_update_EKF_SV3, SV1_state, SV1_OE_state, Q, R, dt);
+        
         % Save states to buffer
         state_SV3_all(i, :) = SV3_state';
         state_SV2_all(i, :) = SV2_state';
         state_SV1_all(i, :) = SV1_state';
 
         % EKF buffer
+        y_actual_EKF_SV2_all(i,:) = y_actual_EKF_SV2;
+        y_pred_EKF_SV2_all(i, :) = y_pred_EKF_SV2;
+        y_post_EKF_SV2_all(i, :) = y_post_EKF_SV2;
+        x_EKF_SV2_all(i, :) = x_update_EKF_SV2;
+        P_EKF_SV2_all(i,:,:) = P_update_EKF_SV2;
+        noise_SV2_all(i, :) = noise_vector_SV2;
+
         y_actual_EKF_SV3_all(i,:) = y_actual_EKF_SV3;
         y_pred_EKF_SV3_all(i, :) = y_pred_EKF_SV3;
         y_post_EKF_SV3_all(i, :) = y_post_EKF_SV3;
@@ -205,11 +244,19 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_state_init, SV3_state_init, 
     ROE_SV3_true = [d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3];
     ROE_SV2_true = [d_a_SV2, d_lambda_SV2, d_e_x_SV2, d_e_y_SV2, d_i_x_SV2, d_i_y_SV2];
 
+    pre_fit_residual_SV2 = y_actual_EKF_SV2_all - y_pred_EKF_SV2_all;
+    post_fit_residual_SV2 = y_actual_EKF_SV2_all - y_post_EKF_SV2_all;
+
     pre_fit_residual_SV3 = y_actual_EKF_SV3_all - y_pred_EKF_SV3_all;
     post_fit_residual_SV3 = y_actual_EKF_SV3_all - y_post_EKF_SV3_all;
     EKF_error = x_EKF_SV3_all - ROE_SV3_true;
 
-    plot_ROE_comparison_with_cov(full_times, t_orbit, ROE_SV3_true, x_EKF_SV3_all, P_EKF_SV3_all, 'Ground Truth', 'EKF Estimate',  ...
+    plot_ROE_comparison_with_cov(full_times, t_orbit, ROE_SV2_true, x_EKF_SV2_all, P_EKF_SV2_all, 'Ground Truth', 'EKF',  ...
+        '','figures/PS8/ROE_planes_SV2_comparison.png', '', 'figures/PS8/ROE_over_time_SV2_comparison.png');
+    
+    plot_EKF_residuals(full_times, t_orbit, pre_fit_residual_SV2, post_fit_residual_SV2, noise_SV2_all, 'figures/PS8/residuals_SV2.png');
+
+    plot_ROE_comparison_with_cov(full_times, t_orbit, ROE_SV3_true, x_EKF_SV3_all, P_EKF_SV3_all, 'Ground Truth', 'EKF',  ...
         '','figures/PS8/ROE_planes_SV3_comparison.png', '', 'figures/PS8/ROE_over_time_SV3_comparison.png');
     
     plot_EKF_error(full_times, t_orbit, EKF_error, 'figures/PS8/EKF_error_SV3.png');
