@@ -64,8 +64,5 @@ function simulate_and_plot_relative_motion(t, t_orbit, SV2_roe_init, state_abs_S
     plot_RT_RN_projections_separate(SV2_rel_pos, SV3_rel_pos, RT,RN,NT,title_str, fig_path);
     %plot_RT_RN_projections(SV2_rel_pos, SV3_rel_pos,title_str, fig_path);
 
-    plot_ROE_comparison(t, t_orbit, ...
-    roe_SV2(:,1), roe_SV2(:,2), roe_SV2(:,3), roe_SV2(:,4), roe_SV2(:,5), roe_SV2(:,6), ...
-    ROE_SV2_FODE(:,1), ROE_SV2_FODE(:,2), ROE_SV2_FODE(:,3), ROE_SV2_FODE(:,4), ROE_SV2_FODE(:,5), ROE_SV2_FODE(:,6), ...
-    'STM', 'Dif. FODE', title_str2, fig_path2, title_str3, fig_path3)
+    plot_ROE_comparison(t, t_orbit, roe_SV2, ROE_SV2_FODE, 'STM', 'Dif. FODE', title_str2, fig_path2, title_str3, fig_path3)
 end

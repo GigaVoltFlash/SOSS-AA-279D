@@ -7,26 +7,25 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
 
     a_chief = SV1_OE_init(1);
 
-    withJ2 = true;
+    % withJ2 = true;
 
     % Factors for Lyaponuv feedback gain matrix  
-    N = 14;
-    k = 1000;
+    % N = 14;
+    % k = 1000;
 
     % Initialize with same size as full time vector
     state_SV1_all = zeros(length(t_series), 6);
     state_SV2_all = zeros(length(t_series), 6);
     state_SV3_all = zeros(length(t_series), 6);
 
-    SV1_OE_test = zeros(length(t_series), 6);
-    ROE_from_OE = zeros(length(t_series), 6);
+    % SV1_OE_test = zeros(length(t_series), 6);
+    % ROE_from_OE = zeros(length(t_series), 6);
 
     % Initialize delta-v and acceleration storage
-    SV2_dv_vals = zeros(length(t_series), 3);
-    SV3_dv_vals = zeros(length(t_series), 3);
-    SV2_a_vals = zeros(length(t_series), 3);
-    SV3_a_vals = zeros(length(t_series), 3);
-    
+    % SV2_dv_vals = zeros(length(t_series), 3);
+    % SV3_dv_vals = zeros(length(t_series), 3);
+    % SV2_a_vals = zeros(length(t_series), 3);
+    % SV3_a_vals = zeros(length(t_series), 3);
     
     % EKF Values
     OE_EKF_SV1_all = zeros(length(t_series), 6);
@@ -40,18 +39,18 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
     y_actual_EKF_SV3_all = zeros(length(t_series), 6);
 
     % Nominal ROE for particular modes
-    SV2_roe_nom = SV2_modes(2, :)/a_chief;
+    % SV2_roe_nom = SV2_modes(2, :)/a_chief;
     SV3_roe_nom_mode1 = SV3_modes(1, :)/a_chief;
-    SV3_roe_nom_mode2 = SV3_modes(2, :)/a_chief;
-    SV3_roe_nom_mode3 = SV3_modes(3, :)/a_chief;
-    SV3_roe_nom_mode4 = SV3_modes(4, :)/a_chief;
-    SV3_roe_nom = SV3_roe_nom_mode1;
+    % SV3_roe_nom_mode2 = SV3_modes(2, :)/a_chief;
+    % SV3_roe_nom_mode3 = SV3_modes(3, :)/a_chief;
+    % SV3_roe_nom_mode4 = SV3_modes(4, :)/a_chief;
+    % SV3_roe_nom = SV3_roe_nom_mode1;
 
     % Maybe pick these differently later
-    SV2_delta_di_max = 0.5/a_chief;
-    SV3_delta_di_max = 0.5/a_chief;
-    SV2_delta_de_max = 0.5/a_chief;
-    SV3_delta_de_max = 0.5/a_chief;
+    % SV2_delta_di_max = 0.5/a_chief;
+    % SV3_delta_di_max = 0.5/a_chief;
+    % SV2_delta_de_max = 0.5/a_chief;
+    % SV3_delta_de_max = 0.5/a_chief;
 
     % Setting initial states
     SV1_state = SV1_state_init;
@@ -88,10 +87,10 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
     estimate_sigma = 0.1*eye(6);
     %estimate_sigma(2,2) = 1e2; 
     estimate_noise = sqrtm(estimate_sigma)*randn(6,1);
-    x_pred_EKF_SV3_all(1,:) = ROE_EKF_SV3_all(1, :); % + estimate_noise';
-    P_pred_EKF_SV3_all(1,:,:) = estimate_sigma;
-    x_update_EKF_SV3_all(1,:) = x_pred_EKF_SV3_all(1,:);
-    P_update_EKF_SV3_all(1,:,:) = P_pred_EKF_SV3_all(1,:,:);
+    % x_pred_EKF_SV3_all(1,:) = ROE_EKF_SV3_all(1, :); % + estimate_noise';
+    % P_pred_EKF_SV3_all(1,:,:) = estimate_sigma;
+    x_update_EKF_SV3_all(1,:) = ROE_EKF_SV3_all(1, :); % + estimate_noise';
+    P_update_EKF_SV3_all(1,:,:) = estimate_sigma;
 
     %x_update_EKF_SV3_prime_unscaled = ROE2ROE_prime((x_update_EKF_SV3_all(1,:)/a_chief)',SV1_OE_state'); % unscaled, qns prime ROE
     %P_pred_EKF_SV3 = squeeze(P_pred_EKF_SV3_all(1,:,:));
@@ -100,7 +99,7 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
     P_update_EKF_SV3 = squeeze(P_update_EKF_SV3_all(1,:,:));
 
     % Generates STM and unscaled roe output at every time step
-    [STMs, ROEs_SV3_STM] = roe_stm_j2(t_series, SV3_ROE_state*a_chief, SV1_OE_init);
+    % [STMs, ROEs_SV3_STM] = roe_stm_j2(t_series, SV3_ROE_state*a_chief, SV1_OE_init);
     %ROEs_SV3_STM = ROEs_SV3_STM_unscaled*a_chief;
 
     % Initial measurements and definition of noise for EKF
@@ -185,16 +184,16 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
         % d_a_SV3_STM,d_lambda_SV3_STM,d_e_x_SV3_STM,d_e_y_SV3_STM,d_i_x_SV3_STM,d_i_y_SV3_STM);
 
         % Use GVE for ground truth
-        [a_o,e_o,i_o,RAAN_o,w_o,nu_o, M_o] = quasi_nonsing2OE(a_o, e_x_o, e_y_o, i_o, RAAN_o, u_o); 
+        [a_o,e_o,i_o,RAAN_o,w_o,nu_o, ~] = quasi_nonsing2OE(a_o, e_x_o, e_y_o, i_o, RAAN_o, u_o); 
         [r_ECI_SV1,v_ECI_SV1] = OE2ECI(a_o,e_o,i_o,RAAN_o,w_o,nu_o);
  
-        [a_t,e_t,i_t,RAAN_t,w_t,nu_t, M_t] = quasi_nonsing2OE(a_t, e_x_t, e_y_t, i_t, RAAN_t, u_t); 
+        [a_t,e_t,i_t,RAAN_t,w_t,nu_t, ~] = quasi_nonsing2OE(a_t, e_x_t, e_y_t, i_t, RAAN_t, u_t); 
         [r_ECI_SV3,v_ECI_SV3] = OE2ECI(a_t,e_t,i_t,RAAN_t,w_t,nu_t);
 
         SV3_state = [r_ECI_SV3', v_ECI_SV3']';
         SV1_state = [r_ECI_SV1', v_ECI_SV1']';
 
-        SV1_OE_sing(i,:) = [a_o,e_o,i_o,RAAN_o,w_o,nu_o];
+        SV1_OE_sing = [a_o,e_o,i_o,RAAN_o,w_o,nu_o];
 
         % [a,e,i,RAAN,omega,nu,M] = ECI2OE(r_IJK,v_IJK)
         %[a_test,e_test,i_test,RAAN_test,omega_test,~,M_test] = ECI2OE(SV1_state(1:3),SV1_state(4:6));
@@ -202,11 +201,12 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
         %[a_test, e_x_test, e_y_test, i_test, RAAN_test, u_test]= OE2quasi_nonsing(a_test,e_test,i_test,RAAN_test,omega_test,M_test);
         %SV1_OE_qns_test = [a_test, e_x_test, e_y_test, i_test, RAAN_test, u_test];
 
-        [STM_big,ROE_test] = roe_stm_j2(dt, x_update_EKF_SV3', SV1_OE_sing(i,:));
+        [STM_big,~] = roe_stm_j2(dt, x_update_EKF_SV3', SV1_OE_sing);
         STM_curr = squeeze(STM_big);
 
         % EKF Mean Prediction (Chief OE, and ROE Euler Integration
 
+        % This commented out section utilizes 
         % x_update_EKF_SV3_prime = ROE2ROE_prime(x_update_EKF_SV3,SV1_OE_state);
         % x_update_EKF_SV3_prime_unscaled = x_update_EKF_SV3_prime/a_chief;
         % 
@@ -238,7 +238,7 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
 
         % EKF Update
         H = measurement_sensitivity_matrix_SV3(SV1_state(1:3)',SV1_state(4:6)',SV1_OE_state);
-        K = P_pred_EKF_SV3*(H')*inv(H*P_pred_EKF_SV3*H' + R);
+        K = (P_pred_EKF_SV3*(H'))/(H*P_pred_EKF_SV3*H' + R);
 
         %x_update_EKF_SV3_unscaled = x_pred_EKF_SV3_unscaled-(K*(y_actual_EKF_SV3-y_pred_EKF_SV3));
         x_update_EKF_SV3 = x_pred_EKF_SV3-(K*(y_actual_EKF_SV3-y_pred_EKF_SV3));
@@ -278,12 +278,12 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
         % EKF buffer
         OE_EKF_SV1_all(i, :) = SV1_OE_state';
         OE_EKF_SV3_all(i, :) = SV3_OE_state';
-        x_pred_EKF_SV3_all(i, :) = x_pred_EKF_SV3;
-        P_pred_EKF_SV3_all(i,:,:) = P_pred_EKF_SV3;
+        % x_pred_EKF_SV3_all(i, :) = x_pred_EKF_SV3;
+        % P_pred_EKF_SV3_all(i,:,:) = P_pred_EKF_SV3;
         y_actual_EKF_SV3_all(i,:) = y_actual_EKF_SV3;
         y_pred_EKF_SV3_all(i, :) = y_pred_EKF_SV3;
-        x_update_EKF_SV3_all(i, :) = x_update_EKF_SV3;
-        P_update_EKF_SV3_all(i,:,:) = P_update_EKF_SV3;
+        x_EKF_SV3_all(i, :) = x_update_EKF_SV3;
+        P_EKF_SV3_all(i,:,:) = P_update_EKF_SV3;
 
         % CONTROL
         

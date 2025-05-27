@@ -1,7 +1,19 @@
-function plot_ROE_comparison(t, t_orbit, ...
-    d_a1, d_lambda1, d_e_x1, d_e_y1, d_i_x1, d_i_y1, ...
-    d_a2, d_lambda2, d_e_x2, d_e_y2, d_i_x2, d_i_y2, ...
-    label1, label2,  title_str2, fig_path2, title_str3, fig_path3)
+function plot_ROE_comparison(t, t_orbit, ROE1, ROE2, ...
+    label1, label2, title_str2, fig_path2, title_str3, fig_path3)
+
+    d_a1 = ROE1(:, 1);
+    d_lambda1 = ROE1(:, 2);
+    d_e_x1 = ROE1(:, 3);
+    d_e_y1 = ROE1(:, 4);
+    d_i_x1 = ROE1(:, 5);
+    d_i_y1 = ROE1(:, 6);
+
+    d_a2 = ROE2(:, 1);
+    d_lambda2 = ROE2(:, 2);
+    d_e_x2 = ROE2(:, 3);
+    d_e_y2 = ROE2(:, 4);
+    d_i_x2 = ROE2(:, 5);
+    d_i_y2 = ROE2(:, 6);
 
     % === Plane Projections ===
     figure('Color', 'w', 'Position', [100, 100, 1000, 600]);
