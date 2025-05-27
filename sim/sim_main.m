@@ -29,7 +29,7 @@ load_SV1;
 %%% PROPAGATION TIME DETAILS %%%
 tstart = 0; % Start time (s)
 t_orbit = 2*pi*sqrt(a_SV1_init^3/mu_earth);
-tend = 5*t_orbit; % End time (s)
+tend = 20*t_orbit; % End time (s)
 tint = t_orbit/500.0; % Time step (s)
 
 % Choose which simulations to run

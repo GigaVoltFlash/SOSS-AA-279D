@@ -19,6 +19,7 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
     state_SV3_all = zeros(length(t_series), 6);
 
     SV1_OE_test = zeros(length(t_series), 6);
+    ROE_from_OE = zeros(length(t_series), 6);
 
     % Initialize delta-v and acceleration storage
     SV2_dv_vals = zeros(length(t_series), 3);
@@ -120,7 +121,7 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
     y_pred_EKF_SV3_all(1,:) = y_actual_EKF_SV3_all(1,:);
 
     % Process and measurement noise covariances
-    Q = 0.1* estimate_sigma; % similar to P_0 but much smaller
+    Q = 10* estimate_sigma; % similar to P_0 but much smaller
     %Q(1,1) = 1e4;
     %Q(2,2) = 1e3;
     %Q(5,5) = 1e1;
@@ -152,9 +153,11 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
 
         % Funky propagation fixes
         SV1_OE_state_inter = SV1_OE_state + (dt*secular_J2(t, SV1_OE_state))'; % propagate chief qns OE using GVE
-        SV1_OE_state = wrap_QNSOE(SV1_OE_state_inter);
+        SV1_OE_state = wrap_QNSOE(SV1_OE_state_inter); % wraps u to be within 0-360
         SV3_OE_state_inter = SV3_OE_state + (dt*secular_J2(t, SV3_OE_state))'; % propagate SV3 qns OE using GVE (take out later)
         SV3_OE_state = wrap_QNSOE(SV3_OE_state_inter);
+
+        ROE_from_OE(i,:) = OE2ROE(SV1_OE_state, SV3_OE_state);
 
         d_a_SV3_STM = ROEs_SV3_STM(i,1);
         d_lambda_SV3_STM =  ROEs_SV3_STM(i,2);
@@ -170,13 +173,25 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
         RAAN_o = SV1_OE_state(5);
         u_o = SV1_OE_state(6);
 
+        a_t = SV3_OE_state(1);
+        e_x_t = SV3_OE_state(2);
+        e_y_t = SV3_OE_state(3);
+        i_t = SV3_OE_state(4);
+        RAAN_t = SV3_OE_state(5);
+        u_t = SV3_OE_state(6);
+
+        % Use ROE STM for ground truth
         [r_ECI_SV3,v_ECI_SV3] = ROE2ECI(a_o,e_x_o,e_y_o,i_o,RAAN_o,u_o, ...
         d_a_SV3_STM,d_lambda_SV3_STM,d_e_x_SV3_STM,d_e_y_SV3_STM,d_i_x_SV3_STM,d_i_y_SV3_STM);
 
         [a_o,e_o,i_o,RAAN_o,w_o,nu_o, M_o] = quasi_nonsing2OE(a_o, e_x_o, e_y_o, i_o, RAAN_o, u_o); 
         [r_ECI_SV1,v_ECI_SV1] = OE2ECI(a_o,e_o,i_o,RAAN_o,w_o,nu_o);
 
-        SV1_OE_sing(i,:) = [a_o,e_o,i_o,RAAN_o,w_o,nu_o];
+        %SV1_OE_sing(i,:) = [a_o,e_o,i_o,RAAN_o,w_o,nu_o];
+
+        % Use GVE for ground truth
+        % [a_t,e_t,i_t,RAAN_t,w_t,nu_t, M_t] = quasi_nonsing2OE(a_t, e_x_t, e_y_t, i_t, RAAN_t, u_t); 
+        % [r_ECI_SV3,v_ECI_SV3] = OE2ECI(a_t,e_t,i_t,RAAN_t,w_t,nu_t);
 
         SV3_state = [r_ECI_SV3', v_ECI_SV3']';
         SV1_state = [r_ECI_SV1', v_ECI_SV1']';
@@ -198,9 +213,10 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
         x_update_EKF_SV3_prime_unscaled = x_update_EKF_SV3_prime_unscaled + dt*eom_ROE_prime(t, SV3_OE_state, SV1_OE_state); % propagate ROE with Euler
 
         x_pred_EKF_SV3_unscaled = ROE_prime2ROE(x_update_EKF_SV3_prime_unscaled,SV1_OE_state);
-        x_pred_EKF_SV3 = (x_pred_EKF_SV3_unscaled')*a_chief; % scaling by a_chief
+        %x_pred_EKF_SV3 = (x_pred_EKF_SV3_unscaled')*a_chief; % scaling by a_chief
 
-        %x_pred_EKF_SV3 = STM_curr*x_update_EKF_SV3;
+
+        x_pred_EKF_SV3 = STM_curr*x_update_EKF_SV3;
 
         % EKF Covariance Prediction
         P_pred_EKF_SV3 = STM_curr * P_update_EKF_SV3 * STM_curr' + Q;
@@ -213,11 +229,6 @@ function test_EKF_continuous(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_
         SV3_RTN_pos = rho3';
         SV3_ECI_pos = SV3_state(1:3);
 
-        % [rho3, ~] = ECI2RTN_rel(SV1_state(1:3)', SV1_state(4:6)', SV3_state(1:3)', SV3_state(4:6)');
-        % SV3_RTN_pos = rho3';
-        % SV3_ECI_pos = SV3_state(1:3);
-
-        % TRY USING OTHER PROPAGATION FOR GROUND TRUTH
         
         RTN_noise = sqrtm(RTN_sigma)*randn(3,1); % use sigma value defined above
         ECI_noise = sqrtm(ECI_sigma)*randn(3,1);
