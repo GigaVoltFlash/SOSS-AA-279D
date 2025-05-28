@@ -127,10 +127,13 @@ function [dvmin_da, dvmin_dlambda, dvmin_de, dvmin_di] = calculate_reachable_del
     % TODO dvmin - dom da
     dvmin_da = abs(aDroe(1))*n/2; % From Table 5.13 in Chernick
     % TODO dmin - dom de
-    ecc_dv_min = norm(aDroe(3:4))*n/2;
+    dvmin_ecc = norm(aDroe(3:4))*n/2;
     
     % TODO dvmin - dom dlambda - limit to tangential burns only
+    % STM to the end, apply the control input at the end to get alpha0
+
     m = -2*abs(d_delta_a0)/abs(d_delta_lambda0);
+    % account for sign changes here
     dvmin_dlambda = n*abs((m*aDroe(2) - aDroe(1))/(d_delta_a0)); % What's delta M here?
 
     % TODO dvmin - dom di
