@@ -18,7 +18,7 @@ a_chief_meters = a_SV1_init*1e3;
 
 % Add up to 25 orbits
 num_orbits_modes = [0,0,0,0];
-num_orbits_station_keep = [20,0,0,0];
+num_orbits_station_keep = [10,0,0,0];
 
 SV2_ROE = SV2_modes(1, :); % Mode 1
 SV3_ROE = SV3_modes(1, :);

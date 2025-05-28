@@ -25,7 +25,7 @@ function [x_update, P_update, y_pred, y_post] = ekf_roes(x_prior, y_meas, P_prio
     H = measurement_sensitivity_matrix_SV3(SV1_state(1:3)',SV1_state(4:6)',SV1_OE_state);
     K = (P_bar*(H'))/(H*P_bar*H' + R);
 
-    x_update = x_bar-(K*(y_meas-y_pred));
+    x_update = x_bar+(K*(y_meas-y_pred));
     P_update = (eye(6)-K*H)*P_bar*(eye(6)-K*H)' + K*R*K';
     y_post = measurement_model_SV3(x_update,SV1_OE_state);
 end

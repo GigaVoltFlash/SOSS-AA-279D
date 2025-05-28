@@ -18,6 +18,6 @@ function H = measurement_sensitivity_matrix_SV3(r_chief,v_chief,SV1_oe_qns)
 
     second_entry = Q_eci2rtn' * J;
 
-    H = 0.001*[first_entry;second_entry]; % Convert to kilometers
+    H = [first_entry;second_entry]/1e3; % Convert to kilometers
 end
 
