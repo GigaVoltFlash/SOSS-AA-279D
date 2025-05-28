@@ -139,8 +139,8 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV2_
     P_update_EKF_SV3 = squeeze(P_EKF_SV3_all(1,:,:));
 
     % Initial measurements and definition of noise for EKF
-    RTN_sigma = 0.01 * eye(3); % 1 m noise in each direction .000001
-    ECI_sigma = 1000 * eye(3); % 100 m noise in each direction .001 or 1
+    RTN_sigma = 0.001 * eye(3); % 1 m noise in each direction .000001
+    ECI_sigma = 0.1* eye(3); % 100 m noise in each direction .001 or 1
 
     [rho2, ~] = ECI2RTN_rel(SV1_state(1:3)', SV1_state(4:6)', SV2_state(1:3)', SV2_state(4:6)');
     SV2_RTN_pos = rho2';
@@ -162,16 +162,19 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV2_
 
     y_pred_EKF_SV2_all(1,:) = y_actual_EKF_SV2_all(1,:);
     y_pred_EKF_SV3_all(1,:) = y_actual_EKF_SV3_all(1,:);
+    y_post_EKF_SV2_all(1,:) = y_actual_EKF_SV2_all(1,:);
+    y_post_EKF_SV3_all(1,:) = y_actual_EKF_SV3_all(1,:);
 
     % Process and measurement noise covariances
-    Q = 10* estimate_sigma; % similar to P_0 but much smaller
+    Q = 1*estimate_sigma; % similar to P_0 but much smaller
     %Q(1,1) = 1e4;
     %Q(2,2) = 1e3;
     %Q(5,5) = 1e1;
     %Q(6,6) = 1e1;
 
     % R assumes there is less noise than there actually is.
-    R = 0.1 *blkdiag(RTN_sigma, ECI_sigma); % diagonal matrix with elements equal to the varianace of each measurement
+    % R = 1000000*blkdiag(RTN_sigma, ECI_sigma); % diagonal matrix with elements equal to the varianace of each measurement
+    R = 100*eye(6);
 
     for i=2:n_steps
         t = full_times(i-1);
@@ -306,7 +309,8 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV2_
 
     pre_fit_residual_SV3 = y_actual_EKF_SV3_all - y_pred_EKF_SV3_all;
     post_fit_residual_SV3 = y_actual_EKF_SV3_all - y_post_EKF_SV3_all;
-    EKF_error = x_EKF_SV3_all - ROE_SV3_true;
+    EKF_error_SV3 = x_EKF_SV3_all - ROE_SV3_true;
+    EKF_error_SV2 = x_EKF_SV2_all - ROE_SV2_true;
 
     plot_ROE_comparison_with_cov(full_times, t_orbit, ROE_SV2_true, x_EKF_SV2_all, P_EKF_SV2_all, 'Ground Truth', 'EKF',  ...
         '','figures/PS8/ROE_planes_SV2_comparison.png', '', 'figures/PS8/ROE_over_time_SV2_comparison.png');
@@ -316,7 +320,8 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV2_
     plot_ROE_comparison_with_cov(full_times, t_orbit, ROE_SV3_true, x_EKF_SV3_all, P_EKF_SV3_all, 'Ground Truth', 'EKF',  ...
         '','figures/PS8/ROE_planes_SV3_comparison.png', '', 'figures/PS8/ROE_over_time_SV3_comparison.png');
     
-    plot_EKF_error(full_times, t_orbit, EKF_error, 'figures/PS8/EKF_error_SV3.png');
+    plot_EKF_error(full_times, t_orbit, EKF_error_SV2, P_EKF_SV2_all, 'figures/PS8/EKF_error_SV2.png');
+    plot_EKF_error(full_times, t_orbit, EKF_error_SV3, P_EKF_SV3_all, 'figures/PS8/EKF_error_SV3.png');
     
     plot_EKF_residuals(full_times, t_orbit, pre_fit_residual_SV3, post_fit_residual_SV3, noise_SV3_all, 'figures/PS8/residuals_SV3.png');
 end

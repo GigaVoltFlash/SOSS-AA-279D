@@ -1,5 +1,4 @@
 function H = measurement_sensitivity_matrix_SV3(r_chief,v_chief,SV1_oe_qns)
-    a_1 = SV1_oe_qns(1);
     u_1 = deg2rad(SV1_oe_qns(6));
 
     J = [...
@@ -7,9 +6,7 @@ function H = measurement_sensitivity_matrix_SV3(r_chief,v_chief,SV1_oe_qns)
     0, 1,  2*sin(u_1), -2*cos(u_1), 0, 0;
     0, 0,  0, 0, sin(u_1), -cos(u_1)];
 
-    first_entry = J * a_1;
-
-    n = size(r_chief, 1);
+    first_entry = J;
 
     % Build RTN basis vectors
     R_hat = r_chief ./ vecnorm(r_chief, 2, 2);
@@ -19,8 +16,8 @@ function H = measurement_sensitivity_matrix_SV3(r_chief,v_chief,SV1_oe_qns)
 
     Q_eci2rtn = [R_hat', T_hat', N_hat']';
 
-    second_entry = Q_eci2rtn' * J * a_1;
+    second_entry = Q_eci2rtn' * J;
 
-    H = [first_entry;second_entry];
+    H = 0.001*[first_entry;second_entry]; % Convert to kilometers
 end
 

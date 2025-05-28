@@ -1,4 +1,4 @@
-function plot_EKF_error(full_times, t_orbit, error,save_path)
+function plot_EKF_error(full_times, t_orbit, error, covariance, save_path)
     num_orbits = full_times / t_orbit;
     figure;
     hold on;
@@ -6,7 +6,11 @@ function plot_EKF_error(full_times, t_orbit, error,save_path)
     for i = 1:6
         subplot(3,2,i);
         hold on;
-        plot(num_orbits, error(:,i), 'k:', 'LineWidth', 1.5, 'DisplayName', 'EKF Error');
+        plot(num_orbits, error(:,i), 'k', 'LineWidth', 1.5, 'DisplayName', 'EKF Error');
+        % Plot 1 sigma covariance bounds
+        sigma = sqrt(covariance(:,i, i));
+        fill([num_orbits; flipud(num_orbits)], [sigma; flipud(-sigma)], [0.7 0.85 1], ...
+            'EdgeColor', 'none', 'FaceAlpha', 0.5, 'DisplayName', '1\sigma Region');
         xlabel('Time [orbits]');
         ylabel(roe_labels(i));
         if i == 1
