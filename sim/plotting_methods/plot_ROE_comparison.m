@@ -61,7 +61,9 @@ function plot_ROE_comparison(t, t_orbit, ROE1, ROE2, ...
         xlabel('Number of orbits'); ylabel(labels{k});
         plot(time_orbits, ydata1{k}, 'b', 'LineWidth', lw);
         plot(time_orbits, ydata2{k}, 'r--', 'LineWidth', lw);
-        legend(label1, label2, 'Location', 'best');
+        if k==1
+            legend(label1, label2, 'Location', 'best');
+        end
     end
 
     %sgtitle(title_str3);
