@@ -129,9 +129,9 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV2_
     %estimate_sigma(2,2) = 1e2; 
     estimate_noise = sqrtm(estimate_sigma)*randn(6,1);
     x_EKF_SV3_all(1,:) = SV3_ROE_init; % + estimate_noise';
-    P_EKF_SV3_all(1,:,:) = estimate_sigma;
+    P_EKF_SV3_all(1,:,:) = 100*estimate_sigma;
     x_EKF_SV2_all(1,:) = SV2_ROE_init; % + estimate_noise';
-    P_EKF_SV2_all(1,:,:) = estimate_sigma;
+    P_EKF_SV2_all(1,:,:) = 100*estimate_sigma;
 
     x_update_EKF_SV2 = x_EKF_SV2_all(1,:)';
     P_update_EKF_SV2 = squeeze(P_EKF_SV2_all(1,:,:));
@@ -164,19 +164,20 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV2_
     y_pred_EKF_SV3_all(1,:) = y_actual_EKF_SV3_all(1,:);
 
     % Process and measurement noise covariances
-    Q = 0.1* estimate_sigma; % similar to P_0 but much smaller
+    Q = 10* estimate_sigma; % similar to P_0 but much smaller
     %Q(1,1) = 1e4;
     %Q(2,2) = 1e3;
     %Q(5,5) = 1e1;
     %Q(6,6) = 1e1;
 
     % R assumes there is less noise than there actually is.
-    R = blkdiag(RTN_sigma, ECI_sigma); % diagonal matrix with elements equal to the varianace of each measurement
+    R = 0.1 *blkdiag(RTN_sigma, ECI_sigma); % diagonal matrix with elements equal to the varianace of each measurement
 
     for i=2:n_steps
         t = full_times(i-1);
 
-        % Use GVE propagated for ground truth ECI positions
+        % Use GVE propagated for ground truth qns OE, then convert to
+        % ground truth ECI positions
         SV1_OE_state_inter = SV1_OE_state + (dt*secular_J2(t, SV1_OE_state))'; % propagate chief qns OE using GVE
         SV1_OE_state = wrap_QNSOE(SV1_OE_state_inter); % wraps u to be within 0-360
         SV2_OE_state_inter = SV2_OE_state + (dt*secular_J2(t, SV2_OE_state))'; % propagate SV2 qns OE using GVE (take out later)
