@@ -11,6 +11,9 @@ function plot_EKF_error(full_times, t_orbit, error, covariance, save_path)
         sigma = sqrt(covariance(:,i, i));
         fill([num_orbits; flipud(num_orbits)], [sigma; flipud(-sigma)], [0.7 0.85 1], ...
             'EdgeColor', [0.2 0.4 0.8], 'FaceAlpha', 0.5, 'DisplayName', '1\sigma Region');
+        % Plot 2 sigma covariance bounds (green, more transparent)
+        fill([num_orbits; flipud(num_orbits)], [2*sigma; flipud(-2*sigma)], [0.7 1 0.7], ...
+            'EdgeColor', [0.2 0.6 0.2], 'FaceAlpha', 0.3, 'DisplayName', '2\sigma Region');
         xlabel('Time [orbits]');
         ylabel(roe_labels(i));
         if i == 1
