@@ -137,7 +137,7 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV2_
     P_update_EKF_SV3 = squeeze(P_EKF_SV3_all(1,:,:));
 
     % Initial measurements and definition of noise for EKF
-    RTN_sigma = 0.0001 * eye(3); % 1 m noise in each direction .000001
+    RTN_sigma = 0.001 * eye(3); % 1 m noise in each direction .000001
     ECI_sigma = 0.01* eye(3); % 100 m noise in each direction .001 or 1
 
     [rho2, ~] = ECI2RTN_rel(SV1_state(1:3)', SV1_state(4:6)', SV2_state(1:3)', SV2_state(4:6)');

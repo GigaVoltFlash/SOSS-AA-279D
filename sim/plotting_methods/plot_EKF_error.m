@@ -7,10 +7,30 @@ function plot_EKF_error(full_times, t_orbit, error, covariance, save_path)
         subplot(3,2,i);
         hold on;
         plot(num_orbits, error(:,i), 'k', 'LineWidth', 1.5, 'DisplayName', 'EKF Error');
-        % Plot 1 sigma covariance bounds
-        sigma = sqrt(covariance(:,i, i));
-        fill([num_orbits; flipud(num_orbits)], [sigma; flipud(-sigma)], [0.7 0.85 1], ...
-            'EdgeColor', [0.2 0.4 0.8], 'FaceAlpha', 0.5, 'DisplayName', '1\sigma Region');
+        % Plot sigma covariance bounds
+
+        % std_1 = sqrt(covariance(:, k, k));
+        % std_2 = 2 * std_1;
+        % 
+        % % 2σ Region (purple)
+        % fill([time_orbits; flipud(time_orbits)], ...
+        %      [ROE2(:, k) + std_2; flipud(ROE2(:, k) - std_2)], ...
+        %      [0.85 0.75 1.0], ...      % light purple fill 
+        %      'FaceAlpha', 0.3, ...
+        %      'EdgeColor', 'none');
+        % 
+        % % 1σ Region (red)
+        % fill([time_orbits; flipud(time_orbits)], ...
+        %      [ROE2(:, k) + std_1; flipud(ROE2(:, k) - std_1)], ...
+        %      [1.0 0.6 0.6],'FaceAlpha', 0.4, ...
+        %      'EdgeColor', 'none');
+        std_1 = sqrt(covariance(:, i, i));
+        std_2 = 2 * std_1;
+        fill([num_orbits; flipud(num_orbits)], [std_2; flipud(-std_2)],[0.85 0.75 1.0], ...    
+             'FaceAlpha', 0.3,'EdgeColor', 'none', 'DisplayName', '2\sigma Region');
+
+        fill([num_orbits; flipud(num_orbits)], [std_1; flipud(-std_1)], [1.0 0.6 0.6],'FaceAlpha', 0.4, ...
+             'EdgeColor', 'none', 'DisplayName', '1\sigma Region');
         xlabel('Time [orbits]');
         ylabel(roe_labels(i));
         if i == 1
