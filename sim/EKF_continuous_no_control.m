@@ -327,4 +327,34 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV2_
     plot_EKF_error(full_times, t_orbit, EKF_error_SV3, P_EKF_SV3_all, 'figures/PS8/EKF_error_SV3.png');
     
     plot_EKF_residuals(full_times, t_orbit, pre_fit_residual_SV3, post_fit_residual_SV3, noise_SV3_all, 'figures/PS8/residuals_SV3.png');
+
+    final_EKF_mean_err_SV2 = EKF_error_SV2(end, :);
+    final_EKF_mean_err_SV3 = EKF_error_SV3(end, :);
+    final_EKF_std_err_SV2 = sqrt(diag(squeeze(P_EKF_SV2_all(end, :, :))));
+    final_EKF_std_err_SV3 = sqrt(diag(squeeze(P_EKF_SV3_all(end, :, :))));
+    disp('Final EKF Mean Error SV2:');
+    disp(final_EKF_mean_err_SV2);
+    disp('Final EKF Std Error SV2:');
+    disp(final_EKF_std_err_SV2);
+
+    disp('Final EKF Mean Error SV3:');
+    disp(final_EKF_mean_err_SV3);
+    disp('Final EKF Std Error SV3:');
+    disp(final_EKF_std_err_SV3);
+
+    % Print as LaTeX matrices (3 decimal places)
+    fprintf('Final EKF Mean Error SV2 (LaTeX):\n');
+    fprintf('\\begin{bmatrix} %s \\end{bmatrix}\n', ...
+        strjoin(arrayfun(@(x) sprintf('%.3f', x), final_EKF_mean_err_SV2, 'UniformOutput', false), ' \\\\ '));
+    fprintf('Final EKF Std Error SV2 (LaTeX):\n');
+    fprintf('\\begin{bmatrix} %s \\end{bmatrix}\n', ...
+        strjoin(arrayfun(@(x) sprintf('%.3f', x), final_EKF_std_err_SV2, 'UniformOutput', false), ' \\\\ '));
+
+    fprintf('Final EKF Mean Error SV3 (LaTeX):\n');
+    fprintf('\\begin{bmatrix} %s \\end{bmatrix}\n', ...
+        strjoin(arrayfun(@(x) sprintf('%.3f', x), final_EKF_mean_err_SV3, 'UniformOutput', false), ' \\\\ '));
+    fprintf('Final EKF Std Error SV3 (LaTeX):\n');
+    fprintf('\\begin{bmatrix} %s \\end{bmatrix}\n', ...
+        strjoin(arrayfun(@(x) sprintf('%.3f', x), final_EKF_std_err_SV3, 'UniformOutput', false), ' \\\\ '));
+    
 end
