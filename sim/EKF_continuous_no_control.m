@@ -130,7 +130,7 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV2_
     P_EKF_SV3_all(1,:,:) = 100*estimate_sigma;
     x_EKF_SV2_all(1,:) = SV2_ROE_init + 10*estimate_noise';
     P_EKF_SV2_all(1,:,:) = 100*estimate_sigma;
-
+    
     x_update_EKF_SV2 = x_EKF_SV2_all(1,:)';
     P_update_EKF_SV2 = squeeze(P_EKF_SV2_all(1,:,:));
     x_update_EKF_SV3 = x_EKF_SV3_all(1,:)';
