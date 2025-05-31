@@ -32,11 +32,17 @@ To generate these measurements, we first take our true ECI and RTN positions of 
  \end{bmatrix}\right) km
 \end{align}
 
-Note that this noise is in kilometers, since the ECI and RTN values are in kilometers. Therefore, we set up our noise to have a variance $\sigma^2 = 1 m$
+Note that this noise is in kilometers, since the ECI and RTN values are in kilometers. Therefore, we set up our noise to have a variance $\sigma^2 = 1 m$ in the RTN measurements, and a variance of $\sigma^2 = 100 m$ in the ECI positions. 
 
 \subsection{Initializing Estimate Mean and Covariance}
 
-We initialize the initial mean $\mu_0$ and the initial covariance $\Sigma_0$ in the following manner...
+We initialize the initial mean $\mu_0$ and the initial covariance $\Sigma_0$ by taking our true initial condition and adding an offset that is randomly generated based on a scaled-up version of our true noise.
+
+The initial mean, is given by 
+\begin{align}
+    \mu_0 = x_0 + x_{offset} \\
+    x_{offset} =  
+\end{align}
 
 \subsection{EKF Implementation and Choice of Q and R}
 
@@ -48,21 +54,16 @@ Q and R chosen to be the following values.
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}[t]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{sim/figures/PS8/ROE_over_time_SV2_comparison.png}
-        \caption{Ground Truth and EKF estimates for SV2 over time.}
-        \label{fig:sv2_ekf_estimates}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[t]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{sim/figures/PS8/ROE_over_time_SV2_comparison_zoomed.png}
-        \caption{Zoomed-in view over the first orbit showing convergence.}
-        \label{fig:sv2_ekf_estimates_zoom}
-    \end{subfigure}
-    \caption{EKF estimation results for SV2.}
-    \label{fig:sv2_ekf_combined}
+    \includegraphics[width=0.8\linewidth]{sim/figures/PS8/ROE_over_time_SV2_comparison.png}
+    \caption{Ground truth and EKF estimates for SV2 over time.}
+    \label{fig:sv2_ekf_estimates}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{sim/figures/PS8/ROE_over_time_SV2_comparison_zoomed.png}
+    \caption{Zoomed-in view over the first orbit showing convergence.}
+    \label{fig:sv2_ekf_estimates_zoom}
 \end{figure}
 
 \begin{figure}[H]
