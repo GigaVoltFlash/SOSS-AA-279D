@@ -21,7 +21,8 @@ run_PS4 = false;
 run_PS5 = false;
 run_PS6 = false; 
 run_PS7 = false;
-run_PS8 = true;
+run_PS8 = false;
+run_PS9 = true;
 
 % Load SV1 information
 load_SV1;
@@ -57,8 +58,9 @@ end
 if run_PS8
     ps8_sims;
 end
-
-
+if run_PS9
+    ps9_sims;
+end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLOTTING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
