@@ -48,10 +48,10 @@ function plot_EKF_error(full_times, t_orbit, error, covariance, save_path)
     saveas(fig, save_path);
 
     % Save zoomed-in version (first orbit)
-    for i = 1:6
-        nexttile(i);
-        xlim([0, 1]);
-    end
-    zoomed_fig_path = strrep(save_path, '.png', '_zoomed.png');
-    saveas(fig, zoomed_fig_path);
+    % for i = 1:6
+    %     nexttile(i);
+    %     xlim([0, 1]);
+    % end
+    % zoomed_fig_path = strrep(save_path, '.png', '_zoomed.png');
+    % saveas(fig, zoomed_fig_path);
 end

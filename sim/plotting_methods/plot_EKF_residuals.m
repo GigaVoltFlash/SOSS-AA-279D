@@ -24,7 +24,7 @@ function plot_EKF_residuals(full_times, t_orbit, pre_fit, post_fit, noise, save_
 
         xlabel(ax, 'Time [orbits]');
         ylabel(ax, roe_labels{i});
-        xlim(ax, [0, 1]);
+        %xlim(ax, [0, 1]);
 
         % Store legend handles only on first tile
         if i == 1

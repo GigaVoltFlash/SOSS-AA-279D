@@ -28,9 +28,10 @@ run_PS9 = true;
 load_SV1;
 
 %%% PROPAGATION TIME DETAILS %%%
+num_orbits = 30; 
 tstart = 0; % Start time (s)
 t_orbit = 2*pi*sqrt(a_SV1_init^3/mu_earth);
-tend = 10*t_orbit; % End time (s)
+tend = num_orbits*t_orbit; % End time (s)
 tint = t_orbit/500.0; % Time step (s)
 
 % Choose which simulations to run

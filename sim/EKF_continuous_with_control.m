@@ -1,14 +1,35 @@
-function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init,t_orbit, t_series)
+function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV2_modes, SV3_modes, num_orbits_modes, num_orbits_station_keep, num_orbits_total, t_orbit, t_series)
     % Inputs: mean OE, mean ROEs, times
 
+    % Factors for Lyaponuv feedback gain matrix  
+    N = 14;
+    k = 1000;
+
+    % Initialize times
     full_times = t_series(:);
     dt = full_times(2) - full_times(1);
     n_steps = length(full_times);
+    switch_times = t_orbit*cumsum(reshape([num_orbits_modes; num_orbits_station_keep], 8, 1));
+
+    % Nominal ROE for particular modes
+    a_chief = SV1_OE_init(1);
+    SV2_roe_nom = SV2_modes(1, :)/a_chief;
+    SV3_roe_nom_mode1 = SV3_modes(1, :)/a_chief;
+    SV3_roe_nom_mode2 = SV3_modes(2, :)/a_chief;
+    SV3_roe_nom_mode3 = SV3_modes(3, :)/a_chief;
+    SV3_roe_nom_mode4 = SV3_modes(4, :)/a_chief;
+    SV3_roe_nom = SV3_roe_nom_mode1;
 
     % Initialize with same size as full time vector
     state_SV1_all = zeros(length(t_series), 6);
     state_SV2_all = zeros(length(t_series), 6);
     state_SV3_all = zeros(length(t_series), 6);
+
+    % Initialize delta-v and acceleration storage
+    SV2_dv_vals = zeros(length(t_series), 3);
+    SV3_dv_vals = zeros(length(t_series), 3);
+    SV2_a_vals = zeros(length(t_series), 3);
+    SV3_a_vals = zeros(length(t_series), 3);
     
     % EKF Values
     x_EKF_SV2_all = zeros(length(t_series), 6);
@@ -134,53 +155,79 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init,t_o
     for i=2:n_steps
         t = full_times(i-1);
 
+        %%% PROPAGATE GROUND TRUTH
         % Use GVE propagated for ground truth qns OE, then convert to
         % ground truth ECI positions
         SV1_OE_state_inter = SV1_OE_state + (dt*secular_J2(t, SV1_OE_state))'; % propagate chief qns OE using GVE
         SV1_OE_state = wrap_QNSOE(SV1_OE_state_inter); % wraps u to be within 0-360
         SV2_OE_state_inter = SV2_OE_state + (dt*secular_J2(t, SV2_OE_state))'; % propagate SV2 qns OE using GVE (take out later)
-        SV2_OE_state = wrap_QNSOE(SV2_OE_state_inter);
+        SV2_OE_state_pre_ctrl = wrap_QNSOE(SV2_OE_state_inter);
         SV3_OE_state_inter = SV3_OE_state + (dt*secular_J2(t, SV3_OE_state))'; % propagate SV3 qns OE using GVE (take out later)
-        SV3_OE_state = wrap_QNSOE(SV3_OE_state_inter);
+        SV3_OE_state_pre_ctrl = wrap_QNSOE(SV3_OE_state_inter);
 
-        % APPLY CONTROL HERE to OE
+        %%% APPLY CONTROL
+        [SV1_state_pre_ctrl, SV2_state_pre_ctrl, SV3_state_pre_ctrl] = ...
+          chief_deputy_OEs_qns2ECIs(SV1_OE_state, SV2_OE_state_pre_ctrl, SV3_OE_state_pre_ctrl);
         
-        a_o = SV1_OE_state(1);
-        e_x_o = SV1_OE_state(2);
-        e_y_o = SV1_OE_state(3);
-        i_o = SV1_OE_state(4);
-        RAAN_o = SV1_OE_state(5);
-        u_o = SV1_OE_state(6);
+        % Convert current states to ROE
+        [d_a_SV2, d_lambda_SV2, d_e_x_SV2, d_e_y_SV2, d_i_x_SV2, d_i_y_SV2] = ...
+            ECI2ROE_array_mean(SV1_state_pre_ctrl(1:3), SV1_state_pre_ctrl(4:6), SV2_state_pre_ctrl(1:3), SV2_state_pre_ctrl(4:6), true);
+        [d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3] = ...
+            ECI2ROE_array_mean(SV1_state_pre_ctrl(1:3), SV1_state_pre_ctrl(4:6), SV3_state_pre_ctrl(1:3), SV3_state_pre_ctrl(4:6), true);
 
-        a_2 = SV2_OE_state(1);
-        e_x_2 = SV2_OE_state(2);
-        e_y_2 = SV2_OE_state(3);
-        i_2 = SV2_OE_state(4);
-        RAAN_2 = SV2_OE_state(5);
-        u_2 = SV2_OE_state(6);
+        [a,e,inc,RAAN,omega,nu,M] = ECI2OE(SV1_state(1:3), SV1_state(4:6));
+        SV1_oe = [a,e,inc,RAAN,omega,nu,M];
+        SV2_roe = [d_a_SV2, d_lambda_SV2, d_e_x_SV2, d_e_y_SV2, d_i_x_SV2, d_i_y_SV2]/a_chief;
+        SV3_roe = [d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3]/a_chief;
 
-        a_3 = SV3_OE_state(1);
-        e_x_3 = SV3_OE_state(2);
-        e_y_3 = SV3_OE_state(3);
-        i_3 = SV3_OE_state(4);
-        RAAN_3 = SV3_OE_state(5);
-        u_3 = SV3_OE_state(6);
+        % SV2 control inputs are always determined the same way
+        %SV2_a_vals(i, :) = station_keeping_continuous(SV2_roe, SV2_roe_nom, SV2_delta_de_max, SV2_delta_di_max, SV1_oe, N, k, 1/t_orbit*switch_times(end));
+        SV2_a_vals(i,:) = Lyapunov_feedback_control(SV2_roe, SV2_roe_nom, SV1_oe, N, k, num_orbits_total);
 
-        [a_o,e_o,i_o,RAAN_o,w_o,nu_o, ~] = quasi_nonsing2OE(a_o, e_x_o, e_y_o, i_o, RAAN_o, u_o); 
-        [r_ECI_SV1,v_ECI_SV1] = OE2ECI(a_o,e_o,i_o,RAAN_o,w_o,nu_o);
-        [a_2,e_2,i_2,RAAN_2,w_2,nu_2, ~] = quasi_nonsing2OE(a_2, e_x_2, e_y_2, i_2, RAAN_2, u_2); 
-        [r_ECI_SV2,v_ECI_SV2] = OE2ECI(a_2,e_2,i_2,RAAN_2,w_2,nu_2);
-        [a_3,e_3,i_3,RAAN_3,w_3,nu_3, ~] = quasi_nonsing2OE(a_3, e_x_3, e_y_3, i_3, RAAN_3, u_3); 
-        [r_ECI_SV3,v_ECI_SV3] = OE2ECI(a_3,e_3,i_3,RAAN_3,w_3,nu_3);
+        % This is primarily for SV3, SV2 just continuously station keeps     
+        if t < switch_times(1)
+            % do nothing, already at initial situation
+        elseif t < switch_times(3) && t > switch_times(2)
+            SV3_roe_nom = SV3_roe_nom_mode2; % Switches it for maneuver and station keeping
+            SV3_a_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, N, k, num_orbits_modes(2));
+        elseif t < switch_times(5) && t > switch_times(4)
+            SV3_roe_nom = SV3_roe_nom_mode3; % Switches it for maneuver and station keeping
+            SV3_a_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, N, k, num_orbits_modes(2));
+        elseif t < switch_times(7) && t > switch_times(6)
+            SV3_roe_nom = SV3_roe_nom_mode4; % Switches it for maneuver and station keeping
+            SV3_a_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, N, k, num_orbits_modes(2));
+        else
+            % Run station keeping 
+            % SV3_a_vals(i, :) = station_keeping_continuous(SV3_roe, SV3_roe_nom, SV3_delta_de_max, SV3_delta_di_max, SV1_oe, N, k);
+            SV3_a_vals(i, :) = Lyapunov_feedback_control(SV3_roe, SV3_roe_nom, SV1_oe, N, k, num_orbits_station_keep(2)); 
+            % SV3_a_vals(i, :) = [0, 0, 0];
+        end
 
-        SV3_state = [r_ECI_SV3', v_ECI_SV3']';
-        SV2_state = [r_ECI_SV2', v_ECI_SV2']';
-        SV1_state = [r_ECI_SV1', v_ECI_SV1']';
+        % Apply acceleration as delta-v
+        % Convert a_RTN to dv_RTN by multiplying by dt
+        SV2_dv_vals(i,:) = dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), dt*SV2_a_vals(i, :)'/1e3); % m/s^2 --> m/s --> km/s
+        SV3_dv_vals(i,:) = dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), dt*SV3_a_vals(i, :)'/1e3); % m/s^2 --> m/s --> km/s
 
+        SV2_state_post_ctrl = SV2_state_pre_ctrl;
+        SV3_state_post_ctrl = SV3_state_pre_ctrl;
+
+        SV2_state_post_ctrl(4:6) = SV2_state_pre_ctrl(4:6) + SV2_dv_vals(i,:);
+        SV3_state_post_ctrl(4:6) = SV3_state_pre_ctrl(4:6) + SV3_dv_vals(i,:);
+
+        % Convert back to OE from post-control ECI
+        SV2_OE_state = ECI2quasi_nonsing(SV2_state_post_ctrl);
+        SV3_OE_state = ECI2quasi_nonsing(SV3_state_post_ctrl);
+     
+        % Get final ECI state of chief and deputy after control is applied
+        [SV1_state, SV2_state, SV3_state, ...
+          r_ECI_SV1, v_ECI_SV1, r_ECI_SV2, v_ECI_SV2, r_ECI_SV3, v_ECI_SV3] = ...
+          chief_deputy_OEs_qns2ECIs(SV1_OE_state, SV2_OE_state, SV3_OE_state);
+
+        %%% GENERATE MEASUREMENTS
         % EKF Generate Measurements
         [rho2, ~] = ECI2RTN_rel(r_ECI_SV1', v_ECI_SV1', r_ECI_SV2', v_ECI_SV2');
         SV2_RTN_pos = rho2';
-        SV2_ECI_pos = SV2_state(1:3);
+        SV2_ECI_pos = SV2_state(1:3)';
         RTN_noise = sqrtm(RTN_sigma)*randn(3,1); % use sigma value defined above
         ECI_noise = sqrtm(ECI_sigma)*randn(3,1);
         SV2_RTN_measurement = SV2_RTN_pos + RTN_noise;
@@ -190,7 +237,7 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init,t_o
 
         [rho3, ~] = ECI2RTN_rel(r_ECI_SV1', v_ECI_SV1', r_ECI_SV3', v_ECI_SV3');
         SV3_RTN_pos = rho3';
-        SV3_ECI_pos = SV3_state(1:3);
+        SV3_ECI_pos = SV3_state(1:3)';
         RTN_noise = sqrtm(RTN_sigma)*randn(3,1); % use sigma value defined above
         ECI_noise = sqrtm(ECI_sigma)*randn(3,1);
         SV3_RTN_measurement = SV3_RTN_pos + RTN_noise;
@@ -198,11 +245,15 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init,t_o
         noise_vector_SV3 = [RTN_noise;ECI_noise];
         y_actual_EKF_SV3 = [SV3_RTN_measurement;SV3_ECI_measurement];
         
-        % Run KF for SV2
-        [x_update_EKF_SV2, P_update_EKF_SV2, y_pred_EKF_SV2, y_post_EKF_SV2] = ekf_roes_with_control(x_update_EKF_SV2, y_actual_EKF_SV2, P_update_EKF_SV2, SV1_state, SV1_OE_state, Q, R, dt, u);
+        %%% RUN EKF
+        u_SV2 = SV2_a_vals(i,:);
+        u_SV3 = SV3_a_vals(i,:);
 
-        % Run KF for SV3
-        [x_update_EKF_SV3, P_update_EKF_SV3, y_pred_EKF_SV3, y_post_EKF_SV3] = ekf_roes_with_control(x_update_EKF_SV3, y_actual_EKF_SV3, P_update_EKF_SV3, SV1_state, SV1_OE_state, Q, R, dt, u);
+        % Run EKF for SV2
+        [x_update_EKF_SV2, P_update_EKF_SV2, y_pred_EKF_SV2, y_post_EKF_SV2] = ekf_roes_with_control(x_update_EKF_SV2, y_actual_EKF_SV2, P_update_EKF_SV2, SV1_state, SV1_OE_state, Q, R, dt, u_SV2);
+
+        % Run EKF for SV3
+        [x_update_EKF_SV3, P_update_EKF_SV3, y_pred_EKF_SV3, y_post_EKF_SV3] = ekf_roes_with_control(x_update_EKF_SV3, y_actual_EKF_SV3, P_update_EKF_SV3, SV1_state, SV1_OE_state, Q, R, dt, u_SV3);
         
         % Save states to buffer
         state_SV3_all(i, :) = SV3_state';

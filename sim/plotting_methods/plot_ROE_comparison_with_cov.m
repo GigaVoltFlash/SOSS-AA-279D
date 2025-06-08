@@ -65,10 +65,10 @@ function plot_ROE_comparison_with_cov(t, t_orbit, ROE1, ROE2, covariance, ...
     saveas(fig, fig_path3);
 
     % === Save Zoomed-In Version ===
-    for k = 1:6
-        nexttile(k);
-        xlim([0, 1]);
-    end
-    zoomed_fig_path = strrep(fig_path3, '.png', '_zoomed.png');
-    saveas(fig, zoomed_fig_path);
+    % for k = 1:6
+    %     nexttile(k);
+    %     xlim([0, 1]);
+    % end
+    % zoomed_fig_path = strrep(fig_path3, '.png', '_zoomed.png');
+    % saveas(fig, zoomed_fig_path);
 end
