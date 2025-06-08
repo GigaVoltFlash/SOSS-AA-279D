@@ -1,7 +1,7 @@
 function [SV1_state, SV2_state, SV3_state, ...
           r_ECI_SV1, v_ECI_SV1, r_ECI_SV2, v_ECI_SV2, r_ECI_SV3, v_ECI_SV3] = ...
           chief_deputy_OEs_qns2ECIs(SV1_OE_state, SV2_OE_state, SV3_OE_state)
-% CHIEF_DEPUTY_OES_QNS2ECIS Converts chief and deputy QNS orbital elements to ECI states
+% CHIEF_DEPUTY_OES_QNS2ECIS Converts chief and deputy MEAN QNS orbital elements to ECI states
 %
 % Inputs:
 %   SV1_OE_state - 1x6 vector [a [km], ex, ey, i [deg], RAAN [deg], u [deg]] chief

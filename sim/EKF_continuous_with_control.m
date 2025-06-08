@@ -1,9 +1,17 @@
 function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV2_modes, SV3_modes, num_orbits_modes, num_orbits_station_keep, num_orbits_total, t_orbit, t_series)
     % Inputs: mean OE, mean ROEs, times
 
+    a_chief = SV1_OE_init(1);
+
     % Factors for Lyaponuv feedback gain matrix  
     N = 14;
     k = 1000;
+
+    % Station-keeping parameters
+    SV2_delta_di_max = 0.5/a_chief;
+    SV3_delta_di_max = 0.5/a_chief;
+    SV2_delta_de_max = 0.5/a_chief;
+    SV3_delta_de_max = 0.5/a_chief;
 
     % Initialize times
     full_times = t_series(:);
@@ -12,7 +20,7 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
     switch_times = t_orbit*cumsum(reshape([num_orbits_modes; num_orbits_station_keep], 8, 1));
 
     % Nominal ROE for particular modes
-    a_chief = SV1_OE_init(1);
+    
     SV2_roe_nom = SV2_modes(1, :)/a_chief;
     SV3_roe_nom_mode1 = SV3_modes(1, :)/a_chief;
     SV3_roe_nom_mode2 = SV3_modes(2, :)/a_chief;
@@ -148,7 +156,7 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
 
     % Process and measurement noise covariances
     % Q = 0.1*estimate_sigma; % similar to P_0 but much smaller
-    Q = 1e-3*diag([1, 1, 1, 1, 0.01, 0.01]);
+    Q = 1e-3*diag([1, 1, 1, 1, 1, 1]); % 0.01, 0.01
 
     R = 1.0*blkdiag(RTN_sigma, ECI_sigma);  % diagonal matrix with elements equal to the varianace of each measurement
 
@@ -156,7 +164,7 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
         t = full_times(i-1);
 
         %%% PROPAGATE GROUND TRUTH
-        % Use GVE propagated for ground truth qns OE, then convert to
+        % Use GVE propagated for ground truth qns mean OE, then convert to
         % ground truth ECI positions
         SV1_OE_state_inter = SV1_OE_state + (dt*secular_J2(t, SV1_OE_state))'; % propagate chief qns OE using GVE
         SV1_OE_state = wrap_QNSOE(SV1_OE_state_inter); % wraps u to be within 0-360
@@ -166,17 +174,24 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
         SV3_OE_state_pre_ctrl = wrap_QNSOE(SV3_OE_state_inter);
 
         %%% APPLY CONTROL
-        [SV1_state_pre_ctrl, SV2_state_pre_ctrl, SV3_state_pre_ctrl] = ...
+        % Convert mean OE to ECI
+        [SV1_state_pre_ctrl, SV2_state_pre_ctrl, SV3_state_pre_ctrl, ...
+          r_ECI_SV1_pre_ctrl, v_ECI_SV1_pre_ctrl, r_ECI_SV2_pre_ctrl, v_ECI_SV2_pre_ctrl, r_ECI_SV3_pre_ctrl, v_ECI_SV3_pre_ctrl] = ...
           chief_deputy_OEs_qns2ECIs(SV1_OE_state, SV2_OE_state_pre_ctrl, SV3_OE_state_pre_ctrl);
         
         % Convert current states to ROE
         [d_a_SV2, d_lambda_SV2, d_e_x_SV2, d_e_y_SV2, d_i_x_SV2, d_i_y_SV2] = ...
-            ECI2ROE_array_mean(SV1_state_pre_ctrl(1:3), SV1_state_pre_ctrl(4:6), SV2_state_pre_ctrl(1:3), SV2_state_pre_ctrl(4:6), true);
+            ECI2ROE_array_mean(r_ECI_SV1_pre_ctrl', v_ECI_SV1_pre_ctrl', r_ECI_SV2_pre_ctrl', v_ECI_SV2_pre_ctrl', true);
         [d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3] = ...
-            ECI2ROE_array_mean(SV1_state_pre_ctrl(1:3), SV1_state_pre_ctrl(4:6), SV3_state_pre_ctrl(1:3), SV3_state_pre_ctrl(4:6), true);
+            ECI2ROE_array_mean(r_ECI_SV1_pre_ctrl', v_ECI_SV1_pre_ctrl', r_ECI_SV3_pre_ctrl', v_ECI_SV3_pre_ctrl', true);
 
-        [a,e,inc,RAAN,omega,nu,M] = ECI2OE(SV1_state(1:3), SV1_state(4:6));
-        SV1_oe = [a,e,inc,RAAN,omega,nu,M];
+        % [a,e,inc,RAAN,omega,nu,M] = ECI2OE(SV1_state(1:3), SV1_state(4:6));
+        % SV1_oe = [a,e,inc,RAAN,omega,nu,M];
+
+        % Get absolute singular chief elements from current qns
+        [a_SV1,e_SV1,inc_SV1,RAAN_SV1,w_SV1,nu_SV1, M_deg_SV1] = quasi_nonsing2OE(SV1_OE_state(1), SV1_OE_state(2), SV1_OE_state(3), SV1_OE_state(4), SV1_OE_state(5), SV1_OE_state(6));
+        SV1_oe = [a_SV1,e_SV1,inc_SV1,RAAN_SV1,w_SV1,nu_SV1,M_deg_SV1];
+
         SV2_roe = [d_a_SV2, d_lambda_SV2, d_e_x_SV2, d_e_y_SV2, d_i_x_SV2, d_i_y_SV2]/a_chief;
         SV3_roe = [d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3]/a_chief;
 
@@ -205,8 +220,11 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
 
         % Apply acceleration as delta-v
         % Convert a_RTN to dv_RTN by multiplying by dt
-        SV2_dv_vals(i,:) = dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), dt*SV2_a_vals(i, :)'/1e3); % m/s^2 --> m/s --> km/s
-        SV3_dv_vals(i,:) = dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), dt*SV3_a_vals(i, :)'/1e3); % m/s^2 --> m/s --> km/s
+        SV2_dv_RTN_val = dt*SV2_a_vals(i, :)'; % m/s^2 --> m/s 
+        SV3_dv_RTN_val = dt*SV3_a_vals(i, :)'; % m/s^2 --> m/s
+
+        SV2_dv_vals(i,:) = dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), SV2_dv_RTN_val/1e3); % m/s --> km/s
+        SV3_dv_vals(i,:) = dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), SV3_dv_RTN_val/1e3); % m/s --> km/s
 
         SV2_state_post_ctrl = SV2_state_pre_ctrl;
         SV3_state_post_ctrl = SV3_state_pre_ctrl;
@@ -214,9 +232,13 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
         SV2_state_post_ctrl(4:6) = SV2_state_pre_ctrl(4:6) + SV2_dv_vals(i,:);
         SV3_state_post_ctrl(4:6) = SV3_state_pre_ctrl(4:6) + SV3_dv_vals(i,:);
 
-        % Convert back to OE from post-control ECI
-        SV2_OE_state = ECI2quasi_nonsing(SV2_state_post_ctrl);
-        SV3_OE_state = ECI2quasi_nonsing(SV3_state_post_ctrl);
+        % Convert back to osculating OE from post-control ECI
+        SV2_OE_state_osc = ECI2quasi_nonsing(SV2_state_post_ctrl);
+        SV3_OE_state_osc = ECI2quasi_nonsing(SV3_state_post_ctrl);
+
+        % Convert osculating OE back to mean OE for propagation
+        SV2_OE_state = qns_osc2qns_mean(SV2_OE_state_osc);
+        SV3_OE_state = qns_osc2qns_mean(SV3_OE_state_osc);
      
         % Get final ECI state of chief and deputy after control is applied
         [SV1_state, SV2_state, SV3_state, ...
@@ -246,8 +268,8 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
         y_actual_EKF_SV3 = [SV3_RTN_measurement;SV3_ECI_measurement];
         
         %%% RUN EKF
-        u_SV2 = SV2_a_vals(i,:);
-        u_SV3 = SV3_a_vals(i,:);
+        u_SV2 = SV2_dv_RTN_val; % or a vals?
+        u_SV3 = SV3_dv_RTN_val; % or a vals?
 
         % Run EKF for SV2
         [x_update_EKF_SV2, P_update_EKF_SV2, y_pred_EKF_SV2, y_post_EKF_SV2] = ekf_roes_with_control(x_update_EKF_SV2, y_actual_EKF_SV2, P_update_EKF_SV2, SV1_state, SV1_OE_state, Q, R, dt, u_SV2);

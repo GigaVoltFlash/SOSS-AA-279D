@@ -15,7 +15,7 @@ function [x_update, P_update, y_pred, y_post] = ekf_roes_with_control(x_prior, y
 
     [STM_big,~] = roe_stm_j2(dt, x_prior', SV1_OE_sing);
     STM_curr = squeeze(STM_big);
-    x_bar = STM_curr*x_prior + B*u';
+    x_bar = STM_curr*x_prior + a_o*(B*u); % x is in scaled ROEs, B gives unscaled
 
     % EKF Covariance Prediction
     P_bar = STM_curr * P_prior * STM_curr' + Q;
