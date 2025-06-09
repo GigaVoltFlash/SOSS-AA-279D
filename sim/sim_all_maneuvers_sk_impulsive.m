@@ -1,4 +1,4 @@
-function sim_all_maneuvers_station_keeping(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_station_keep, SV1_OE_init, SV2_state_init, SV3_state_init, ...
+function sim_all_maneuvers_sk_impulsive(SV2_modes, SV3_modes, num_orbits_modes, num_orbits_station_keep, SV1_OE_init, SV2_state_init, SV3_state_init, ...
                                      SV1_state_init, t_orbit, t_series, fig_path, title_str)
     full_times = t_series(:);
     a_chief = SV1_OE_init(1);
@@ -18,10 +18,10 @@ function sim_all_maneuvers_station_keeping(SV2_modes, SV3_modes, num_orbits_mode
     SV3_roe_nom_mode4 = SV3_modes(4, :)/a_chief;
 
     % Maybe pick these differently later
-    SV2_delta_di_max = 0.5/a_chief;
-    SV3_delta_di_max = 0.5/a_chief;
-    SV2_delta_de_max = 0.5/a_chief;
-    SV3_delta_de_max = 0.5/a_chief;
+    SV2_delta_di_max = 20.0/a_chief;
+    SV3_delta_di_max = 3.0/a_chief;
+    SV2_delta_de_max = 20.0/a_chief;
+    SV3_delta_de_max = 3.0/a_chief;
 
     SV2_dphi = asin(SV2_delta_de_max/norm(SV2_roe_nom(3:4)));
     SV2_de_des = [SV2_roe_nom(3)*cos(SV2_dphi) - SV2_roe_nom(4)*sin(SV2_dphi);...
@@ -250,14 +250,23 @@ function sim_all_maneuvers_station_keeping(SV2_modes, SV3_modes, num_orbits_mode
             SV2_dv_times(SV2_time_match) = [];
         end
         
-        SV3_time_match = find(SV3_dv_times == i, 1);
+        SV3_time_match = find(SV3_dv_times == i);
         if ~isempty(SV3_time_match)
-            SV3_state(4:6) = SV3_state(4:6) + dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), SV3_dv_vals(SV3_time_match, :)'/1e3);
-            SV3_dv_vals_complete = [SV3_dv_vals_complete; SV3_dv_vals(SV3_time_match, :)];
-            SV3_dv_times_complete = [SV3_dv_times_complete, SV3_dv_times(SV3_time_match)];
-            SV3_dv_vals(SV3_time_match, :) = [];
-            SV3_dv_times(SV3_time_match) = [];
+            for idx = fliplr(SV3_time_match)  % Use fliplr to avoid indexing issues when deleting
+                SV3_state(4:6) = SV3_state(4:6) + dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), SV3_dv_vals(idx, :)'/1e3);
+                SV3_dv_vals_complete = [SV3_dv_vals_complete; SV3_dv_vals(idx, :)];
+                SV3_dv_times_complete = [SV3_dv_times_complete, SV3_dv_times(idx)];
+                SV3_dv_vals(idx, :) = [];
+                SV3_dv_times(idx) = [];
+            end
         end
+        % if ~isempty(SV3_time_match)
+        %     SV3_state(4:6) = SV3_state(4:6) + dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), SV3_dv_vals(SV3_time_match, :)'/1e3);
+        %     SV3_dv_vals_complete = [SV3_dv_vals_complete; SV3_dv_vals(SV3_time_match, :)];
+        %     SV3_dv_times_complete = [SV3_dv_times_complete, SV3_dv_times(SV3_time_match)];
+        %     SV3_dv_vals(SV3_time_match, :) = [];
+        %     SV3_dv_times(SV3_time_match) = [];
+        % end
 
     end
 

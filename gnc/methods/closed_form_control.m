@@ -4,6 +4,7 @@
 
 % This file has the implementation of a closed-form control solution, that is used extensively in the proximity
 % operations and potentially in the approach calculations.
+% ANSHUK CODED VERSION. SEE PROVIDED METHOD INSTEAD.
 
 function [delta_v_vals, delta_v_times] = closed_form_control(roe_initial, roe_final, SV1_oe_init, t0, tf)
     % Some relevant parameters that are useful
@@ -19,19 +20,19 @@ function [delta_v_vals, delta_v_times] = closed_form_control(roe_initial, roe_fi
     Q = 5*(cos(i))^2 - 1;
     n = sqrt(mu_earth/a^3);
     omega_dot = kappa * Q;
-    delta_M = n*(tf-t0);
     
     % Step 1. Identify dominant case 
-    roe_diff = roe_final - roe_initial;
+    STM_from_init = calc_STM_for_control(t0, t_final, SV1_oe_init);
+    no_control_roe_final = STM_from_init * roe_init';
+    roe_diff = roe_final - no_control_roe_final;
     d_delta_a = roe_diff(1);
     d_delta_lambda = roe_diff(2);
     d_delta_e = roe_diff(3:4);
     d_delta_i = roe_diff(5:6);
 
     a_dv_min = abs(a*d_delta_a)*n/2; % From Table 5.13 in Chernick
-    %m = -2*abs(d_delta_a0)/abs(d_delta_lambda0);
-    %lambda_dv_min = n*a*abs((m*d_delta_lambda - d_delta_a)/(d_delta_a0)); % What's delta M here?
-    lambda_dv_min = n*a*abs(d_delta_lambda)/(3*delta_M);
+    m = -2*abs(d_delta_a0)/abs(d_delta_lambda0);
+    lambda_dv_min = n*a*abs((m*d_delta_lambda - d_delta_a)/(d_delta_a0)); % What's delta M here?
     ecc_dv_min = norm(a*d_delta_e)*n/2;
     i_dv_min = norm(a*d_delta_i)*n; % Do this separately but calculate it in case we need a cross-track burn
 
@@ -97,7 +98,6 @@ function [delta_v_vals, delta_v_times] = closed_form_control(roe_initial, roe_fi
         end
 
         delta_v_vals = dv_vec(good_combo, :) .* good_c(:);% TODO: Make sure this is multiplying correctly
-        % from slides: good_c * dv_vec?
         delta_v_times = T_opt_vals(good_combo);
 
     elseif d_lb_case==2
