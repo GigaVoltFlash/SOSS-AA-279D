@@ -40,7 +40,7 @@ function plot_RT_RN_projections(SV2_rel_pos, SV3_rel_pos, title_string,fig_path)
     legend('SV2 / Watcher', 'SV3 / Docker', 'SV1 / Chief');
     % legend('SV2 / Watcher', 'SV1 / Chief');
     
-    sgtitle(title_string, 'FontWeight', 'bold');
+    %sgtitle(title_string, 'FontWeight', 'bold');
     % Save figure
     saveas(gcf, fig_path);
 end

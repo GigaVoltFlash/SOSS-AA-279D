@@ -34,7 +34,7 @@ function [] = plot_3D_rel_orbit(SV2_rel_pos1, SV3_rel_pos1, both_on_one, title_s
         %legend('YA Dif. Eq.', 'YA Mapping');
         hold off;
     
-        sgtitle(title_string, 'FontWeight', 'bold');
+        %sgtitle(title_string, 'FontWeight', 'bold');
         % Save figure
         saveas(gcf, fig_path);
     else
@@ -56,7 +56,7 @@ function [] = plot_3D_rel_orbit(SV2_rel_pos1, SV3_rel_pos1, both_on_one, title_s
         grid on;
         axis equal;
         legend('Location', 'best');
-        sgtitle(title_string, 'FontWeight', 'bold');
+        %sgtitle(title_string, 'FontWeight', 'bold');
         
         % Save figure
         saveas(gcf, fig_path);

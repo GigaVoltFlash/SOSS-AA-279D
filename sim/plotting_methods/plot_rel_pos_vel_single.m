@@ -32,6 +32,6 @@ function plot_rel_pos_vel_single(t, t_orbit, rel_pos1, rel_vel1, title_string, f
     %xlabel('Time [s]');
     xlabel('Number of Orbits');
 
-    sgtitle(title_string, 'FontWeight', 'bold');
+    %sgtitle(title_string, 'FontWeight', 'bold');
     saveas(gcf, fig_path);
 end
