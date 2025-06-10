@@ -3,7 +3,7 @@
 
 \subsubsection{Initial Conditions for HCW}
 
-We would like to use the Hill-Clohessy-Wiltshire (HCW) equations to give us a clear solution to the relative motion of the deputy satellites. However, the HCW equations assume that the motion of the depity with respect to the chief is very small compared to the orbit radius, as they rely on linearizing the non-linear equations of motion the The initial conditions for this are built over the original absolute and relative initial conditions for SV1, SV2, and SV3 that were previous defined in Table \ref{tab:abs_oe} and Table \ref{tab:relative_oe}.
+We would like to use the Hill-Clohessy-Wiltshire (HCW) equations to give us a clear solution to the relative motion of the deputy satellites. However, the HCW equations assume that the motion of the deputy with respect to the chief is very small compared to the orbit radius, as they rely on linearizing the non-linear equations of motion the initial conditions for this are built over the original absolute and relative initial conditions for SV1, SV2, and SV3 that were previous defined in Table \ref{tab:abs_oe} and Table \ref{tab:relative_oe}.
 
 The eccentricity of SV1 is already very low, as seen in Table \ref{tab:abs_oe_kepler} (and meets the conditions for applying HCW). Therefore, the orbital elements of the chief did not need to be modified. However, the relative orbital elements initial conditions create a large separation between SV1 and SV2/SV3. So the quasi-nonsingular relative orbital elements are modified to be as in Table \ref{tab:relative_oe_hcw} below. These are written in order as described in Equation \ref{eq:quasi_nonsign_roe}.
 
@@ -13,8 +13,8 @@ The eccentricity of SV1 is already very low, as seen in Table \ref{tab:abs_oe_ke
 \toprule
 \textbf{ID} & \textbf{HCW Conditions} \\
 \midrule
-SV2 & $\delta\boldsymbol{\alpha} = [0, 0, 0, 100, 0, 1000]~\text{m}$ \\
-SV3 & $\delta\boldsymbol{\alpha} = [0, 0, 0, 200, 0, 800]~\text{m}$ \\
+SV2 & $\delta\boldsymbol{\alpha} = [0, 0, 0, 300, 0, 300]~\text{m}$ \\
+SV3 & $\delta\boldsymbol{\alpha} = [0, 0, 0, 250, 0, -250]~\text{m}$ \\
 \bottomrule
 \end{tabular}
 \caption{Quasi-Nonsingular Relative Orbit Parameters for SV2 and Sv3 to apply for HCW}
@@ -32,8 +32,8 @@ The main differences in these quasi-nonsingular relative orbital elements (and t
 Based on these initial conditions, we see that the ratio of the maximum separation between spacecraft is small relative to the distance of the chief from the primary attractor. This is verified by propagating the nonlinear equations of motion throughout the time scale to get the position of the chief and the relative positions of the deputies, and finding the average ratio over time (since the orbit is circular, this worst-case ratio is very close to the average). We see that the average ratios are
 
 \begin{align}
-    \frac{\rho_{SV2}}{r_{SV1}} = 9.49\cdot10^{-5} \\
-    \frac{\rho_{SV3}}{r_{SV1}} = 8.69\cdot10^{-5}
+    \frac{\rho_{SV2}}{r_{SV1}} = 7.25\cdot10^{-5} \\
+    \frac{\rho_{SV3}}{r_{SV1}} = 6.04\cdot10^{-5}
 \end{align}
 Both of these are well below the $10^{-3}$ requirement.
 
@@ -48,7 +48,7 @@ we convert the quasi-nonsingular relative orbital elements into absolute orbital
 \centering
 \begin{tabular}{cccccc} \hline
     $a$ & $e$ & $i$ & $\omega$ & $\Omega$ & $\nu$ \\ \hline 
-     6944 km & 0.0016 & 99.4 $^\circ$ & 91.419$^\circ$ & -151.09$^\circ$ & -139.438$^\circ$ \\ \hline
+     6944 km & 0.0016 & 99.4 $^\circ$ & 91.3946$^\circ$ & -151.10$^\circ$ & -139.417$^\circ$ \\ \hline
 \end{tabular}
 \caption{Initial Keplerian Orbit Parameters of SV2, modified for applying HCW}
 \label{tab:abs_oe_kepler_SV2_HCW}
@@ -58,7 +58,7 @@ we convert the quasi-nonsingular relative orbital elements into absolute orbital
 \centering
 \begin{tabular}{cccccc} \hline
     $a$ & $e$ & $i$ & $\omega$ & $\Omega$ & $\nu$ \\ \hline 
-     6944 km & 0.0016 & 99.4 $^\circ$ & 91.407$^\circ$ & -151.09$^\circ$ & -139.427$^\circ$ \\ \hline
+     6944 km & 0.0016 & 99.4 $^\circ$ & 91.4003$^\circ$ & -151.10$^\circ$ & -139.423$^\circ$ \\ \hline
 \end{tabular}
 \caption{Initial Keplerian Orbit Parameters of SV3, modified for applying HCW}
 \label{tab:abs_oe_kepler_SV3_HCW}
@@ -67,26 +67,28 @@ we convert the quasi-nonsingular relative orbital elements into absolute orbital
 These Keplerian orbital elements are then converted to ECI co-ordinates using the expressions provided in Section \ref{sec:initial_ECI}. The initial ECI co-ordinates of the chief remain the same as in Equation \ref{eq:SV1_initial_ECI}. Equations \ref{eq:SV2_HCW1_ECI_initial} and \ref{eq:SV3_HCW1_ECI_initial} provide the ECI co-ordinates of SV2 and SV3. 
 \begin{align} \label{eq:SV2_HCW1_ECI_initial}
     r_{0, ECI, SV2} &= \begin{bmatrix}
-        -3091.3 \\
-        -2937.0 \\
-        -6503.8
+        -3664.4 \\
+        -2988.6 \\
+        -5102.7
     \end{bmatrix} km \\
     v_{0, ECI, SV2} &= \begin{bmatrix}
-        -5.0008 \\
-        -2.0031 \\
-        4.0106
+        -5.3182 \\
+        -1.9926 \\
+        4.9928
     \end{bmatrix} \frac{km}{s}
 \end{align}
+
+[-3.664634040411143e+03;-2.988364002505523e+03;-5.102717495801277e+03;-5.318448889943923;-1.992230030548635;4.992735637485701]
 \begin{align} \label{eq:SV3_HCW1_ECI_initial}
     r_{0, ECI. SV3} &= \begin{bmatrix}
-        -3091.4 \\
-        -2937.0 \\
-        -6503.7
+        -3664.6 \\
+        -2988.4 \\
+        -5102.7
     \end{bmatrix} km \\
     v_{0, ECI, SV3} &= \begin{bmatrix}
-        -5.0009 \\
-        -2.0029 \\
-        4.0107
+        -5.3184 \\
+        -1.9922 \\
+        4.9927
     \end{bmatrix} \frac{km}{s}
 \end{align}
 \textbf{Relative Position and Velocity in Chief's RTN frame, Orbital Element Differences} \\
@@ -147,7 +149,7 @@ K_1 \\ K_2 \\ K_3 \\ K_4 \\ K_5 \\ K_6
 \end{bmatrix},
 \end{align}
 
-where $a$ represents the semi-major axis, $n$ represents the mean motion, and $t$ is time since the initial conditions. $K_1$ through $K_6$ are the integration constants. THe matrix relating the integration constants and the state is called the State Transition Matrix (STM).
+where $a$ represents the semi-major axis, $n$ represents the mean motion, and $t$ is time since the initial conditions. $K_1$ through $K_6$ are the integration constants. The matrix relating the integration constants and the state, when the state is made of integration constants (e.g., with ROE), is called the State Transition Matrix (STM). The STM maps the state at a certain time to the state at a future time. 
 
 To calculate the integration constants, $t = 0$ in the STM, and the state is set to the initial conditions calculated in Section \ref{sec:hcw_initial_conditions}. Then the inverse of the STM matrix is taken to find the state.
 
@@ -179,12 +181,12 @@ For our chosen initial conditions, the integration constants computed are provid
         \toprule
         \textbf{Constant} & \textbf{SV2} & \textbf{SV3} \\
         \midrule
-        $K_1$ & $3.652\cdot10^{-7}$ & $2.764\cdot10^{-7}$ \\
-        $K_2$ & $-3.848\cdot10^{-5}$ & $-2.886\cdot10^{-5}$ \\
-        $K_3$ & $4.242\cdot10^{-5}$& $3.181\cdot10^{-5}$\\
-        $K_4$ & $-2.076\cdot10^{-7}$ & $-1.583\cdot10^{-7}$ \\
-        $K_5$ & $-1.0734\cdot10^{-4}$ & $-8.834\cdot10^{-5}$ \\
-        $K_6$ & $-9.692\cdot10^{-5}$ & $-7.976\cdot10^{-5}$ \\
+        $K_1$ & $3.796\cdot10^{-7}$ & $3.172\cdot10^{-7}$ \\
+        $K_2$ & $-2.880\cdot10^{-5}$ & $-2.398\cdot10^{-5}$ \\
+        $K_3$ & $3.173\cdot10^{-5}$& $2.645\cdot10^{-5}$\\
+        $K_4$ & $-2.100\cdot10^{-7}$ & $-1.757\cdot10^{-7}$ \\
+        $K_5$ & $-3.204\cdot10^{-5}$ & $2.670\cdot10^{-5}$ \\
+        $K_6$ & $-2.895\cdot10^{-5}$ & $2.4123\cdot10^{-5}$ \\
         \bottomrule
     \end{tabular}
     \caption{Integration Constants for SV2 and SV3 Used in HCW Analytical Solution}
@@ -253,7 +255,7 @@ to \ref{fig:hcw_3d_side_by_side}, there are a few common trends that we can obse
     \item The projection of the orbit in the R-T and R-N planes is elliptical (ignoring the drift in the along-track direction).
 \end{enumerate}
 
-First, we address the elliptical orbit's shape and orientation. This elliptical orbit can be related to the relative eccentricity vector $\boldsymbol{\delta e} = [\delta e_x, \delta e_y]^\top$ and the relative inclination vector $\boldsymbol{\delta i} = [\delta i_x, \delta i_y]^\top$. With the selected initial conditions in Table \ref{tab:relative_oe_hcw}, we see that the angle between $\boldsymbol{\delta e}$ and $\boldsymbol{\delta i}$ is $0$, as they both lie along the y-axis. The two vectors being parallel results in an elliptical relative orbit around the chief that is safe and avoids collision (see Figure \ref{fig:relative_orbit_geometry}).
+First, we address the elliptical orbit's shape and orientation. This elliptical orbit can be related to the relative eccentricity vector $\boldsymbol{\delta e} = [\delta e_x, \delta e_y]^\top$ and the relative inclination vector $\boldsymbol{\delta i} = [\delta i_x, \delta i_y]^\top$. With the selected initial conditions in Table \ref{tab:relative_oe_hcw}, we see that the angle between $\boldsymbol{\delta e}$ and $\boldsymbol{\delta i}$ is $0$, as they both lie along the y-axis. The two vectors being parallel results in an elliptical relative orbit around the chief that is safe and avoids collision even under uncertainty in the along track direction (see Figure \ref{fig:relative_orbit_geometry}).
 
 \begin{figure}[htpb]
     \centering
@@ -280,9 +282,9 @@ If we compute these quantities for SV2 and SV3, we get the results in Table \ref
         \toprule
         \textbf{Value (in km)} & \textbf{SV2} & \textbf{SV3} \\
         \midrule
-        $2aK_{23}$ & 0.199 & 0.397 \\
-        $aK_{56}$ & 0.999 & 0.799 \\
-        $aK_1$ & $5\cdot10^{-4}$& $1.258\cdot10^{-3}$\\
+        $2aK_{23}$ & 0.595 & 0.496 \\
+        $aK_{56}$ & 0.300 & 0.250 \\
+        $aK_1$ & $2.64\cdot10^{-3}$& $2.20\cdot10^{-3}$\\
         \bottomrule
     \end{tabular}
     \caption{Values derived from the HCW geometry equations that correspond to the ellipse shape as seen in Figure \ref{fig:hcw_gemeotry}.}
@@ -380,12 +382,12 @@ Note that in solving this equation, $\tau$ will be zero because our initial time
         \toprule
         \textbf{Constant} & \textbf{SV2} & \textbf{SV3} \\
         \midrule
-        $K_1$ & $-1.5886\cdot10^{-8}$ & $-1.0799\cdot10^{-8}$ \\
-        $K_2$ & $3.7051\cdot10^{-6}$ & $2.9694\cdot10^{-6}$ \\
-        $K_3$ & $-1.4750\cdot10^{-5}$& $-2.9477\cdot10^{-5}$\\
-        $K_4$ & $8.4251\cdot10^{-7}$ & $6.7435\cdot10^{-7}$ \\
-        $K_5$ & $1.4401\cdot10^{-4}$ & $1.1521\cdot10^{-4}$ \\
-        $K_6$ & $3.8971\cdot10^{-8}$ & $3.0781\cdot10^{-8}$ \\
+        $K_1$ & $0.0006\cdot10^{-4}$ & $0.0005\cdot10^{-4}$ \\
+        $K_2$ & $0.0115\cdot10^{-4}$ & $-0.0090\cdot10^{-4}$ \\
+        $K_3$ & $-0.4413\cdot10^{-4}$& $-0.3677\cdot10^{-4}$\\
+        $K_4$ & $0.0023\cdot10^{-4}$ & $-0.0022\cdot10^{-4}$ \\
+        $K_5$ & $0.4321\cdot10^{-4}$ & $-0.3600\cdot10^{-4}$ \\
+        $K_6$ & $0.0004\cdot10^{-4}$ & $-0.0003\cdot10^{-4}$ \\
         \bottomrule
     \end{tabular}
     \caption{Integration Constants for SV2 and SV3 Used in YA Analytical Solution}
@@ -565,9 +567,9 @@ The unscaled ROE can be found by dividing the original ROE given in Table \ref{t
 0 \\
 0 \\
 0 \\
-1.44 \times 10^{-5} \\
+0.4320 \times 10^{-4} \\
 0 \\
-1.44\times 10^{-4}
+0.4320 \times 10^{-4}
 \end{bmatrix}
 \]
 \[
@@ -579,9 +581,9 @@ The unscaled ROE can be found by dividing the original ROE given in Table \ref{t
 0 \\
 0 \\
 0 \\
-2.88 \times 10^{-5} \\
+0.3600 \times 10^{-4} \\
 0 \\
-1.15\times 10^{-4}
+-0.3600 \times 10^{-4}
 \end{bmatrix}
 \]
 
