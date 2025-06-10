@@ -259,13 +259,14 @@ For the relative orbit elements, the STM is given by \ref{eq:stm_matrix}. Togeth
 
 Each of the deputies (SV2 and SV3) is equipped with the following sensors, which also give the raw measurements mentioned below:
 \begin{itemize}
-    \item \textbf{Vision-based sensors:} These provide relative bearing angle measurements for SV2 and SV3 relative to SV1. We assume that the sensors on SV2 and SV3 are always pointed at SV1. For close-range measurements required during SV3's docking phase, the vision-based sensors can also provide feature-rich images that may be used for more accurate position estimation. 
-    \item \textbf{GNSS antennas:} These provide GNSS measurements such as pseudoranges. For simplicity, we stick with the single-difference GNSS pseudoranges. Although, in the future, we will consider combing the pseudo-range measurements get to apply double-difference GNSS methods.
+    \item \textbf{High-gain antennas:} Communication between the satellite and the ground is vital for higher accuracy measurements and an initialization of the orbital elements of our chief and deputy satellites. This can also enable us to get good measurements of the chief's orbital elements, which could be treated as true values when estimating the deputy satellites' positions.
+    \item \textbf{Vision-based sensors + range sensor:} These provide relative bearing angle measurements for SV2 and SV3 relative to SV1. We assume that the sensors on SV2 and SV3 are always pointed at SV1. For close-range measurements required during SV3's docking phase, the vision-based sensors can also provide feature-rich images that may be used for more accurate position estimation. An additional range sensor is also used along with the vision sensor, to solve the range-ambiguity of purely perception-based navigation.
+    \item \textbf{GNSS antennas:} These provide GNSS measurements such as pseudoranges. For simplicity, we stick with the single-difference GNSS pseudoranges. The single-difference DGNSS is enabled by inter-satellite links. Although, in the future, we will consider combining the pseudo-range measurements get to apply double-difference GNSS methods.
 \end{itemize}
 
 These raw measurements can be converted into simpler pseudo-measurements based on standard operations for each of the sensors. 
 \begin{itemize}
-    \item The relative bearing angle measurements of the vision-based sensor, $\alpha$ and $\epsilon$, can be converted into relative position vector measurements in the rectilinear frame $\boldsymbol{x}^\mathcal{R}$ \cite{sullivan2020nonlinear}. For this project, we make the simplifcation that the vision-based sensor gives us the pseudo-measurement of the relative position vector of the deputy in the chief's RTN frame.
+    \item The relative bearing angle measurements of the vision-based sensor, $\alpha$ and $\epsilon$, along with the range measurement from a range sensor, can be converted into relative position vector measurements in the rectilinear frame $\boldsymbol{x}^\mathcal{R}$ \cite{sullivan2020nonlinear}. For this project, we make the simplifcation that the vision-based sensor gives us the pseudo-measurement of the relative position vector of the deputy in the chief's RTN frame.
     \item The psuedorange measurements acquired from the GNSS signals can be converted into absolute position measurements for the deputy satellites. For this project, we make the simplifcation that the GNSS sensors give us the psuedo-measurement of the absolute positions of the deputies in the ECI frame.
 \end{itemize}
 These pseudo-measurements are compiled into a measurement vector $y_{SV}$, for each spacecraft. For SV2, this is given by
@@ -317,7 +318,7 @@ The conversion from relative orbital element to relative position vectors can be
 \delta \boldsymbol{\alpha} \\
 \boldsymbol{r}^{RTN} &\approx 
 \mathcal{J}
-a_1\delta \boldsymbol{\alpha} \\
+a_1\delta \boldsymbol{\alpha} \\ \label{eq:J_linear_mapping}
 \end{align}
 where $u$ is the mean argument of latitude of the chief spacecraft. We use $\mathcal{J}_{3\times 6}$ to represent this transformation matrix. This is linear with respect to the deputy, but non-linear with respect to the chief's state.
 
