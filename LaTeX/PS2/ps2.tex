@@ -10,7 +10,7 @@ The subscript $o$ indicates the chief or "observer", while the subscript $t$ ind
 \end{align}
 
 
-Then, we compute the deputy semi-major axis, eccentricity components, inclination, RAAN, and argument of latitude:
+Then, we compute the deputy semi-major axis, eccentricity components, inclination, RAAN, and argument of latitude using the ROEs from Starling:
     \begin{align}
     a_t &= \frac{a_o + d_a}{10^3} \\
     e_{x,t} &= \frac{d_{e_x}}{a_o} + e_{x,o} \\
@@ -51,16 +51,7 @@ Then the quasi-nonsingular orbital elements can be converted to the Keplerian or
 \end{align}
 
 \subsubsection{Numerical Integration of Non-linear Equations for Relative Motion} \label{sec:nonlinear_rel_eom}
-Given the initial ECI conditions of the chief (SV1) and the deputies (SV2 and SV3), we can find the initial position and velocity of the deputies in the RTN frame of the chief. Similar to what was shown in Equations \ref{eq:eci2rtn} to \ref{eq:v_rtn}, the rotation matrix from ECI to RTN is done as follows, 
-
-\begin{align}
-    \boldsymbol{\hat{R}} &= \frac{\boldsymbol{r}^{ECI}_{SV1}}{||\boldsymbol{r}^{ECI}_{SV1}||} \\ \label{eq:q_eci2rtn_rel}
-    \boldsymbol{\hat{N}} &= \frac{\boldsymbol{r}^{ECI}_{SV1} \times \boldsymbol{v}^{ECI}_{SV1}}{||\boldsymbol{r}^{ECI}_{SV1} \times \boldsymbol{v}^{ECI}_{SV1}||} \\
-    \boldsymbol{\hat{T}} &= \boldsymbol{\hat{N}} \times \boldsymbol{\hat{R}} \\
-    Q_{eci2rtn} &= \begin{bmatrix}
-        \boldsymbol{\hat{R}} & \boldsymbol{\hat{T}} & \boldsymbol{\hat{N}}
-    \end{bmatrix}^T
-\end{align}
+Given the initial ECI conditions of the chief (SV1) and the deputies (SV2 and SV3), we can find the initial position and velocity of the deputies in the RTN frame of the chief. The rotation matrix from ECI to RTN is the same as in Equations \ref{eq:eci2rtn} to \ref{eq:v_rtn}. 
 
 We take $\boldsymbol{\rho}$ as the relative position between the chief and deputy (for the equations below, we use SV2), so $\boldsymbol{\rho}^{RTN}$ is relative position of the deputy in the chief's RTN frame. Similarly, $\boldsymbol{\dot{\rho}}^{RTN}$ is the relative velocity of the deputy in the chief's RTN frame.
 
@@ -160,9 +151,9 @@ Since the two methods used above for relative orbit calculation are mathematical
     \label{fig:error_in_SV3_rel}
 \end{figure}
 
-We see that using fine time-steps, we can keep the numerical error between the two methods contained to negligible amounts.
+We see that using fine time-steps of 11.5 seconds, we can keep the numerical error between the two methods contained to negligible amounts.
 
-This also holds when the initial condition has a semi-major axis difference, which we can see in Figure \ref{fig:error_in_SV2_rel_nonzero_a} for SV2 when its initial conditions of SV2 have a non-zero difference in the semi-major axis. Although the error has a different profile than in the previous plots, the error is still at a much smaller magnitude than the actual values, so is negligible, and can be attributed to numerical error.
+This also holds when the initial condition has a semi-major axis difference, which we can see in Figure \ref{fig:error_in_SV2_rel_nonzero_a} for SV2 when its initial conditions of SV2 have a non-zero difference in the semi-major axis. Although the error has a different profile than in the previous plots, the error is still at a much smaller magnitude than the actual values, so is negligible, and can be attributed to numerical error. The different error profile is due to the drift in the RTN frame due to the difference in semi-major axis. 
 
 \begin{figure}
     \centering
