@@ -16,13 +16,13 @@ constants;
 % Flags for which plots to create
 run_PS1 = false;
 run_PS2 = false;
-run_PS3 = false;
+run_PS3 = true;
 run_PS4 = false;
 run_PS5 = false;
 run_PS6 = false; 
 run_PS7 = false;
 run_PS8 = false;
-run_PS9 = true;
+run_PS9 = false;
 
 % Load SV1 information
 load_SV1;
@@ -123,7 +123,7 @@ if run_PS3
     %plot_RT_RN_projections(SV2_HCW_pos, SV3_HCW_pos, 'HCW evaluated relative orbits', 'figures/PS3/RTN_projections_HCW.png');
     % plot_RT_RN_projections(SV2_rel_pos, SV3_rel_pos, 'Non-linear EOMs relative orbits', 'figures/PS3/RTN_projections_numerical.png');
 
-    plot_RT_RN_projections_both(SV2_HCW_pos,SV2_rel_pos,SV3_HCW_pos,SV3_rel_pos, 'Comparing HCW with non-linear propagation', 'figures/PS3/RTN_projections_HCW_comparison.png');
+    %plot_RT_RN_projections_both(SV2_HCW_pos,SV2_rel_pos,SV3_HCW_pos,SV3_rel_pos, 'Comparing HCW with non-linear propagation', 'figures/PS3/RTN_projections_HCW_comparison.png');
     %plot_3D_rel_orbit(SV2_HCW_pos,SV3_HCW_pos, 'figures/PS3/3D_HCW_orbit_SV2.png', 'figures/PS3/3D_HCW_orbit_SV3.png');
 
     % %%%%% PLOT OF RELATIVE ORBITS USING YA %%%%%
@@ -157,10 +157,10 @@ if run_PS3
     % plot_3D_rel_orbit(SV2_YA_mapping_pos,SV2_YA_mapping_vel,'Geometric mapping: 3D orbits','figures/PS3/YA_mapping_3D_orbits.png')
     % 
     % % Combined plots
-    % plot_RT_RN_projections_triple(SV2_YA_pos,SV2_YA_mapping_pos,SV2_rel_pos_ecc,SV3_YA_pos,SV3_YA_mapping_pos,SV3_rel_pos_ecc, 'Comparison of YA methods', 'figures/PS3/RTN_projections_YA_comparison.png');
-    % plot_RT_RN_error_projections(SV2_YA_pos,SV2_YA_mapping_pos,SV2_rel_pos_ecc,SV3_YA_pos,SV3_YA_mapping_pos,SV3_rel_pos_ecc,'Comparison of errors in YA methods','figures/PS3/RTN_error_projections_YA_comparison.png')
-    % plot_3D_rel_orbits_triple(SV2_YA_pos,SV2_YA_mapping_pos,SV2_rel_pos_ecc,SV3_YA_pos,SV3_YA_mapping_pos,SV3_rel_pos_ecc,'Comparison of 3D orbits','figures/PS3/3D_YA_comparison.png');
-    % 
+    plot_RT_RN_projections_triple(SV2_YA_pos,SV2_YA_mapping_pos,SV2_rel_pos_ecc,SV3_YA_pos,SV3_YA_mapping_pos,SV3_rel_pos_ecc, 'Comparison of YA methods', 'figures/PS3/RTN_projections_YA_comparison.png');
+    plot_RT_RN_error_projections(SV2_YA_pos,SV2_YA_mapping_pos,SV2_rel_pos_ecc,SV3_YA_pos,SV3_YA_mapping_pos,SV3_rel_pos_ecc,'Comparison of errors in YA methods','figures/PS3/RTN_error_projections_YA_comparison.png')
+    plot_3D_rel_orbits_triple(SV2_YA_pos,SV2_YA_mapping_pos,SV2_rel_pos_ecc,SV3_YA_pos,SV3_YA_mapping_pos,SV3_rel_pos_ecc,'Comparison of 3D orbits','figures/PS3/3D_YA_comparison.png');
+
     % % Combined plots with non-zero semi-major axis separation
     % plot_RT_RN_projections_triple(SV2_YA_pos_2,SV2_YA_mapping_pos_2,SV2_rel_pos_ecc_2,SV3_YA_pos_2,SV3_YA_mapping_pos_2,SV3_rel_pos_ecc_2, 'Comparison of YA methods with semi-major axis separation', 'figures/PS3/RTN_projections_YA_comparison_2.png');
     % plot_RT_RN_error_projections(SV2_YA_pos_2,SV2_YA_mapping_pos_2,SV2_rel_pos_ecc_2,SV3_YA_pos_2,SV3_YA_mapping_pos_2,SV3_rel_pos_ecc_2,'Comparison of errors in YA methods with semi-major axis separation','figures/PS3/RTN_error_projections_YA_comparison_2.png')

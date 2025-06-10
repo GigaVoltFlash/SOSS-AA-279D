@@ -6,10 +6,10 @@ function [] = plot_3D_rel_orbits_triple(SV2_rel_pos1, SV2_rel_pos2, SV2_rel_pos3
     x1_3 = SV2_rel_pos3(:,1); y1_3 = SV2_rel_pos3(:,2); z1_3 = SV2_rel_pos3(:,3);
     x2_3 = SV3_rel_pos3(:,1); y2_3 = SV3_rel_pos3(:,2); z2_3 = SV3_rel_pos3(:,3);
     
-    figure();
+    figure('Position', [100, 100, 1200, 500]);
 
     t = tiledlayout(1, 2, 'TileSpacing', 'compact', 'Padding', 'compact');
-    title(t, title_string, 'FontWeight', 'bold');
+    %title(t, title_string, 'FontWeight', 'bold');
 
     ax1 = nexttile;
     plot3(x1_1, y1_1, z1_1, 'b');
@@ -41,7 +41,7 @@ function [] = plot_3D_rel_orbits_triple(SV2_rel_pos1, SV2_rel_pos2, SV2_rel_pos3
     %legend({'YA Dif. Eq.', 'YA Mapping', 'YA FERM'}, 'Location', 'northeastoutside');
     hold off;
 
-    lgd = legend(ax2, {'YA Dif. Eq.', 'YA Mapping', 'YA FERM'}, 'Location', 'southoutside', 'Orientation', 'horizontal');
+    lgd = legend(ax2, {'YA Dif. Eq.', 'Geometric Mapping', 'YA FERM'}, 'Location', 'southoutside', 'Orientation', 'horizontal');
     lgd.Layout.Tile = 'south';  % Place legend under both plots
     % Save figure
     saveas(gcf, fig_path);

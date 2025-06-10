@@ -13,16 +13,16 @@ ps1_sims;
 d_a_SV2_init = 0; % m
 d_lambda_SV2_init = 0; % m % -124
 d_e_x_SV2_init = 0; % m
-d_e_y_SV2_init = 100; % m
+d_e_y_SV2_init = 300; % m
 d_i_x_SV2_init = 0; % m % 79
-d_i_y_SV2_init = 1000; % m % 1005
+d_i_y_SV2_init = 300; % m % 1005
 
 d_a_SV3_init = 0; % m
 d_lambda_SV3_init = 0; % m % -793
 d_e_x_SV3_init = 0; % m
-d_e_y_SV3_init = 200; % m
+d_e_y_SV3_init = 250; % m
 d_i_x_SV3_init = 0; % m
-d_i_y_SV3_init = 800; % m % 827
+d_i_y_SV3_init = -250; % m % 827
 
 [r_SV2_init, v_SV2_init] = ROE2ECI(a_SV1_init,ex_SV1_init,ey_SV1_init,i_SV1_init,RAAN_SV1_init,u_SV1_init, ...
 d_a_SV2_init,d_lambda_SV2_init,d_e_x_SV2_init,d_e_y_SV2_init,d_i_x_SV2_init,d_i_y_SV2_init);

@@ -1,22 +1,21 @@
 function states = evaluate_YA_geometric_mapping(t, a, ex, ey, i, w, M_init, d_a,d_lambda,d_e_x,d_e_y,d_i_x,d_i_y)
     global mu_earth;
-    n = sqrt(mu_earth / a^3);
+    n = sqrt(mu_earth / a^3); % rad/s
     e = sqrt(ex^2 + ey^2);
     eta = sqrt(1 - e^2);
     
-
     ROE_init = [d_a;d_lambda;d_e_x;d_e_y;d_i_x;d_i_y];
     N = length(t);
     states = zeros(N, 6);
     for idx = 1:N
-        M = deg2rad(M_init) + n * t(idx);
-        %M = mod(M, 2*pi);
+        M = deg2rad(M_init) + n * t(idx); % rad
+        M = mod(M, 2*pi);
         %E = Newton_Raphson(M, e, 1e-5);
         %f = 2 * atan2(sqrt(1 + e) * tan(E / 2), sqrt(1 - e));
         %f = mod(f,2*pi);
-        E = mean2ecc(M,e,1e-10);
-        f = ecc2true(E,e);
-        u = w + f;  % True longitude
+        %E = mean2ecc(M,e,1e-10);
+        f = mean2true(M,e); % rad
+        u = deg2rad(w) + f;  % Argument of latitude (rad)
         %u = f;
 
         %k = 1 + e*cos(f);
@@ -28,7 +27,7 @@ function states = evaluate_YA_geometric_mapping(t, a, ex, ey, i, w, M_init, d_a,
         %tau = n * t(idx) / eta^3;
 
         A = [a * (eta^2)*eye(3), zeros(3); zeros(3), a * (n / eta) * eye(3)];
-        B = compute_B_full(t(idx), k, k_prime, n, eta, u, i, ex, ey);
+        B = compute_B_full(t(idx), k, k_prime, n, eta, u, deg2rad(i), ex, ey);
         total = A * B;
         states(idx, :) = (total * ROE_init)';
     end
@@ -37,7 +36,7 @@ end
 function B = compute_B_full(t, k, kp, n, eta, u, i, ex, ey)
     
     % Bx block
-    bx1 = 1/k + (3/2)*kp*(n/eta^3)*t;
+    bx1 = (1/k) + (3/2)*kp*(n/eta^3)*t;
     bx2 = -kp / eta^3;
     bx3 = (1/eta^3)*(ex*(k - 1)/(1 + eta) - cos(u));
     bx4 = (1/eta^3)*(ey*(k - 1)/(1 + eta) - sin(u));
@@ -48,7 +47,7 @@ function B = compute_B_full(t, k, kp, n, eta, u, i, ex, ey)
     by2 = k / eta^3;
     by3 = (1/eta^2)*((1 + 1/k)*sin(u) + (ey/k) + (k/eta)*(ey/(1 + eta)));
     by4 = -(1/eta^2)*((1 + 1/k)*cos(u) + (ex/k) + (k/eta)*(ex/(1 + eta)));
-    by6 = (1/k - (k/eta^3))*cot(i);
+    by6 = ((1/k) - (k/eta^3))*cot(i);
     
     % Bz block
     bz5 = (1/k) * sin(u);
