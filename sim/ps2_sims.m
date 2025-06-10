@@ -2,6 +2,11 @@
 % Tycho Bogdanowitsch
 % Anshuk Chigullapalli 
 
+%%%%% RUN CHIEF PROPAGATOR NO J2 %%%%%%%%%%%
+[t_1, state1] = rk4_eom_ECI(tstart:tint:tend, state_init, false);
+r_ECI_no_j2 = state1(:,1:3);
+v_ECI_no_j2 = state1(:,4:6);
+
 %%%%% INITIAL RELATIVE ORBITAL ELEMENTS %%%%%%%
 d_a_SV2_init = 0; % m
 d_lambda_SV2_init = -124350; % m

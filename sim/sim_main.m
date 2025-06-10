@@ -15,8 +15,8 @@ constants;
 
 % Flags for which plots to create
 run_PS1 = false;
-run_PS2 = false;
-run_PS3 = true;
+run_PS2 = true;
+run_PS3 = false;
 run_PS4 = false;
 run_PS5 = false;
 run_PS6 = false; 
@@ -93,15 +93,16 @@ if run_PS2
     plot_rel_pos_vel(t_3, t_orbit, SV2_rel_pos, SV2_rel_vel, rho_SV2_RTN, rho_SV2_RTN_dot, 'SV2 RTN position and velocity', 'figures/SV2_rel_pos_vel.png'); % For part b and c
     plot_rel_pos_vel(t_4, t_orbit, SV3_rel_pos, SV3_rel_vel, rho_SV3_RTN, rho_SV3_RTN_dot, 'SV3 RTN position and velocity', 'figures/SV3_rel_pos_vel.png'); % For part b and c
 
-    % plot_rel_pos_vel(t_SV2_combined, t_orbit, rho_SV2_RTN_w_maneuver, rho_SV2_RTN_dot_w_maneuver, 'SV2 RTN position and velocity with maneuver','figures/SV2_rel_pos_vel_eom_maneuver.png'); % For part f
-    % plot_rel_pos_vel(t_SV3_combined, t_orbit, rho_SV3_RTN_w_maneuver, rho_SV3_RTN_dot_w_maneuver, 'SV3 RTN position and velocity with maneuver','figures/SV3_rel_pos_vel_eom_maneuver.png'); % For part f
+    %plot_rel_pos_vel(t_SV2_combined, t_orbit, rho_SV2_RTN_w_maneuver, rho_SV2_RTN_dot_w_maneuver, 'SV2 RTN position and velocity with maneuver','figures/SV2_rel_pos_vel_eom_maneuver.png'); % For part f
+    %plot_rel_pos_vel(t_SV3_combined, t_orbit, rho_SV3_RTN_w_maneuver, rho_SV3_RTN_dot_w_maneuver, 'SV3 RTN position and velocity with maneuver','figures/SV3_rel_pos_vel_eom_maneuver.png'); % For part f
      
     %%%%%%% 3D PLOTTING OF ORBITS %%%%%%%%%
     plot_rel_sat_pos_3D_multi_method(SV2_rel_pos, rho_SV2_RTN, SV3_rel_pos, rho_SV3_RTN, 'figures/SV2_SV3_3d_traj_rel.png') % For part b and c
     % plot_rel_sat_pos_3D(rho_SV2_RTN_w_maneuver, 'figures/SV2_3d_traj_rel_eom.png') % For part f
     
     %%%%%%% PROJECTING ONTO RTN PLANES %%%%%%%%%
-    plot_RT_RN_projections_both(SV2_rel_pos, rho_SV2_RTN, SV3_rel_pos, rho_SV3_RTN, 'RTN position of SV2 and SV3','figures/RTN_projection.png') % For part c
+    plot_RT_RN_projections_both_PS2(SV2_rel_pos, rho_SV2_RTN, SV3_rel_pos, rho_SV3_RTN, 'RTN position of SV2 and SV3','figures/RTN_projection.png') % For part c
+    plot_RT_RN_projections_both_PS2_2(rho_SV2_RTN_w_maneuver, rho_SV3_RTN_w_maneuver, 'RTN position of SV2 and SV3 with maneuver','figures/RTN_projection_maneuver.png') % For part c
     
     %%%%%%% COMPARING ERRORS BETWEEN METHODS %%%%%%%%%
     compare_rel_pos_error(t_5, t_orbit, rho_SV2_RTN, SV2_rel_pos, rho_SV2_RTN_dot, SV2_rel_vel,'SV2 RTN Error Comparison','figures/SV2_error_in_rel_methods.png'); % For part d
