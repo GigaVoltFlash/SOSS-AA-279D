@@ -32,6 +32,9 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
     state_SV1_all = zeros(length(t_series), 6);
     state_SV2_all = zeros(length(t_series), 6);
     state_SV3_all = zeros(length(t_series), 6);
+    OE_state_SV1_all = zeros(length(t_series), 6);
+    OE_state_SV2_all = zeros(length(t_series), 6);
+    OE_state_SV3_all = zeros(length(t_series), 6);
 
     % Initialize delta-v and acceleration storage
     SV2_dv_vals = zeros(length(t_series), 3);
@@ -111,6 +114,9 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
     state_SV3_all(1, :) = SV3_state';
     state_SV2_all(1, :) = SV2_state';
     state_SV1_all(1, :) = SV1_state';
+    OE_state_SV3_all(1, :) = SV3_OE_state';
+    OE_state_SV2_all(1, :) = SV2_OE_state';
+    OE_state_SV1_all(1, :) = SV1_OE_state';
     
 
     % Initial estimate and covariance for EKF (assuming perfect SV1
@@ -166,11 +172,11 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
         %%% PROPAGATE GROUND TRUTH
         % Use GVE propagated for ground truth qns mean OE, then convert to
         % ground truth ECI positions
-        SV1_OE_state_inter = SV1_OE_state + (dt*secular_J2(t, SV1_OE_state))'; % propagate chief qns OE using GVE
+        SV1_OE_state_inter = SV1_OE_state + (dt*secular_J2_and_drag(t, SV1_OE_state))'; % propagate chief qns OE using GVE
         SV1_OE_state = wrap_QNSOE(SV1_OE_state_inter); % wraps u to be within 0-360
-        SV2_OE_state_inter = SV2_OE_state + (dt*secular_J2(t, SV2_OE_state))'; % propagate SV2 qns OE using GVE (take out later)
+        SV2_OE_state_inter = SV2_OE_state + (dt*secular_J2_and_drag(t, SV2_OE_state))'; % propagate SV2 qns OE using GVE (take out later)
         SV2_OE_state_pre_ctrl = wrap_QNSOE(SV2_OE_state_inter);
-        SV3_OE_state_inter = SV3_OE_state + (dt*secular_J2(t, SV3_OE_state))'; % propagate SV3 qns OE using GVE (take out later)
+        SV3_OE_state_inter = SV3_OE_state + (dt*secular_J2_and_drag(t, SV3_OE_state))'; % propagate SV3 qns OE using GVE (take out later)
         SV3_OE_state_pre_ctrl = wrap_QNSOE(SV3_OE_state_inter);
 
         %%% APPLY CONTROL
@@ -268,8 +274,8 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
         y_actual_EKF_SV3 = [SV3_RTN_measurement;SV3_ECI_measurement];
         
         %%% RUN EKF
-        u_SV2 = SV2_dv_RTN_val; % or a vals?
-        u_SV3 = SV3_dv_RTN_val; % or a vals?
+        u_SV2 = SV2_dv_RTN_val; % or a vals? zeros(3,1); 
+        u_SV3 = SV3_dv_RTN_val; % or a vals? zeros(3,1); 
 
         % Run EKF for SV2
         [x_update_EKF_SV2, P_update_EKF_SV2, y_pred_EKF_SV2, y_post_EKF_SV2] = ekf_roes_with_control(x_update_EKF_SV2, y_actual_EKF_SV2, P_update_EKF_SV2, SV1_state, SV1_OE_state, Q, R, dt, u_SV2);
@@ -281,6 +287,10 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
         state_SV3_all(i, :) = SV3_state';
         state_SV2_all(i, :) = SV2_state';
         state_SV1_all(i, :) = SV1_state';
+        OE_state_SV3_all(i, :) = SV3_OE_state';
+        OE_state_SV2_all(i, :) = SV2_OE_state';
+        OE_state_SV1_all(i, :) = SV1_OE_state';
+
 
         % EKF buffer
         y_actual_EKF_SV2_all(i,:) = y_actual_EKF_SV2;
