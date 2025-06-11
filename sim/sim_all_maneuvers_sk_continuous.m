@@ -162,6 +162,19 @@ function sim_all_maneuvers_sk_continuous(SV2_modes, SV3_modes, num_orbits_modes,
     plot_delta_v_timeline(full_times, SV3_dv_RTN_vals, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
        true, 'figures/PS6/delta_v_timeline_modes_SV3.png');
     plot_delta_v_cumulative_timeline(full_times, SV3_dv_RTN_vals, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
-       true, 'figures/PS6/delta_v_cumulative_timeline_modes_SV3.png')
+       true, 'figures/PS6/delta_v_cumulative_timeline_modes_SV3.png');
+
+    % --- Compute delta-v lower bounds for each mode change in SV3 ---
+    dv_lb_all_modes = zeros(size(SV3_modes,1)-1,1); % Preallocate
     
+    for i = 2:size(SV3_modes,1)
+        d_delta_e = SV3_modes(i,3:4) - SV3_modes(i-1,3:4);
+        d_delta_i = SV3_modes(i,5:6) - SV3_modes(i-1,5:6);
+    
+        dv_lb_all_modes(i-1) = compute_dv_lower_bound(a_chief, d_delta_e/a_chief, d_delta_i/a_chief);
+    end
+    
+    % Display results:
+    disp('Delta-v lower bounds for each SV3 mode change (m/s):');
+    disp(dv_lb_all_modes);
 end
