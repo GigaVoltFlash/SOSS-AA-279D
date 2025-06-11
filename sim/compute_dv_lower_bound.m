@@ -11,6 +11,8 @@ function dv_lb = compute_dv_lower_bound(a, d_delta_e, d_delta_i)
     % Cross-track inclination change
     i_dv_min = norm(a * d_delta_i) * n;
 
+    %dv_lb = ecc_dv_min + i_dv_min;
+
     dv_lb = sqrt(ecc_dv_min^2 + i_dv_min^2);
     %dv_lb = min(ecc_dv_min,i_dv_min);
 end

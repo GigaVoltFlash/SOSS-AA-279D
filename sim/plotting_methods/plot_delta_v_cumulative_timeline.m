@@ -1,5 +1,5 @@
 function plot_delta_v_cumulative_timeline(delta_v_times, delta_v_vals, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, is_continuous, filename)
-    % Converts delta-v values (in m/s) into a time series plot of R, T, N components with
+    % Converts delta-v values (in RTN m/s) into a time series plot of R, T, N components with
     % shaded regions for operational modes and station-keeping, and plots cumulative delta-v
 
     colors = lines(size(SV3_modes, 1));
@@ -18,19 +18,20 @@ function plot_delta_v_cumulative_timeline(delta_v_times, delta_v_vals, t_orbit, 
 
     % Plot impulses or continuous values
     if is_continuous
-        plot(ax(1), time_orbits, delta_v_vals(:,1)*1e3);
-        plot(ax(2), time_orbits, delta_v_vals(:,2)*1e3);
-        plot(ax(3), time_orbits, delta_v_vals(:,3)*1e3);
+        plot(ax(1), time_orbits, delta_v_vals(:,1));
+        plot(ax(2), time_orbits, delta_v_vals(:,2));
+        plot(ax(3), time_orbits, delta_v_vals(:,3));
     else
-        stem(ax(1), time_orbits, delta_v_vals(:,1)*1e3, 'filled', 'LineWidth', 1.5);
-        stem(ax(2), time_orbits, delta_v_vals(:,2)*1e3, 'filled', 'LineWidth', 1.5);
-        stem(ax(3), time_orbits, delta_v_vals(:,3)*1e3, 'filled', 'LineWidth', 1.5);
+        stem(ax(1), time_orbits, delta_v_vals(:,1), 'filled', 'LineWidth', 1.5);
+        stem(ax(2), time_orbits, delta_v_vals(:,2), 'filled', 'LineWidth', 1.5);
+        stem(ax(3), time_orbits, delta_v_vals(:,3), 'filled', 'LineWidth', 1.5);
     end
 
     % Compute cumulative delta-v magnitude and plot
-    dv_mag = vecnorm(delta_v_vals, 2, 2);  % Euclidean norm of each RTN delta-v
-    dv_cum = cumsum(dv_mag);              % Cumulative delta-v
-    plot(ax(4), time_orbits, dv_cum*1e3, 'k', 'LineWidth', 1.5); % km/s --> m/s
+    dv_abs_sum = sum(abs(delta_v_vals), 2);  % sum of absolute value of each entry per row
+    dv_cum = cumsum(dv_abs_sum);             % cumulative sum of that
+    
+    plot(ax(4), time_orbits, dv_cum, 'k', 'LineWidth', 1.5);
 
     % Add shaded regions and legend entries
     cum_orbits = 0;
@@ -54,13 +55,13 @@ function plot_delta_v_cumulative_timeline(delta_v_times, delta_v_vals, t_orbit, 
         t_start = orb_start * t_orbit;
         t_end = orb_end * t_orbit;
         idx = delta_v_times >= t_start & delta_v_times < t_end;
-        total_dv_per_mode(i) = sum(dv_mag(idx));
+        total_dv_per_mode(i) = sum(dv_abs_sum(idx));
     end
 
     % Print total delta-v per mode
     fprintf('\n=== Total Δv per mode ===\n');
     for i = 1:length(total_dv_per_mode)
-        fprintf('Mode %d: %.6f m/s\n', i, total_dv_per_mode(i)*1e3); % km/s --> m/s
+        fprintf('Mode %d: %.6f m/s\n', i, total_dv_per_mode(i)); 
     end
     fprintf('==========================\n\n');
 

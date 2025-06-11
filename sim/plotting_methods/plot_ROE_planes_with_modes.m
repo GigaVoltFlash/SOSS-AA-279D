@@ -18,11 +18,32 @@ function plot_ROE_planes_with_modes(t, t_orbit, d_a, d_lambda, d_e_x, d_e_y, d_i
     xlabel('\delta \lambda [m]'); ylabel('\delta a [m]');
     plot(ax3, d_lambda, d_a, 'k-', 'LineWidth', lw);
 
-    for i = 1:size(SV3_modes,1)
+    % Initialize current positions to first mode:
+    current_pos_RT = SV3_modes(1,3:4);
+    current_pos_RN = SV3_modes(1,5:6);
+    current_pos_NR = SV3_modes(1,[2,1]);
+    
+    for i = 2:size(SV3_modes,1)
         color_i = colors(i,:);
-        quiver(ax1, 0, 0, SV3_modes(i,3), SV3_modes(i,4), 0, 'Color', color_i, 'LineWidth', 1.5);
-        quiver(ax2, 0, 0, SV3_modes(i,5), SV3_modes(i,6), 0, 'Color', color_i, 'LineWidth', 1.5);
-        quiver(ax3, 0, 0, SV3_modes(i,2), SV3_modes(i,1), 0, 'Color', color_i, 'LineWidth', 1.5);
+        
+        delta_RT = SV3_modes(i,3:4) - SV3_modes(i-1,3:4);
+        delta_RN = SV3_modes(i,5:6) - SV3_modes(i-1,5:6);
+        delta_NR = SV3_modes(i,[2,1]) - SV3_modes(i-1,[2,1]);
+        
+        % R-T plane
+        quiver(ax1, current_pos_RT(1), current_pos_RT(2), delta_RT(1), delta_RT(2), 0, ...
+               'Color', color_i, 'LineWidth', 1.5);
+        current_pos_RT = current_pos_RT + delta_RT;
+        
+        % R-N plane
+        quiver(ax2, current_pos_RN(1), current_pos_RN(2), delta_RN(1), delta_RN(2), 0, ...
+               'Color', color_i, 'LineWidth', 1.5);
+        current_pos_RN = current_pos_RN + delta_RN;
+        
+        % N-R plane
+        quiver(ax3, current_pos_NR(1), current_pos_NR(2), delta_NR(1), delta_NR(2), 0, ...
+               'Color', color_i, 'LineWidth', 1.5);
+        current_pos_NR = current_pos_NR + delta_NR;
     end
 
     % Add unified legend below all subplots

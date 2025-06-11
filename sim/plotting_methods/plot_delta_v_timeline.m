@@ -1,5 +1,5 @@
 function plot_delta_v_timeline(delta_v_times, delta_v_vals, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, is_continuous, filename)
-    % Converts delta-v values (in m/s) into a time series plot of R, T, N components with
+    % Converts delta-v values (in RTN m/s) into a time series plot of R, T, N components with
     % shaded regions for operational modes and station-keeping
 
     colors = lines(size(SV3_modes, 1));
@@ -18,13 +18,13 @@ function plot_delta_v_timeline(delta_v_times, delta_v_vals, t_orbit, SV3_modes, 
 
     % Plot impulses
     if is_continuous
-        plot(ax(1), time_orbits, delta_v_vals(:,1)*1e3); % km/s --> m/s
-        plot(ax(2), time_orbits, delta_v_vals(:,2)*1e3);
-        plot(ax(3), time_orbits, delta_v_vals(:,3)*1e3);
+        plot(ax(1), time_orbits, delta_v_vals(:,1)); 
+        plot(ax(2), time_orbits, delta_v_vals(:,2));
+        plot(ax(3), time_orbits, delta_v_vals(:,3));
     else
-        stem(ax(1), time_orbits, delta_v_vals(:,1)*1e3, 'filled', 'LineWidth', 1.5);
-        stem(ax(2), time_orbits, delta_v_vals(:,2)*1e3, 'filled', 'LineWidth', 1.5);
-        stem(ax(3), time_orbits, delta_v_vals(:,3)*1e3, 'filled', 'LineWidth', 1.5);
+        stem(ax(1), time_orbits, delta_v_vals(:,1), 'filled', 'LineWidth', 1.5);
+        stem(ax(2), time_orbits, delta_v_vals(:,2), 'filled', 'LineWidth', 1.5);
+        stem(ax(3), time_orbits, delta_v_vals(:,3), 'filled', 'LineWidth', 1.5);
     end
 
     % Add shaded regions and legend entries
