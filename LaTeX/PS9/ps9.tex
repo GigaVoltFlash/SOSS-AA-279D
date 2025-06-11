@@ -5,13 +5,10 @@ To do:
 - implement drag in ground truth propagation (Tycho) - DONE
 - fix geometric mapping (Tycho) - DONE
 
-- implement reachable set impulsive control (maybe don't need?)
-- try double radial burns for clean control in mode 3-4 (Anshuk)
-- three tangential burn method for control (further away, more efficient)
-+ clean up control stuff (Anshuk)
-- look into min delta v for continuous control (Anshuk)
-
-
+- try double radial burns for clean control in mode 3-4 (Anshuk) - DONE
+- three tangential burn method for control (further away, more efficient) --DONE 
++ clean up control stuff (Anshuk) -- DONE
+- look into min delta v for continuous control (Anshuk) -- DONE
 
 - make report cohesive 
 - incorporate all feedback
@@ -38,10 +35,54 @@ https://explorers.larc.nasa.gov/APMIDEX2016/MO/pdf_files/12-6U_CDS_2016-05-19_Pr
 
 Atmospheric Density models --> Vallado Table 8.4
 
+real-time space-borne GPS Accuracy for LEO satellites is 10m --> conservative with no carrier-phase or dynamics orbit determination improvements, which get accuracy down to 1m --> https://link.springer.com/content/pdf/10.1007/s10291-007-0080-x.pdf
+
+relative navigation error (RMS) of 10cm can be achieved using GPS, crosslink (radio link between spacecraft that is used to transfer data and also measure range), and celestial object measurements --> https://ntrs.nasa.gov/api/citations/20030032254/downloads/20030032254.pdf#:~:text=A%20relative%20navigation%20position%20accuracy%20of%20better,continuously%20track%20at%20least%20one%20GPS%20signal.&text=The%20primary%20sources%20of%20the%20absolute%20navigation,and%20clock%20errors%2C%20and%20receiver%20clock%20errors.
+
+
+LiDAR for docking --> 1-3cm accuracy --> https://engineering.usu.edu/ece/faculty-sites/cail/software?
+
+\subsection{Catching Up}
+The main issues that needed to be addressed in the previous problem sets were the inaccuracy of the geometric linear mapping in PS3, improving the impulsive control to (   ) in PS5, improving the delta-v usage of the continuous control in PS6, and incorporating updates from PS7 and PS8 into PS9. Along with these major fixes, each problem set was also updated with minor fixes for readability and accuracy.
+
+For problem set 1, we clarified which ROEs are being used when throughout the project. Specifically, the ROES from the NASA Starling mission are used in problem sets 1 and 2 to investigate and verify the dynamics models. For later problem sets, our custom ROEs are used to simulate rendezvous and docking, except for problem set 4 where the prescribed ROEs are used.
+
+For problem set 2, we consolidated some repeated equations, updated the RTN projection plot for readability, added a new RTN projection plot to showcase the effects of the maneuver, and added supportive analysis.
+
+For problem set 3, we updated the ROEs to match those chosen in later problem sets, fixed geometric linear mapping so that it is more accurate than the Yamanaka-Ankersen solution, created more readable figures to highlight the differences between the methods, and  improved overall readability through spelling and grammar fixes.
+
+For problem set 4, we included clarification over the usage of given ROEs versus custom ROEs, and improved the language and reasoning about drifts observed in $\delta \lambda$.
+
+For problem set 5, we (   )
+
+For problem set 6, we added a missing negative sign in the equation for drift in $\delta \lambda$, and fixed the calculation and plotting of delta-v's for Lyapunov control so that they are much more reasonable and closer to delta-v lower bound 
+
+For problem set 7, we incorporated improvements into problem set 8 since it was the implementation of the EKF outlined in problem set 7. The major update was that we no longer estimate the absolute chief state in our EKF. This was done to simplify the measurement model and the EKF mean propagation. 
+
+For problem set 8, we incorporated all remaining improvements into problem set 9. The main improvements include the addition of drag into our ground truth force model, better justification of noise values, and the addition of the 3-sigma region to the EKF plots. These were along with the successful integration of navigation and control and the addition of some bonus material. 
+
+\subsection{Integration of Navigation and Control}
+Drag (Tycho)
+Measurement Noise (Tycho)
+
+Re-discussion of control architecture (Anshuk) -- talk about combo of impulsive and continuous control
+Flow chart of simulation structure (Anshuk)
+Results and Analysis (Anshuk)
 
 
 
-\subsection{Conclusion}
+\subsection{Bonus Material}
+\subsubsection{Utilizing Radial Burns for Proximity Operations}
+
+\subsubsection{Actuator Modeling}
+
+\subsubsection{Dynamic Q Tuning}
+As shown in Figure ..., there is a spike in the estimate of the relative orbital elements during and around the large impulsive maneuvers. The EKF is too slow to adapt to the larger jumps in the state. Therefore, to get a good estimate even during these impulsive burns, we increase the process noise significantly, thus making the filter more reliant on the measurements during that phase. The two choices for $Q$ were ($R$ was not changed between the two cases)
+
+\subsubsection{PID control for Docking}
+
+
+\subsection{Conclusion and Way Forward}
 This is the last section of your documentation. We are interested in reading on the
 following topics:
 a) Self-contained short summary of the project

@@ -56,7 +56,7 @@ For each station keeping mode, a keep-in region was defined for the relative ecc
 
 This tight keep-in region dictates a tight relative position knowledge requirement: the Watcher's knowledge should be less than a meter and the Docker's should be less than a centimeter in order to allow for successful docking and servicing. Similarly, the velocity estimation of the Docker should be on order of mm/s.
 
-Additionally, the actuation needed will be low-thrust, high-preicison with a low impulse bit on the order of mm/s, such as a cold gas thruster. Short, impulsive bursts will be used so to not disturb the attitude of the Docker and allow for precise control. 
+Additionally, the actuation needed will be low-thrust, high-preicison with a low impulse bit on the order of mm/s, such as a cold gas thruster (rather than a very low-thrust option such as a Hall-effect thruster). Short, impulsive bursts will be used so to not disturb the attitude of the Docker and allow for precise control. 
 
 
 \subsubsection{Reconfiguration Control Requirements}
@@ -68,18 +68,19 @@ For reconfiguration, there must always be passive safety, which is achieved thro
 \hline
 \textbf{Phase} & \textbf{Number of Orbits} \\
 \hline
-Mode 2 & 2 \\
-Station-Keeping 2 & 3 \\
-Mode 3 & 2 \\
-Station-Keeping 3 & 3 \\
-Mode 4 & 2 \\
+Station-Keeping Mode 1 & 4 \\
+Mode 2 & 5 \\
+Station-Keeping 2 & 4 \\
+Mode 3 & 5 \\
+Station-Keeping 3 & 4 \\
+Mode 4 & 4 \\
 \hline
 \end{tabular}
 \caption{Number of orbits spent in each mode and station-keeping phase} \label{tab:mode_durations}
 \end{table}
 
 \subsubsection{Choice of Actuators}
-Two different types of actuators will be used. The first will be higher-thrust and lower specific impulse chemical propulsion for station keeping, phasing, and the approach. Electric propulsion is also an option here as it has higher specific impulse, but will not be used for now as impulsive delta-v's are simpler to model. The second kind of actuator used with be lower-thrust propulsion, such as cold-gas thrusters. These will be used for proximity and docking operations, as fine and accurate thrust control with small impulse bits is required. Cold gas thrusters will be used instead of hydrazine thrusters since they are less hazardous to work with. 
+Two different types of actuators will be used. The first will be higher-thrust and lower specific impulse chemical propulsion for large maneuvers and formation reconfiguration. Electric propulsion is also an option here as it has higher specific impulse, but its low thrust makes it a poor choice for impulsive control. Another kind of actuator used with be lower-thrust propulsion, such as cold-gas thrusters. These will be used for proximity and docking operations, as fine and accurate thrust control with small impulse bits is required. 
 
 \subsubsection{Absolute and Relative Orbit Dynamics Models}
 Two dynamics models are needed: the first will be the ground-truth and the second will actually run onboard the computationally-limited spacecraft. The absolute ground-truth will be given by numerical integration of the Fundamental Orbital Differential Equation (FODE) with J2 effects for the chief and both deputies. The relative ground-truth will be calculated by taking the differences in the absolute states and converting to the RTN and ROE representations. The onboard dynamics model cannot perform numerical integration as this would be too computationally-expensive. Instead, the absolute and onboard dynamics will be given by the analytical STM with J2 for ROE as outlined in Section \ref{sec:j2_analytical_roe}, which still needs to provide accuracy as it will be used for control. 
@@ -134,7 +135,7 @@ Implementing the ground-truth model in open-loop shows each desired mode in the 
 \begin{figure}[H]
     \centering
     \begin{subfigure}[b]{0.32\linewidth}
-        \includegraphics[width=\linewidth]{sim/figures/PS5/mode_3_RTN_.png_RT.pn}
+        \includegraphics[width=\linewidth]{sim/figures/PS5/mode_3_RTN.png_RT.pn}
         \caption{RT Projection}
         \label{fig:mode_3_rt}
     \end{subfigure}
@@ -172,7 +173,7 @@ To verify that the STM is an acceptable model, it is compared in the ROE represe
 
 As highlighted in Section \ref{sec:control_objectives}, our system has four distinct operational modes, each with their own unique control accuracy and safety requirements. We also have control considerations for the maneuvers for transitioning between different modes.
 
-Based on the requirements detailed in the previous section, we decided on the operational methods highlighted in Table \ref{tab:mode_control_methods}. Note here, that just the Docker (SV3) that performs the approach towards SV1, and so its control schemes change with time. SV2, on the other hand, keeps its original station through all modes, and does not perform any larger maneuvers (attitude maneuvers are not considered in this formulation).
+Based on the requirements detailed in the previous section, we decided on the operational methods highlighted in Table \ref{tab:mode_control_methods}. Note here, that just the Docker (SV3) that performs the approach towards SV1, and so its control schemes change with time. SV2, on the other hand, keeps its original station through all modes, and does not perform any larger maneuvers (attitude maneuvers are not considered in this formulation). It only performs station-keeping corrections, if any.
 
 \definecolor{lightgray}{gray}{0.9}
 
@@ -191,9 +192,9 @@ Based on the requirements detailed in the previous section, we decided on the op
         \hline
         \textbf{Mode of Operation} & \textbf{Tracked State} & \textbf{In-plane Control Method} & \textbf{Out-of-plane Control Method} & \textbf{Control Window} & \textbf{Reasoning} \\
         \hline
-        General Station Keeping (SV2 always and SV3 Mode 1) & Relative orbital elements that provide passive safety & Pairs of along-track burns & Single impulse cross-track burn & Full duration of station-keeping (see Table \ref{tab:mode_durations}) & Simple efficient control methodology that does not require prior time allocation. \\
+        General Station Keeping (SV2 always and SV3 Mode 1) & Relative orbital elements that provide passive safety & Triplets of along-track burns & Single impulse cross-track burn & Full duration of station-keeping (see Table \ref{tab:mode_durations}) & Simple efficient control methodology that does not require prior time allocation, prevents along-track drift. \\
         \hline
-        Approach Transfer (SV3 Mode 2) & Desired Mode 2 final ROE & Naive least squares control solution & Naive least squares control solution & Two orbits for transfer & Simple open-loop solution, merges in-plane and out-of-plane, no drift in $\delta \lambda$ \\
+        Approach Transfer (SV3 Mode 2) & Desired Mode 2 final ROE & Triplets of along-track burns & Single impulse cross-track burn & Two orbits for transfer & Simple efficient control methodology that does not require prior time allocation, prevents along-track drift. \\
         \hline
         Proximity Maneuvers (SV3 Mode 3) & Desired Mode 3 final ROE & Radial impulse burns & Single-impulse cross-track burn & Two orbits for transfer & Provides tight control, no plume on target satellite. \\
         \hline
@@ -284,7 +285,7 @@ The comparison of the least-squares method with the lower-bound delta-v $\Delta 
 
 \textbf{\textit{Station-Keeping Maneuvers}}
 
-Station keeping has not been fully integrated with the rest of the maneuvers yet, however we have a separate demo where we apply station keeping to prevent a drift in the relative orbital elements.
+Station-keeping is implemented in the station-keeping periods between large maneuver modes to prevent satellite drift in an incorrect direction. Specifically, our method calls the naive-least squares formulation (as described in the previous section) to find impulsive maneuvers that bring the satellite back to the desired relative orbital elements.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{sim//figures//PS5/station_keeping_man_damico.png}
@@ -302,39 +303,39 @@ For our ground-truth simulation model, we utilized a FODE simulation model that 
 
 When simulating a maneuver, the propagation is stopped, the required $\delta v$ is added to the state, and then the propagation is continued. This allows us to simulate the impulsive burns. The $\delta v$ burns, which are calculated in RTN frame as a result of the naive least-squares and converted to ECI based on the chief's state at maneuver time.
 
-Separate from the primary simulation that implemented the different modes and maneuvers, we implemented a more integrated simulation for station-keeping that continuously plans maneuvers if the eccentricity vector or inclination vector go beyond the safe region. The code structure for station keeping, which will also simulate the primary larger maneuvers in the future, is shown in Algorithm \ref{alg:station_keeping}.
+% Separate from the primary simulation that implemented the different modes and maneuvers, we implemented a more integrated simulation for station-keeping that continuously plans maneuvers if the eccentricity vector or inclination vector go beyond the safe region. The code structure for station keeping, which will also simulate the primary larger maneuvers in the future, is shown in Algorithm \ref{alg:station_keeping}.
 
-\begin{algorithm}[H]
-\caption{Station=keeping Simulation and Plotting}
-\begin{algorithmic}[1]
+% \begin{algorithm}[H]
+% \caption{Station=keeping Simulation and Plotting}
+% \begin{algorithmic}[1]
 
-\State Initialize time array, chief semi-major axis, and empty state histories
-\State Extract nominal ROE for SV2 and SV3
-\State Define station-keeping bounds
-\State Compute desired eccentricity offsets
+% \State Initialize time array, chief semi-major axis, and empty state histories
+% \State Extract nominal ROE for SV2 and SV3
+% \State Define station-keeping bounds
+% \State Compute desired eccentricity offsets
 
-\For{each time step $t_i$ in $t_{\text{series}}$}
-    \State Propagate SV1, SV2, SV3 states using RK4
-    \State Convert SV2 and SV3 states to ROE w.r.t. SV1
+% \For{each time step $t_i$ in $t_{\text{series}}$}
+%     \State Propagate SV1, SV2, SV3 states using RK4
+%     \State Convert SV2 and SV3 states to ROE w.r.t. SV1
 
-    \If{SV has not yet performed control}
-        \If{eccentricity deviation exceeds threshold}
-            \State Compute station keeping maneuver with naive least squares (3 burns)
-            \State Store SV $\Delta v$ for eccentricity control
-        \EndIf
-        \If{inclination deviation exceeds threshold}
-            \State Compute station keeping maneuver with naive least squares (1 burn)
-            \State Store SV $\Delta v$ for inclination control
-        \EndIf
-    \EndIf
-    \If{a planned SV $\Delta v$ is scheduled now}
-        \State Apply $\Delta v$ to SV and remove it from queue
-    \EndIf
-\EndFor
+%     \If{SV has not yet performed control}
+%         \If{eccentricity deviation exceeds threshold}
+%             \State Compute station keeping maneuver with naive least squares (3 burns)
+%             \State Store SV $\Delta v$ for eccentricity control
+%         \EndIf
+%         \If{inclination deviation exceeds threshold}
+%             \State Compute station keeping maneuver with naive least squares (1 burn)
+%             \State Store SV $\Delta v$ for inclination control
+%         \EndIf
+%     \EndIf
+%     \If{a planned SV $\Delta v$ is scheduled now}
+%         \State Apply $\Delta v$ to SV and remove it from queue
+%     \EndIf
+% \EndFor
 
-\State Convert SV2 and SV3 final states to RTN position relative to SV1\EndProcedure
-\end{algorithmic}
-\end{algorithm} \label{alg:station_keeping}
+% \State Convert SV2 and SV3 final states to RTN position relative to SV1\EndProcedure
+% \end{algorithmic}
+% \end{algorithm} \label{alg:station_keeping}
 
 \textbf{\textit{Selection of Dynamics Model for Controller}} \\
 The naive least-squares utilizes the STM for near-circular orbits detailed in Equation \ref{eq:stm_matrix} to propagate the state. Control maneuvers calculate $\delta v$ in the RTN frame, the input and reference ROEs use quasi-nonsingular relative orbital elements.
@@ -344,9 +345,9 @@ For this submission, considerations of the delta-v budget, actuator implementati
 
 \subsubsection{Results and Analysis of Control Performance} \label{sec:analysis_of_control}
 
-The results of the control system are shown in the following figures. Note that these figures do not include station-keeping control in between the modes, as this will be implemented in the future. This is why there are still significant drifts in the station keeping modes from J2. 
+The results of the control system are shown in the following figures. These results also include the station-keeping control between modes. However, this station-keeping method behaves oddly, and does not do a satisfactory job in maintaining the current relative orbital elements.
 
-Figures \ref{fig:roe_planes_modes} and \ref{fig:roe_time_modes} show the desired and actual ROEs for each mode. $\delta a$ becomes non-zero during the maneuvers because there are along-track elements. However, at the end of each mode, the control system is able to reduce $\delta a$ to near zero. But due to $\delta a$ and $\delta i_x$ not being precisely zero throughout the control and station-keeping modes, a drift is introduced in $\delta \lambda$. $\delta e_x$ and $\delta i_x$ are always meant to be zero, but again the maneuvers introduce variations. Each control mode tries to return $\delta e_x$ and $\delta i_x$ to zero but is unable to get all the way there. These errors can be addressed by station-keeping control in between modes. $\delta e_y$ and $\delta i_y$ exhibit the most accurate behavior. The control system is able to reach the desired $\delta e_y$ and $\delta i_y$ in each mode with very little error. This is important because these are the only non-zero factors in the desired ROEs and drive passive safety. 
+Figures \ref{fig:roe_planes_modes} and \ref{fig:roe_time_modes} show the desired and actual ROEs for each mode. $\delta a$ becomes non-zero during the maneuvers because there are along-track elements. However, at the end of each mode, the control system is able to reduce $\delta a$ to near zero. But due to $\delta a$ and $\delta i_x$ not being precisely zero throughout the control and station-keeping modes, a drift is introduced in $\delta \lambda$. $\delta e_x$ and $\delta i_x$ are always meant to be zero, but again the maneuvers introduce variations. Each control mode tries to return $\delta e_x$ and $\delta i_x$ to zero but is unable to get all the way there. $\delta e_y$ and $\delta i_y$ exhibit the most accurate behavior. The control system is able to reach the desired $\delta e_y$ and $\delta i_y$ in each mode with very little error. This is important because these are the only non-zero factors in the desired ROEs and drive passive safety. 
 
 \begin{figure}[H]
     \centering
