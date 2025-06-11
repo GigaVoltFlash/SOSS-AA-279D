@@ -135,7 +135,7 @@ Implementing the ground-truth model in open-loop shows each desired mode in the 
 \begin{figure}[H]
     \centering
     \begin{subfigure}[b]{0.32\linewidth}
-        \includegraphics[width=\linewidth]{sim/figures/PS5/mode_3_RTN.png_RT.pn}
+        \includegraphics[width=\linewidth]{sim/figures/PS5/mode_3_RTN.png_RT.png}
         \caption{RT Projection}
         \label{fig:mode_3_rt}
     \end{subfigure}
@@ -208,9 +208,10 @@ Based on the requirements detailed in the previous section, we decided on the op
 
 \subsubsection{Control Maneuver Formulations}
 
-
-
-Although we had the different ideas for control methodologies for the different modes, during the duration of this submission we were only able to get one method working exactly to meet our requirements: naive least squares. Two other methods were attempted: the relative orbit control impulse burn formulations in \cite{damicothesis}, and the closed-form control solution highlighted in \cite{chernick2021optimal}. However, the method from \cite{damicothesis} causes a drift in the $\delta \lambda$ that we were not able to close (likely with a third burn). We were also unable to complete a working implementation of the closed-form solution. Although these will be discussed in later submissions (to cover all the methods detailed in Table \ref{tab:mode_control_methods}), here we will primarily discuss the naive-least squares method.
+% Although we had the different ideas for control methodologies for the different modes, during the duration of this submission we were only able to get one method working exactly to meet our requirements: naive least squares. 
+Multiple techniques for control were implemented for both in-plane and out-of-plane control: closed-form solutions for ROE control in perturbed near-circular orbits provided in \cite{chernick2018new}, and a naive least squares method for control of all ROEs simultaneously. 
+% However, the method from \cite{damicothesis} causes a drift in the $\delta \lambda$ that we were not able to close (likely with a third burn). We were also unable to complete a working implementation of the closed-form solution. Although these will be discussed in later submissions (to cover all the methods detailed in Table \ref{tab:mode_control_methods}), here we will primarily discuss the naive-least squares method. 
+These methods are discussed below. In the original PSET 5 submission, the Naive least squares method was the primary mode of control. During the final submission, other methods were implemented for significantly improved impulsive-control performance.
 
 \textit{\textbf{Naive Least-Squares Method}}\\
 The naive least-squares method works on the principle that a sequence of relative orbital elements can be related to each other with a linearized model that accounts for J2 perturbations, called a state transition matrix. This STM was previously stated in Equations \ref{eq:stm_matrix} and \ref{eq:state_transition_relation}. 
@@ -277,11 +278,41 @@ Using a pseudo-inverse for an analytical least-squares solution
 
 This is our control solution, and is applied in the FODE simulation described in the following section.
 
+\textit{\textbf{Triplet of Tangential Burns for In-Plane Control}}\\
+
+In our relative orbit re-configurations, the primary in-plane change is in $\delta e_y$. At the end of each reconfiguration, $\delta a$ and $\delta \lambda$ are ideally zero. This is a control case with the change in eccentricity vector dominant. For this, \cite{chernick2018new} provides a three tangential burn control method that controls the in-plane ROEs. The result is derived from the variational equations that relate the tangential burns to the change in the ROEs, shown below.
+
+\begin{align}
+    2(\delta v_{T1} + \delta v_{T2} + \delta v_{T3}) &= n a \Delta \bar{a} \\
+    -q \, \delta v_{T1} - p \, \delta v_{T2} - l \, \delta v_{T3} &= n a \Delta \bar{\lambda} \\
+    2 \cos(U_1) \delta v_{T1} + 2 \cos(U_2) \delta v_{T2} + 2 \cos(U_3) \delta v_{T3} &= n a \Delta \delta_{e_x} \\
+    2 \sin(U_1) \delta v_{T1} + 2 \sin(U_2) \delta v_{T2} + 2 \sin(U_3) \delta v_{T3} &= n a \Delta \delta_{e_y}
+\end{align}
+
+where 
+\begin{align}
+    q &= \left( u_f - u_{T1} - \frac{c}{1 - c} u_f \right) \\
+    p &= \left( u_f - u_{T2} - \frac{c}{1 - c} u_f \right) \\
+    l &= \left( u_f - u_{T3} - \frac{c}{1 - c} u_f \right) \\
+    U_i &= (1 - c) u_{Ti} + c u_f \\
+    c &= \frac{\dot{\omega}}{n + \kappa (\eta P + Q)}
+\end{align}.
+
+Based on this, \cite{chernick2018new} provides a formulation for $\Delta v_{T1}, \Delta v_{T2}, \Delta v_{T3}$ in Tables 3 and 4. The burns are separated by mean longitude $u$ of $k\pi$ radians, i.e. on opposite ends of the near-circular orbit. 
+
+\textit{\textbf{Single-burn Relative Inclination Control}}\\
+
+Relative inclination can be controlled by a single burn in the cross-track direction. This result is also provided in \cite{chernick2018new}, which provides a formulation for near-circular orbits that also accounts for J2 perturbations.
+
+
+\textit{\textbf{Pair of Radial Burns for In-Plane Control}}\\
+
 \textbf{\textit{Setup Formulation}} \\
 The setup of the formation reconfigurations and what we want to solve are highlighted in Section \ref{sec:control_objectives}.
 
 \textbf{\textit{Comparing delta-v}} \\
-The comparison of the least-squares method with the lower-bound delta-v $\Delta v_{lb}$ is provided in Table \ref{tab:dv_comparison}.
+% The comparison of the least-squares method with the lower-bound delta-v $\Delta v_{lb}$ is provided in Table \ref{tab:dv_comparison}.
+The comparison of our final control configuration $\Delta v$ with the lower-bound delta-v $\Delta v_{lb}$ is provided in Table \ref{tab:dv_comparison}.
 
 \textbf{\textit{Station-Keeping Maneuvers}}
 
@@ -387,16 +418,18 @@ As a point of comparison, the theoretical delta-v lower bound can be calculated 
 \end{align*}
 Note that only changes in ROEs were in $\delta e$ and $\delta i$, which is why delta-v lower bound can be calculated as the norm of the along-track and cross-track delta-v's. 
 
-Table \ref{tab:dv_comparison} compares the total delta-v with the theoretical lower-bound. The actual delta-v's were approximately double the theoretical lower-bound for each mode. This suggests that there is room for improvement in optimizing the delta-v cost, which methods like reachable set theory could offer. 
+Table \ref{tab:dv_comparison} compares the total delta-v with the theoretical lower-bound. 
+% The actual delta-v's were approximately double the theoretical lower-bound for each mode. This suggests that there is room for improvement in optimizing the delta-v cost, which methods like reachable set theory could offer. 
+The actual $\Delta v$ values were usually around 1.5x the lower bound values, which we deem as an acceptable inefficiency for the control of the $\delta \lambda$, $\delta a$, and $\delta e$. In Mode 4, the $\Delta v$ used is much higher than the lower bound because of the use of radial burns, as justified in Table \ref{tab:mode_control_methods}.
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|}
 \hline
 \textbf{Mode} & \textbf{Total }$\Delta v$ \textbf{(m/s)} & \textbf{Lower Bound (m/s)} \\
 \hline
-2 & 0.3624 & 0.1830 \\
-3 & 0.2174 & 0.1098 \\
-4 & 0.0216 & 0.0110 \\
+2 & 0.2463 & 0.1830 \\
+3 & 0.1472 & 0.1098 \\
+4 & 0.07156 & 0.0110 \\
 \hline
 \end{tabular}
 \caption{Total delta-$v$ compared with theoretical lower bounds for each maneuver mode}
