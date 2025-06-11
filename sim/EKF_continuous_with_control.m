@@ -7,6 +7,10 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
     N = 14;
     k = 1000;
 
+    % Settings for more things to test
+    DYNAMIC_Q = false;
+    ACTUATOR_NOISE = false;
+
     % Initialize times
     full_times = t_series(:);
     dt = full_times(2) - full_times(1);
@@ -154,8 +158,10 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
     y_post_EKF_SV3_all(1,:) = y_actual_EKF_SV3_all(1,:);
 
     % Process and measurement noise covariances
-    Q3 = diag([1, 1, 1, 1, 1, 1]); % 0.01, 0.01
+    Q3_1 = diag([1, 1, 1, 1, 1, 1]); % 0.01, 0.01
+    Q3_2 = 100*diag([1, 1, 1, 1, 1, 1]); % 0.01, 0.01
     Q2 = 1e-3*diag([1, 1, 1, 1, 1, 1]); % 0.01, 0.01
+    Q3 = Q3_1;
 
     R = 1.0*blkdiag(RTN_sigma, ECI_sigma);  % diagonal matrix with elements equal to the varianace of each measurement
 
@@ -173,7 +179,7 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
         % SV2 control inputs are always determined the same way, with
         % continuous lyapunov control
         SV2_a_vals(i,:) = Lyapunov_feedback_control(x_EKF_SV2_all(i-1, :)/a_chief, SV2_roe_nom, SV1_oe, N, k, num_orbits_total);
-        SV2_dv_vals(i,:) = dt*SV2_a_vals(i, :)/1e3; % m/s^2 --> km/s 
+        SV2_dv_vals(i,:) = actuator_model(dt*SV2_a_vals(i, :)/1e3, ACTUATOR_NOISE); % m/s^2 --> km/s 
 
         % This is primarily for SV3, SV2 just continuously station keeps     
         if t < switch_times(1)
@@ -184,7 +190,7 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
                 [delta_v_vals, delta_v_times] = mode2_control(x_EKF_SV3_all(i-1, :)/a_chief, SV3_roe_nom_mode2, t, switch_times(3), SV1_oe, u_deg_SV1); % For SV3
                 for j = 1:length(delta_v_times)
                     [~, idx] = min(abs(full_times - delta_v_times(j)));
-                    SV3_dv_vals(idx, :) = SV3_dv_vals(idx, :) + delta_v_vals(j, :)/1e3;  % m/s --> km/s
+                    SV3_dv_vals(idx, :) = SV3_dv_vals(idx, :) + actuator_model(delta_v_vals(j, :)/1e3, ACTUATOR_NOISE);  % m/s --> km/s
                 end
                 IMPULSE_MANEUVER_PLANNED = true;
             end
@@ -194,7 +200,7 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
                 [delta_v_vals, delta_v_times] = mode3_control(x_EKF_SV3_all(i-1, :)/a_chief, SV3_roe_nom_mode3, t, switch_times(5), SV1_oe, u_deg_SV1); % For SV3
                 for j = 1:length(delta_v_times)
                     [~, idx] = min(abs(full_times - delta_v_times(j)));
-                    SV3_dv_vals(idx, :) = SV3_dv_vals(idx, :) + delta_v_vals(j, :)/1e3;  % m/s --> km/s
+                    SV3_dv_vals(idx, :) = SV3_dv_vals(idx, :) + actuator_model(delta_v_vals(j, :)/1e3, ACTUATOR_NOISE);  % m/s --> km/s
                 end
                 IMPULSE_MANEUVER_PLANNED = true;
             end
@@ -204,7 +210,7 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
                 [delta_v_vals, delta_v_times] = mode4_control(x_EKF_SV3_all(i-1, :)/a_chief, SV3_roe_nom_mode4, t, switch_times(7), SV1_oe, u_deg_SV1); % For SV3
                 for j = 1:length(delta_v_times)
                     [~, idx] = min(abs(full_times - delta_v_times(j)));
-                    SV3_dv_vals(idx, :) = SV3_dv_vals(idx, :) + delta_v_vals(j, :)/1e3;  % m/s --> km/s
+                    SV3_dv_vals(idx, :) = SV3_dv_vals(idx, :) + actuator_model(delta_v_vals(j, :)/1e3, ACTUATOR_NOISE);  % m/s --> km/s
                 end
                 IMPULSE_MANEUVER_PLANNED = true;
             end        
@@ -212,7 +218,7 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
             % Run station keeping 
             IMPULSE_MANEUVER_PLANNED = false;
             SV3_a_vals(i, :) = Lyapunov_feedback_control(x_EKF_SV3_all(i-1, :)/a_chief, SV3_roe_nom, SV1_oe, N, k, num_orbits_station_keep(2)); % Currently hardcoded number of orbits for station keep
-            SV3_dv_vals(i, :) = dt*SV3_a_vals(i, :)/1e3; % m/s^2 --> m/s
+            SV3_dv_vals(i, :) = actuator_model(dt*SV3_a_vals(i, :)/1e3, ACTUATOR_NOISE); % m/s^2 --> m/s
         end
 
         %%% PROPAGATE GROUND TRUTH
@@ -274,7 +280,15 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
         
         %%% RUN EKF
         u_SV2 = SV2_dv_vals(i, :)';
-        u_SV3 = SV3_dv_vals(i, :)';  
+        u_SV3 = SV3_dv_vals(i, :)'; 
+
+        if DYNAMIC_Q
+            if IMPULSE_MANEUVER_PLANNED==true & any(SV3_dv_vals(i, :))==true
+                Q3 = Q3_2; % Use a much larger Q at the time-steps that we have an impulse
+            else
+                Q3 = Q3_1; 
+            end
+        end
 
         % Run EKF for SV2
         [x_update_EKF_SV2, P_update_EKF_SV2, y_pred_EKF_SV2, y_post_EKF_SV2] = ekf_roes_with_control(x_update_EKF_SV2, y_actual_EKF_SV2, P_update_EKF_SV2, SV1_state, SV1_OE_state, Q2, R, dt, u_SV2);
@@ -374,11 +388,11 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
         num_orbits_modes, num_orbits_station_keep,'figures/PS9/ROE_planes_modes_SV3.png', 'figures/PS9/ROE_over_time_modes_SV3.png', 'figures/PS9/ROE_error_over_time_modes_SV3.png');
 
     % Delta V plots to see control inputs
-    plot_delta_v_timeline(full_times(:), SV2_dv_vals, t_orbit, SV2_modes, num_orbits_modes, num_orbits_station_keep, ...
-        false, 'figures/PS9/delta_v_timeline_modes_SV2.png');
-    plot_delta_v_timeline(full_times(:), SV3_dv_vals, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
+    plot_delta_v_timeline(full_times(:), SV2_dv_vals*1e3, t_orbit, SV2_modes, num_orbits_modes, num_orbits_station_keep, ...
+        true, 'figures/PS9/delta_v_timeline_modes_SV2.png');
+    plot_delta_v_timeline(full_times(:), SV3_dv_vals*1e3, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
         false, 'figures/PS9/delta_v_timeline_modes_SV3.png');
-    plot_delta_v_cumulative_timeline(full_times(:), SV3_dv_vals, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
+    plot_delta_v_cumulative_timeline(full_times(:), SV3_dv_vals*1e3, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
        true, 'figures/PS9/delta_v_cumulative_timeline_modes_SV3.png')
 
     % Plot the 3D orbit
