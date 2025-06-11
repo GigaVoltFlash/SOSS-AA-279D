@@ -280,11 +280,29 @@ This is our control solution, and is applied in the FODE simulation described in
 
 \textit{\textbf{Triplet of Tangential Burns for In-Plane Control}}\\
 
-In our relative orbit configurations, most of th
+In our relative orbit re-configurations, the primary in-plane change is in $\delta e_y$. At the end of each reconfiguration, $\delta a$ and $\delta \lambda$ are ideally zero. This is a control case with the change in eccentricity vector dominant. For this, \cite{chernick2018new} provides a three tangential burn control method that controls the in-plane ROEs. The result is derived from the variational equations that relate the tangential burns to the change in the ROEs, shown below.
 
-FINISH
+\begin{align}
+    2(\delta v_{T1} + \delta v_{T2} + \delta v_{T3}) &= n a \Delta \bar{a} \\
+    -q \, \delta v_{T1} - p \, \delta v_{T2} - l \, \delta v_{T3} &= n a \Delta \bar{\lambda} \\
+    2 \cos(U_1) \delta v_{T1} + 2 \cos(U_2) \delta v_{T2} + 2 \cos(U_3) \delta v_{T3} &= n a \Delta \delta_{e_x} \\
+    2 \sin(U_1) \delta v_{T1} + 2 \sin(U_2) \delta v_{T2} + 2 \sin(U_3) \delta v_{T3} &= n a \Delta \delta_{e_y}
+\end{align}
+
+where 
+\begin{align}
+    q &= \left( u_f - u_{T1} - \frac{c}{1 - c} u_f \right) \\
+    p &= \left( u_f - u_{T2} - \frac{c}{1 - c} u_f \right) \\
+    l &= \left( u_f - u_{T3} - \frac{c}{1 - c} u_f \right) \\
+    U_i &= (1 - c) u_{Ti} + c u_f \\
+    c &= \frac{\dot{\omega}}{n + \kappa (\eta P + Q)}
+\end{align}.
+
+Based on this, \cite{chernick2018new} provides a formulation for $\Delta v_{T1}, \Delta v_{T2}, \Delta v_{T3}$ in Tables 3 and 4. The burns are separated by mean longitude $u$ of $k\pi$ radians, i.e. on opposite ends of the near-circular orbit. 
 
 \textit{\textbf{Single-burn Relative Inclination Control}}\\
+
+Relative inclination can be controlled by a single burn in the cross-track direction. This result is also provided in \cite{chernick2018new}, which provides a formulation for near-circular orbits that also accounts for J2 perturbations.
 
 
 \textit{\textbf{Pair of Radial Burns for In-Plane Control}}\\
