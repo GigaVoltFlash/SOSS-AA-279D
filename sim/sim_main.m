@@ -18,11 +18,11 @@ run_PS1 = false;
 run_PS2 = false;
 run_PS3 = false;
 run_PS4 = false;
-run_PS5 = false;
+run_PS5 = true;
 run_PS6 = false; 
 run_PS7 = false;
 run_PS8 = false;
-run_PS9 = true;
+run_PS9 = false;
 
 % Load SV1 information
 load_SV1;

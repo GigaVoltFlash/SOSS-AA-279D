@@ -18,9 +18,9 @@ function sim_all_maneuvers_sk_impulsive(SV2_modes, SV3_modes, num_orbits_modes, 
     SV3_roe_nom_mode4 = SV3_modes(4, :)/a_chief;
 
     % Maybe pick these differently later
-    SV2_delta_di_max = 20.0/a_chief;
+    SV2_delta_di_max = 10.0/a_chief;
     SV3_delta_di_max = 3.0/a_chief;
-    SV2_delta_de_max = 20.0/a_chief;
+    SV2_delta_de_max = 10.0/a_chief;
     SV3_delta_de_max = 3.0/a_chief;
 
     SV2_dphi = asin(SV2_delta_de_max/norm(SV2_roe_nom(3:4)));
