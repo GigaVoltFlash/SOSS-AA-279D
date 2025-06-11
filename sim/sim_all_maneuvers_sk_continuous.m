@@ -45,6 +45,8 @@ function sim_all_maneuvers_sk_continuous(SV2_modes, SV3_modes, num_orbits_modes,
     SV3_dv_vals = zeros(length(t_series), 3);
     SV2_a_vals = zeros(length(t_series), 3);
     SV3_a_vals = zeros(length(t_series), 3);
+    SV2_dv_RTN_vals = zeros(length(t_series), 3);
+    SV3_dv_RTN_vals = zeros(length(t_series), 3);
 
     withJ2 = true;
 
@@ -108,8 +110,11 @@ function sim_all_maneuvers_sk_continuous(SV2_modes, SV3_modes, num_orbits_modes,
 
         %%% APPLY ACCELERATION AS DELTA V 
         % Convert a_RTN to dv_RTN by multiplying by dt
-        SV2_dv_vals(i,:) = dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), dt*SV2_a_vals(i, :)'/1e3); % m/s^2 --> m/s --> km/s
-        SV3_dv_vals(i,:) = dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), dt*SV3_a_vals(i, :)'/1e3); % m/s^2 --> m/s --> km/s
+        SV2_dv_RTN_vals(i,:) = SV2_a_vals(i,:)*dt; % m/s^2 --> m/s (all RTN)
+        SV3_dv_RTN_vals(i,:) = SV3_a_vals(i,:)*dt; % m/s^2 --> m/s (all RTN)
+
+        SV2_dv_vals(i,:) = dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), SV2_dv_RTN_vals(i,:)'/1e3); % RTN m/s --> ECI km/s
+        SV3_dv_vals(i,:) = dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), SV3_dv_RTN_vals(i,:)'/1e3); % RTN m/s --> ECI km/s
 
         SV2_state(4:6) = SV2_state(4:6) + SV2_dv_vals(i,:)';
         SV3_state(4:6) = SV3_state(4:6) + SV3_dv_vals(i,:)';
@@ -152,11 +157,11 @@ function sim_all_maneuvers_sk_continuous(SV2_modes, SV3_modes, num_orbits_modes,
        num_orbits_modes, num_orbits_station_keep,'figures/PS6/ROE_planes_modes_SV2.png', 'figures/PS6/ROE_over_time_modes_SV2.png', 'figures/PS6/ROE_error_over_time_modes_SV2.png');
     plot_ROE_planes_with_modes(full_times, t_orbit, d_a_SV3, d_lambda_SV3, d_e_x_SV3, d_e_y_SV3, d_i_x_SV3, d_i_y_SV3,SV3_modes,...
         num_orbits_modes, num_orbits_station_keep,'figures/PS6/ROE_planes_modes_SV3.png', 'figures/PS6/ROE_over_time_modes_SV3.png', 'figures/PS6/ROE_error_over_time_modes_SV3.png');
-    plot_delta_v_timeline(full_times, SV2_a_vals, t_orbit, SV2_modes, num_orbits_modes, num_orbits_station_keep, ...
+    plot_delta_v_timeline(full_times, SV2_dv_RTN_vals, t_orbit, SV2_modes, num_orbits_modes, num_orbits_station_keep, ...
        true, 'figures/PS6/delta_v_timeline_modes_SV2.png');
-    plot_delta_v_timeline(full_times, SV3_a_vals, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
+    plot_delta_v_timeline(full_times, SV3_dv_RTN_vals, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
        true, 'figures/PS6/delta_v_timeline_modes_SV3.png');
-    plot_delta_v_cumulative_timeline(full_times, SV3_a_vals, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
+    plot_delta_v_cumulative_timeline(full_times, SV3_dv_RTN_vals, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
        true, 'figures/PS6/delta_v_cumulative_timeline_modes_SV3.png')
     
 end
