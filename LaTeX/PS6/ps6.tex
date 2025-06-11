@@ -211,7 +211,7 @@ We can thus modulate the $\delta a_{des}$ such that we can help converge $\delta
 
 We determine those upper bounds $\delta \dot{\lambda}_{ref}$ based on a $\delta a_{ref}$
 \begin{align}
-    \delta \dot{\lambda}_{ref} = \frac{3}{2} n_c \delta a_{ref}
+    \delta \dot{\lambda}_{ref} = -\frac{3}{2} n_c \delta a_{ref}
 \end{align}
 
 where $\delta a_{ref}$ accounts for the shift in $\delta a$ that occurs when performing tangential burns to modify the in-plane eccentricity vector change $\Delta \delta \textbf{e}$. We thus use the following expression for $\delta a_{ref}$ as
@@ -377,16 +377,16 @@ As a point of comparison, the theoretical delta-v lower bound can be calculated 
 \end{align*}
 Note that only changes in ROEs were in $\delta e$ and $\delta i$, which is why delta-v lower bound can be calculated as the norm of the along-track and cross-track delta-v's. 
 
-Table \ref{tab:dv_comparison_continuous} compares the total delta-v with the theoretical lower-bound. The actual delta-v's were approximately almost two orders of magnitude larger than the theoretical lower-bound for each mode. This is due to the nature of continuous control with frequent, oscillatory burns as mentioned previously. A greater total delta-v for continuous control is acceptable since a low-thrust engine, such as a Hall Effect Thruster, has much higher specific impulse than a higher-thrust engine, such as a cold-gas thruster, which would likely be used for impulsive control. That being said, the control strategy could be improved to better optimize delta-v and thus fuel usage through the introduction of constraints in the Lyapunov formulation and exploration of convex optimization. 
+Table \ref{tab:dv_comparison_continuous} compares the total delta-v with the theoretical lower-bound. The actual delta-v's were approximately 30 \% larger than the theoretical lower-bound for each mode. This is due to the nature of continuous control with frequent, oscillatory burns as mentioned previously. A greater total delta-v for continuous control is acceptable since a low-thrust engine, such as a Hall Effect Thruster, has much higher specific impulse than a higher-thrust engine, such as a cold-gas thruster, which would likely be used for impulsive control. That being said, the control strategy could be improved to better optimize delta-v and thus fuel usage through the introduction of constraints in the Lyapunov formulation and exploration of convex optimization. 
 \begin{table}[H]
 \centering
 \begin{tabular}{|c|c|c|}
 \hline
 \textbf{Mode} & \textbf{Total }$\Delta v$ \textbf{(m/s)} & \textbf{Lower Bound (m/s)} \\
 \hline
-2 & 17.6259 & 0.1830 \\
-3 & 10.5896 & 0.1098 \\
-4 & 1.0535 & 0.0110 \\
+2 & 0.2377 & 0.1830 \\
+3 & 0.1430 & 0.1098 \\
+4 & 0.0132 & 0.0110 \\
 \hline
 \end{tabular}
 \caption{Total delta-$v$ for continuous control compared with theoretical lower bounds for each maneuver mode}
