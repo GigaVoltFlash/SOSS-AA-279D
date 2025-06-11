@@ -123,7 +123,7 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV2_
 
     % Initial estimate and covariance for EKF (assuming perfect SV1
     % knowledge for now)
-    estimate_sigma = 0.1*eye(6);
+    estimate_sigma = (0.1)^2 *eye(6);
     %estimate_sigma(2,2) = 1e2; 
     estimate_noise = sqrtm(estimate_sigma)*randn(6,1);
     x_EKF_SV3_all(1,:) = SV3_ROE_init + 10*estimate_noise';
@@ -137,8 +137,8 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV2_
     P_update_EKF_SV3 = squeeze(P_EKF_SV3_all(1,:,:));
 
     % Initial measurements and definition of noise for EKF
-    RTN_sigma = 0.001 * eye(3); % 1 m noise in each direction .000001
-    ECI_sigma = 0.1* eye(3); % 100 m noise in each direction .001 or 1
+    RTN_sigma = (0.001)^2 * eye(3); % 1 m noise in each direction .000001
+    ECI_sigma = (0.1)^2* eye(3); % 100 m noise in each direction .001 or 1
 
     [rho2, ~] = ECI2RTN_rel(SV1_state(1:3)', SV1_state(4:6)', SV2_state(1:3)', SV2_state(4:6)');
     SV2_RTN_pos = rho2';
@@ -166,10 +166,6 @@ function EKF_continuous_no_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV2_
     % Process and measurement noise covariances
     % Q = 0.1*estimate_sigma; % similar to P_0 but much smaller
     Q = 1e-3*diag([1, 1, 1, 1, 0.01, 0.01]);
-    %Q(1,1) = 1e4;
-    %Q(2,2) = 1e3;
-    %Q(5,5) = 1e1;
-    %Q(6,6) = 1e1;
 
     % R assumes there is less noise than there actually is.
     % R = 1000000*blkdiag(RTN_sigma, ECI_sigma); % diagonal matrix with elements equal to the varianace of each measurement
