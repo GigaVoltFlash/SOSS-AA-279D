@@ -393,10 +393,16 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
     plot_delta_v_timeline(full_times(:), SV3_dv_vals*1e3, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
         false, 'figures/PS9/delta_v_timeline_modes_SV3.png');
     plot_delta_v_cumulative_timeline(full_times(:), SV3_dv_vals*1e3, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
-       true, 'figures/PS9/delta_v_cumulative_timeline_modes_SV3.png')
+       false, 'figures/PS9/delta_v_cumulative_timeline_modes_SV3.png')
+    plot_delta_v_cumulative_timeline(full_times(:), SV2_dv_vals*1e3, t_orbit, SV3_modes, num_orbits_modes, num_orbits_station_keep, ...
+       true, 'figures/PS9/delta_v_cumulative_timeline_modes_SV2.png')
 
     % Plot the 3D orbit
-    plot_3D_rel_orbit(SV2_rel_pos, SV3_rel_pos, true, 'All maneuvers 3D path', 'figures/PS9/ROE_3d_all_maneuvers.png');
+    if ACTUATOR_NOISE
+        plot_3D_rel_orbit(SV2_rel_pos, SV3_rel_pos, true, 'All maneuvers 3D path', 'figures/PS9/ROE_3d_all_maneuvers_act_noise.png');
+    else
+        plot_3D_rel_orbit(SV2_rel_pos, SV3_rel_pos, true, 'All maneuvers 3D path', 'figures/PS9/ROE_3d_all_maneuvers.png');
+    end
     % final_EKF_mean_err_SV2 = EKF_error_SV2(end, :);
     % final_EKF_mean_err_SV3 = EKF_error_SV3(end, :);
     % final_EKF_std_err_SV2 = sqrt(diag(squeeze(P_EKF_SV2_all(end, :, :))));
