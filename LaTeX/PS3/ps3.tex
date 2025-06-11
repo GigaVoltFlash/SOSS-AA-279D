@@ -555,7 +555,7 @@ The resulting relative position and velocity 3D components of SV2 and SV3 are sh
 \end{figure}
 
 \subsubsection{Analysis of Geometric Linear Mapping Results}\label{sec:geom_mapping_analysis}
-The results from geometric linear mapping are as expected, because there are close to those from the YA solution but slightly different. Specifically, the ellipses are skewed differently and have different thicknesses in the tangential direction. This is expected because, as explained by Willis, geometric linear mapping is an approximation of the transformation from ROE to position and velocity vectors \cite{willis2023analytical}. The ROEs can be related to the position and velocity vecotrs of the chief and deputy spacecraft through the geometry of Keplerian orbits. But this is still an approximation and not a solution to the TH equations, like the previous method was. 
+The results from geometric linear mapping are as expected, as they are much closer to the ground truth than the YA solution. This is expected because, as explained by Willis, geometric linear mapping is a transformation from ROE to position and velocity vectors \cite{willis2023analytical}. The ROEs can be related to the position and velocity vectors of the chief and deputy spacecraft through the geometry of Keplerian orbits. This method is more accurate than solving the differential equation which has approximations in it. 
 
 The unscaled ROE can be found by dividing the original ROE given in Table \ref{tab:relative_oe_hcw} by the chief's semi-major axis. They are computed for SV2 and SV3 to be:
 \[
@@ -591,7 +591,7 @@ These match up with the integration constants computed before. Specifically, for
 
 
 \subsubsection{Comparison of Errors from Different Propagation Methods}
-Now we can compare YA solution and geometric mapping to the true relative position and velocity given by numerical propagation of the nonlinear equations (Fundamental Equations of Relative Motion or FERM) as outlined in Section \ref{sec:nonlinear_rel_eom}. Note that the YA solution method is referred to as "YA Dif. Eq." and the geometric mapping method is referred to as "YA Mapping" in the Figures. 
+Now we can compare YA solution and geometric mapping to the true relative position and velocity given by numerical propagation of the nonlinear equations (Fundamental Equations of Relative Motion or FERM) as outlined in Section \ref{sec:nonlinear_rel_eom}. Note that the YA solution method is referred to as "YA Dif. Eq." and the geometric linear mapping method is referred to as "Geometric Mapping" in the Figures. 
 
 \begin{figure}[H]
     \centering
@@ -601,9 +601,15 @@ Now we can compare YA solution and geometric mapping to the true relative positi
 \end{figure}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\linewidth]{sim/figures/PS3/RTN_error_projections_YA_comparison.png}
-    \caption{RTN projections of error between YA Solution, Geometric Mapping and FERM}
-    \label{fig:RTN_error_comp}
+    \includegraphics[width=0.7\linewidth]{sim/figures/PS3/RTN_error_over_time_YA_comparison_SV2.png}
+    \caption{SV2: RTN projections of error between YA Solution, Geometric Mapping and FERM}
+    \label{fig:RTN_error_comp_SV2}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{sim/figures/PS3/RTN_error_over_time_YA_comparison_SV3.png}
+    \caption{SV3: RTN projections of error between YA Solution, Geometric Mapping and FERM}
+    \label{fig:RTN_error_comp_SV3}
 \end{figure}
 \begin{figure}[H]
     \centering
@@ -612,7 +618,7 @@ Now we can compare YA solution and geometric mapping to the true relative positi
     \label{fig:3D_orbits_comp}
 \end{figure}
 
-These plots show that the YA solution of the differential equation is more accurate than geometric mapping, as the YA solution is much closer to the true motion. While geometric mapping is close to the true motion, it exhibits significant errors. This is because, as discussed in Section \ref{sec:geom_mapping_analysis}, geometric mapping is a linear approximation relating the ROEs to the integration constants and thus to the relative motion. On the other hand, the YA solution is intrinsic to the YA model as the relative motion is inherently linked to the integration constants. 
+These plots show that the geometric mapping method is more accurate than the YA solution of the differential equation, as the geometric mapping method is closer to the true motion with less error in the radial, tangential, and normal directions. The reason for this is discussed in Section \ref{sec:geom_mapping_analysis}. 
 
 \subsubsection{Repeating with Difference in Semi-Major Axis}
 Now, following the same procedure outlined above, we can adjust the initial conditions to investigate the behavior when there is a difference in semi-major axis between the deputy and the chief. We chose to apply the following conditions, while maintaining all other initial conditions the same. 
@@ -634,18 +640,24 @@ Figure \ref{fig:RTN_comp_2} shows the new RTN projections of all YA methods now 
 \end{figure}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\linewidth]{sim/figures/PS3/RTN_error_projections_YA_comparison_2.png}
-    \caption{RTN error projections of YA methods with semi-major axis separation}
-    \label{fig:RTN_error_comp_2}
+    \includegraphics[width=0.7\linewidth]{sim/figures/PS3/RTN_error_over_time_YA_comparison_SV2_2.png}
+    \caption{SV2: RTN projections of error between YA Solution, Geometric Mapping and FERM with semi-major axis separation}
+    \label{fig:RTN_error_comp_SV2_2}
 \end{figure}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\linewidth]{sim/figures/PS3/3D_YA_comparison_2.png}
+    \includegraphics[width=0.7\linewidth]{sim/figures/PS3/RTN_error_over_time_YA_comparison_SV3_2.png}
+    \caption{SV3: RTN projections of error between YA Solution, Geometric Mapping and FERM with semi-major axis separation}
+    \label{fig:RTN_error_comp_SV3_2}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{sim/figures/PS3/3D_YA_comparison_2.png}
     \caption{3D orbits of YA methods with semi-major axis separation}
     \label{fig:3D_orbits_YA_comp_2}
 \end{figure}
 
-As expected, there is significant drift arising from the differences in semi-major axis. Tangentially, SV2 drifts behind the chief since SV2 is above the chief and has a longer orbital period, while SV3 drifts ahead of the chief since SV3 is below the chief and thus has a shorter orbital period. There is also a radial drift which causes the deputy orbits to rotate about the tangential axis. This is due to the coupled nature of the tangential and radial components in the TH equations. The normal components are unaffected as out-of-plane behavior is decoupled from in-plane behavior. As before, the YA solution of the differential equation is much more accurate than the geometric linear mapping, which has significant and growing errors. The 3D orbits are as expected as they loop around the chief orbit with drift in tangential and radial directions.
+As expected, there is significant drift arising from the differences in semi-major axis. Tangentially, SV2 drifts behind the chief since SV2 is above the chief and has a longer orbital period, while SV3 drifts ahead of the chief since SV3 is below the chief and thus has a shorter orbital period. There is also a radial drift which causes the deputy orbits to rotate about the tangential axis. This is due to the coupled nature of the tangential and radial components in the TH equations. The normal components are unaffected as out-of-plane behavior is decoupled from in-plane behavior. As before, the geometric mapping method is more accurate than the YA solution. The 3D orbits are as expected as they loop around the chief orbit with drift in tangential and radial directions.
 
 \subsubsection{Repeating with Highly Eccentric Chief Orbit}
 Now, following the same procedure outlined above, we can adjust the initial conditions to investigate the behavior when there is a highly eccentric chief orbit. We chose to apply the following condition, while maintaining all other original initial conditions the same. 
@@ -662,9 +674,15 @@ Figure \ref{fig:RTN_comp_3} shows the new RTN projections of all YA methods now 
 \end{figure}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\linewidth]{sim/figures/PS3/RTN_error_projections_YA_comparison_3.png}
-    \caption{RTN error projections of YA methods with highly-eccentric chief orbit}
-    \label{fig:RTN_error_comp_3}
+    \includegraphics[width=0.7\linewidth]{sim/figures/PS3/RTN_error_over_time_YA_comparison_SV2_3.png}
+    \caption{SV2: RTN projections of error between YA Solution, Geometric Mapping and FERM with highly-eccentric chief orbit}
+    \label{fig:RTN_error_comp_SV2_3}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{sim/figures/PS3/RTN_error_over_time_YA_comparison_SV3_3.png}
+    \caption{SV3: RTN projections of error between YA Solution, Geometric Mapping and FERM with highly-eccentric chief orbit}
+    \label{fig:RTN_error_comp_SV3_3}
 \end{figure}
 \begin{figure}[H]
     \centering
@@ -673,4 +691,4 @@ Figure \ref{fig:RTN_comp_3} shows the new RTN projections of all YA methods now 
     \label{fig:3D_orbits_YA_comp_3}
 \end{figure}
 
-As expected, the high eccentricity skews relative motion away from the normal 2:1 ellipses. As Willis explains the relative position in the RT plane is bounded by two ellipses which rely on the eccentricity of the chief's orbit \cite{willis2023analytical}. As eccentricity is increased these ellipses are stretched out or skewed, which leads to the behavior found here. Again, the geometric mapping method exhibits much larger error than the solution of the differential equation. 
+As expected, the high eccentricity skews relative motion away from the normal 2:1 ellipses. As Willis explains the relative position in the RT plane is bounded by two ellipses which rely on the eccentricity of the chief's orbit \cite{willis2023analytical}. As eccentricity is increased these ellipses are stretched out or skewed, which leads to the behavior found here. Here, the geometric mapping method exhibits a larger error than the YA solution, which arises from the high eccentricity. 
