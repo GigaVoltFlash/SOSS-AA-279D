@@ -30,16 +30,22 @@ function plot_ROE_comparison_with_cov(t, t_orbit, ROE1, ROE2, covariance, ...
 
         std_1 = sqrt(covariance(:, k, k));
         std_2 = 2 * std_1;
-
-        % 2σ Region (light purple)
+        std_3 = 3 * std_1;
+        
+        % 3σ Region (orange)
+        h_fill3 = fill(ax, [time_orbits; flipud(time_orbits)], ...
+            [ROE2(:, k) + std_3; flipud(ROE2(:, k) - std_3)], ...
+            [1.0, 0.8, 0.6], 'FaceAlpha', 0.8, 'EdgeColor', 'none');
+        
+        % 2σ Region (purple)
         h_fill2 = fill(ax, [time_orbits; flipud(time_orbits)], ...
             [ROE2(:, k) + std_2; flipud(ROE2(:, k) - std_2)], ...
-            [0.85 0.75 1.0], 'FaceAlpha', 0.3, 'EdgeColor', 'none');
-
-        % 1σ Region (light red)
+            [0.85 0.75 1.0], 'FaceAlpha', 0.8, 'EdgeColor', 'none');
+        
+        % 1σ Region (red)
         h_fill1 = fill(ax, [time_orbits; flipud(time_orbits)], ...
             [ROE2(:, k) + std_1; flipud(ROE2(:, k) - std_1)], ...
-            [1.0 0.6 0.6], 'FaceAlpha', 0.4, 'EdgeColor', 'none');
+            [1.0 0.6 0.6], 'FaceAlpha', 0.8, 'EdgeColor', 'none');
 
         % Plot lines
         h1 = plot(ax, time_orbits, ydata1{k}, 'b', 'LineWidth', lw);
@@ -49,12 +55,12 @@ function plot_ROE_comparison_with_cov(t, t_orbit, ROE1, ROE2, covariance, ...
         ylabel(ax, labels{k});
 
         if k == 1
-            h_all = [h1, h2, h_fill2, h_fill1];
+            h_all = [h1, h2, h_fill3, h_fill2, h_fill1];
         end
     end
 
     lg = legend(h_all, ...
-        {label1, label2, '2\sigma Region', '1\sigma Region'}, ...
+        {label1, label2,'3\sigma Region', '2\sigma Region', '1\sigma Region'}, ...
         'Orientation', 'horizontal', ...
         'Location', 'southoutside', ...
         'Box', 'off', 'FontSize', 10);

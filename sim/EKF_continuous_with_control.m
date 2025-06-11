@@ -114,7 +114,7 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
 
     % Initial estimate and covariance for EKF (assuming perfect SV1
     % knowledge for now)
-    estimate_sigma = 0.1*eye(6);
+    estimate_sigma = (0.1)^2 *eye(6);
     estimate_noise = sqrtm(estimate_sigma)*randn(6,1);
     x_EKF_SV3_all(1,:) = SV3_ROE_init + 10*estimate_noise';
     P_EKF_SV3_all(1,:,:) = 100*estimate_sigma;
@@ -127,8 +127,8 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
     P_update_EKF_SV3 = squeeze(P_EKF_SV3_all(1,:,:));
 
     % Initial measurements and definition of noise for EKF
-    RTN_sigma = 0.001 * eye(3); % 1 m noise in each direction .000001
-    ECI_sigma = 0.1* eye(3); % 100 m noise in each direction .001 or 1
+    RTN_sigma = (0.001)^2 * eye(3); % 0.1 m noise in each direction (defined in km)
+    ECI_sigma = (0.1)^2 * eye(3); % 10 m noise in each direction (defined in km)
 
     [rho2, ~] = ECI2RTN_rel(SV1_state(1:3)', SV1_state(4:6)', SV2_state(1:3)', SV2_state(4:6)');
     SV2_RTN_pos = rho2';

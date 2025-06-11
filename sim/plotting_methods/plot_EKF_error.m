@@ -14,6 +14,12 @@ function plot_EKF_error(full_times, t_orbit, error, covariance, save_path)
 
         std_1 = sqrt(covariance(:, i, i));
         std_2 = 2 * std_1;
+        std_3 = 3 * std_1;
+        
+        % 3σ Region (orange)
+        h_fill3 = fill(ax, [num_orbits; flipud(num_orbits)], ...
+            [std_3; flipud(-std_3)], ...
+            [1.0, 0.8, 0.6], 'FaceAlpha', 0.8, 'EdgeColor', 'none');
 
         % Fill ±2σ Region (light purple)
         h_fill2 = fill(ax, [num_orbits; flipud(num_orbits)], ...
@@ -32,12 +38,12 @@ function plot_EKF_error(full_times, t_orbit, error, covariance, save_path)
         ylabel(ax, roe_labels{i});
 
         if i == 1
-            h_all = [h_err, h_fill2, h_fill1];
+            h_all = [h_err, h_fill3, h_fill2, h_fill1];
         end
     end
 
     % Unified legend below all subplots
-    lg = legend(h_all, {'EKF Error', '2\sigma Region', '1\sigma Region'}, ...
+    lg = legend(h_all, {'EKF Error','3\sigma Region', '2\sigma Region', '1\sigma Region'}, ...
         'Orientation', 'horizontal', ...
         'Location', 'southoutside', ...
         'Box', 'off', 'FontSize', 10);
