@@ -7,12 +7,6 @@ function EKF_continuous_with_control(SV1_OE_init, SV2_ROE_init, SV3_ROE_init, SV
     N = 14;
     k = 1000;
 
-    % Station-keeping parameters
-    SV2_delta_di_max = 0.5/a_chief;
-    SV3_delta_di_max = 0.5/a_chief;
-    SV2_delta_de_max = 0.5/a_chief;
-    SV3_delta_de_max = 0.5/a_chief;
-
     % Initialize times
     full_times = t_series(:);
     dt = full_times(2) - full_times(1);
