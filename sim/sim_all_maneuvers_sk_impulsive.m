@@ -105,7 +105,7 @@ function sim_all_maneuvers_sk_impulsive(SV2_modes, SV3_modes, num_orbits_modes, 
             if MANEUVER_PLANNED == false
                 SV3_dv_vals = [];
                 SV3_dv_times = [];
-                [delta_v_vals, delta_v_times] = mode2_control(SV3_roe, SV3_roe_nom_mode2, t, t+t_orbit, SV1_oe, SV1_u_val); % For SV3
+                [delta_v_vals, delta_v_times] = mode2_control(SV3_roe, SV3_roe_nom_mode2, t, switch_times(3), SV1_oe, SV1_u_val); % For SV3
                 delta_v_idxs_sk = zeros(size(delta_v_times));
                 for j = 1:length(delta_v_times)
                     [~, delta_v_idxs_sk(j)] = min(abs(full_times - delta_v_times(j)));
@@ -124,7 +124,7 @@ function sim_all_maneuvers_sk_impulsive(SV2_modes, SV3_modes, num_orbits_modes, 
             if MANEUVER_PLANNED == false
                 SV3_dv_vals = [];
                 SV3_dv_times = [];
-                [delta_v_vals, delta_v_times] = mode3_control(SV3_roe, SV3_roe_nom_mode3, t,t+t_orbit, SV1_oe, SV1_u_val);
+                [delta_v_vals, delta_v_times] = mode3_control(SV3_roe, SV3_roe_nom_mode3, t,switch_times(5), SV1_oe, SV1_u_val);
                 delta_v_idxs_sk = zeros(size(delta_v_times));
                 for j = 1:length(delta_v_times)
                     [~, delta_v_idxs_sk(j)] = min(abs(full_times - delta_v_times(j)));
@@ -142,7 +142,7 @@ function sim_all_maneuvers_sk_impulsive(SV2_modes, SV3_modes, num_orbits_modes, 
             if MANEUVER_PLANNED == false
                 SV3_dv_vals = [];
                 SV3_dv_times = [];
-                [delta_v_vals, delta_v_times] = mode4_control(SV3_roe, SV3_roe_nom_mode4, t, t+t_orbit, SV1_oe, SV1_u_val);
+                [delta_v_vals, delta_v_times] = mode4_control(SV3_roe, SV3_roe_nom_mode4, t, switch_times(7), SV1_oe, SV1_u_val);
                 delta_v_idxs_sk = zeros(size(delta_v_times));
                 for j = 1:length(delta_v_times)
                     [~, delta_v_idxs_sk(j)] = min(abs(full_times - delta_v_times(j)));
@@ -244,7 +244,7 @@ function sim_all_maneuvers_sk_impulsive(SV2_modes, SV3_modes, num_orbits_modes, 
         SV2_time_match = find(SV2_dv_times == i, 1);
         if ~isempty(SV2_time_match)
             SV2_state(4:6) = SV2_state(4:6) + dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), SV2_dv_vals(SV2_time_match, :)'/1e3);
-            SV2_dv_vals_complete = [SV2_dv_vals_complete; SV2_dv_vals(SV2_time_match, :)];
+            SV2_dv_vals_complete = [SV2_dv_vals_complete; SV2_dv_vals(SV2_time_match, :)/1e3];
             SV2_dv_times_complete = [SV2_dv_times_complete, SV2_dv_times(SV2_time_match)];
             SV2_dv_vals(SV2_time_match, :) = [];
             SV2_dv_times(SV2_time_match) = [];
@@ -254,7 +254,7 @@ function sim_all_maneuvers_sk_impulsive(SV2_modes, SV3_modes, num_orbits_modes, 
         if ~isempty(SV3_time_match)
             for idx = fliplr(SV3_time_match)  % Use fliplr to avoid indexing issues when deleting
                 SV3_state(4:6) = SV3_state(4:6) + dv_RTN2ECI(SV1_state(1:3), SV1_state(4:6), SV3_dv_vals(idx, :)'/1e3);
-                SV3_dv_vals_complete = [SV3_dv_vals_complete; SV3_dv_vals(idx, :)];
+                SV3_dv_vals_complete = [SV3_dv_vals_complete; SV3_dv_vals(idx, :)/1e3];
                 SV3_dv_times_complete = [SV3_dv_times_complete, SV3_dv_times(idx)];
                 SV3_dv_vals(idx, :) = [];
                 SV3_dv_times(idx) = [];
