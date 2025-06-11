@@ -144,7 +144,7 @@ In Figures \ref{fig:roe_error_control_sv3} and \ref{fig:roe_final_SV3_planes}, w
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{sim/figures/PS9/ROE_error_over_time_modes_SV3.png}
-    \caption{Error between the true ROEs and the desired ROEs for SV2}
+    \caption{Error between the true ROEs and the desired ROEs for SV3}
     \label{fig:roe_error_control_sv3}
 \end{figure}
 
@@ -159,7 +159,7 @@ Figures \ref{fig:delta_v_cumulative_sv2} and \ref{fig:delta_v_cumulative_sv3} sh
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{sim/figures/PS9/delta_v_cumulative_timeline_modes_SV3.png}
-    \caption{$\Delta v$ over time for SV3. Note that this uses impulsive control for the maneuvers.}
+    \caption{$\Delta v$ over time for SV3. Note that this uses impulsive control for the maneuvers, but continuous control for station keeping.}
     \label{fig:delta_v_cumulative_sv3}
 \end{figure}
 
@@ -172,91 +172,118 @@ Figures \ref{fig:delta_v_cumulative_sv2} and \ref{fig:delta_v_cumulative_sv3} sh
 
 \textbf{\textit{Navigation Performance}}
 
-Now, we look specifically at comparisons between the true states and the estimate states. Figures \ref{fig:}
+Now, we look specifically at comparisons between the true states and the estimate states. Figures \ref{fig:sv2_ekf_comparison_ps9} and \ref{fig:sv3_ekf_comparison_ps9} show the true state and the EKF estimated states over time, along with the covariance bounds over this time. We see that SV2's estimation works well, with small covariance bounds and good tracking. SV3 has some interesting behavior. Specifically, because of a lower reliance on the dynamics (larger process noise $Q$), the covariance bounds are significantly larger. In addition, during the impulses, we see large difference in error between the estimated states and true states. This is easy to see in Figure \ref{fig:ekf_error_ps9_sv3}. Although we are accounting for the control input in our EKF, it is unable to predict the behavior during these impulses, incorrectly estimating a spike in $\delta e_x$ and $\delta i_x$ when there is no such spike in the true values. Relying more on the process step reduces these spikes, but makes the response to the spike too slow for some of the fast changes in. Experiments with putting a lower process noise on $\delta e_x$ and $\delta i_x$ yieled mixed results (including loss of control due to poor estimates resulting in poor planning), but further tuning to the EKF may improve these results. Regardless, the estimates converge to values within acceptable error bounds.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{sim/figures/PS9/ROE_over_time_SV2_comparison.png}
-    \caption{Caption}
-    \label{fig:enter-label}
+    \caption{True ROEs, estimate ROEs, and covariance bounds for SV2 over time.}
+    \label{fig:sv2_ekf_comparison_ps9}
 \end{figure}
-
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{sim/figures/PS9/ROE_over_time_SV3_comparison.png}
-    \caption{Caption}
-    \label{fig:enter-label}
+    \caption{True ROEs, estimate ROEs, and covariance bounds for SV3 over time.}
+    \label{fig:sv3_ekf_comparison_ps9}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{sim/figures/PS9/EKF_error_SV2.png}
-    \caption{Caption}
-    \label{fig:enter-label}
+    \caption{SV2 EKF error over time.}
+    \label{fig:ekf_error_ps9_sv2}
 \end{figure}
 
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{sim/figures/PS9/EKF_error_SV3.png}
-    \caption{Caption}
-    \label{fig:enter-label}
+    \caption{SV3 EKF error over time.}
+    \label{fig:ekf_error_ps9_sv3}
 \end{figure}
+
+Looking at the residuals, we see that a result of the measurement model we get very small residuals in RTN and large residuals in ECI. The measurement step is especially good at reducing the residuals in the RTN position, which is clear in Figure \ref{fig:ekf_residuals_sv3_ps9}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{sim/figures/PS9/residuals_SV2.png}
-    \caption{Caption}
-    \label{fig:enter-label}
+    \caption{SV2 EKF residuals.}
+    \label{fig:ekf_residuals_sv2_ps9}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{sim/figures/PS9/residuals_SV3.png}
-    \caption{Caption}
-    \label{fig:enter-label}
+    \caption{SV3 EKF residuals.}
+    \label{fig:ekf_residuals_sv3_ps9}
 \end{figure}
-
-
 
 Finally, for visualization purposes, we look at the 3D plot of SV1, SV2, and SV3 throughout the simulation, shown in Figure \ref{fig:3d_visual_RTN_final_control}. Despite some drift in the along-track direction, we maintain passive safety and the Docker spacecraft carefully approaches the target while the Watcher watches.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{sim/figures/PS9/ROE_3d_all_maneuvers.png}
-    \caption{Caption}
+    \caption{3D visualization of RTN positions of SV1, SV2, SV3}
     \label{fig:3d_visual_RTN_final_control}
 \end{figure}
+
+A useful metric to look at is the error and standard deviation in the final state of SV2 and SV3, given below. As see
+
+\begin{align}
+    \mu_{err, SV2}:
+\begin{bmatrix} -0.384 \\ 0.607 \\ 0.038 \\ 0.441 \\ -0.171 \\ -0.057 \end{bmatrix} m\\
+\mu_{err, SV3}:
+\begin{bmatrix} 0.299 \\ 0.637 \\ 0.273 \\ 0.341 \\ 0.139 \\ 0.257 \end{bmatrix} m\\
+\sigma_{SV2}:
+\begin{bmatrix} -0.142 \\ -0.093 \\ -0.145 \\ 0.045 \\ -0.053 \\ -0.238 \end{bmatrix} m\\
+\sigma_{SV3}:
+\begin{bmatrix} 9.373 \\ 19.998 \\ 8.500 \\ 10.751 \\ 4.318 \\ 7.814 \end{bmatrix} m
+\end{align}
 
 \subsection{Bonus Material}
 \subsubsection{Utilizing Radial Burns for Proximity Operations}
 We experimented with various different control methods, as highlighted in PS5. One interesting design choice made was to use a more inefficient method pair of radial burns method for our final Mode 4 maneuver. We implemented this despite a working, more efficient tangential burn method for two reasons:
 \begin{itemize}
     \item Since radial burns are $2x$ less effective than tangential burns, we get finer control for each impulse bit the thruster can impart. Thus, it becomes a good choice for proximity operations, where the thrust reaction needed would be very small.
+    \item Radial burns affect $\delta e$ and thus the $\delta \lambda$ drift. But, radial burns do not impact $\delta a$ unlike tangential burns, which is helpful for controlling the $\delta \lambda$ drift, since it only depends on $\delta e$ rather than both $\delta e$ and $\delta a$.
     \item In practical scenarios, thrusters of our Docker satellite pluming the target satellite would be a major concern. Radial burns avoid that by thrusting in a perpendicular direction.
 \end{itemize}
 
 The result of this can be seen in Figure \ref{fig:delta_v_cumulative_sv3}, which shows the radial $\Delta v$ in mode 4.
 
 \subsubsection{Actuator Modeling}
-We went about coming up with an approximate model of our larger thruster used for impulsive control. Specifically, we wanted to create a model between the commanded $\Delta v_{cmd}$ and the resultant output $\Delta v_{out}$. Taking our largest $\Delta v = 0.04 m/s \implies a = \Delta v dt = 0.41 m/s^2 \implies F = ma = 5.5 N$, we see that we require around a 5N thruster. Based on \cite{polk2013recommended}, we can say that we would approximately see white noise in the actuator with a standard deviation around $5 mN$ of thrust, $\approx~0.1\%$ of the true value.
+We went about coming up with an approximate model of our larger thruster used for impulsive control. Specifically, we wanted to create a model between the commanded $\Delta v_{cmd}$ and the resultant output $\Delta v_{out}$. Taking our largest $\Delta v$, we can estimate the approximate thrust output of our impulse thruster.
+
+\begin{align}
+    \Delta v &= 0.04 m/s \\
+    &\implies a = \Delta v dt = 0.41 m/s^2 \\
+    &\implies F = ma = 5.5 N
+\end{align}
+
+We see that we require around a 5N thruster. Based on \cite{polk2013recommended}, we can say that we would approximately see white noise in the actuator with a standard deviation around $5 mN$ of thrust, $\approx~0.1\%$ of the true value.
 
 In our modeling, we do this by applying a uniform noise between $\pm k_{noise} \%$ to the commanded thrust value for the impulse burns. While experimenting with different values of $k_{noise}$, we noticed that $0.1\%$ has a negligible effect on our results. For lack of repetition, those plots are excluded. However, to see an extreme case, we explored adding $10\%$ noise to the impulse burns. The 3D visualization for this is shown in Figure \ref{fig:3d_vis_with_act_noise}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\linewidth]{sim/figures/PS9/ROE_3d_all_maneuvers_act_noise.png}
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS9/ROE_3d_all_maneuvers_act_noise.png}
     \caption{3D visualization of RTN positions of SV1, SV2, SV3, with 10\% noise added to impulsive burns.}
     \label{fig:3d_vis_with_act_noise}
 \end{figure}
 
 We can see that this change to the thrust results in poor maneuvers, which in turn lead to more of a drift in the relative mean longitude that has to be corrected by the continuous control during station keeping. As a result, the $\Delta v$ increased slightly. Although the difference is noticeable, we were surprised that the effect was not more drastic for smaller noise levels.
-In reality, such a thruster would also have some delay in thrust output, second order effects in its valve response, etc. However, since our time-step for the simulation is very large, these effects would not be possible to simulate.
+In reality, such a thruster would also have some delay in thrust output, second order effects in its valve response, etc. However, since our time-step for the simulation is very large relative to the time for thruster actuation, these effects would not be possible to simulate.
 
 \subsubsection{Dynamic Q Tuning}
-As shown in Figure ..., there is a spike in the estimate of the relative orbital elements during and around the large impulsive maneuvers. The EKF is too slow to adapt to the larger jumps in the state. Therefore, to get a good estimate even during these impulsive burns, we increase the process noise significantly, thus making the filter more reliant on the measurements during that phase. The two choices for $Q$ were ($R$ was not changed between the two cases)
+As shown in Figure \ref{fig:ekf_error_ps9_sv3}, there is a spike in the estimate error of the relative orbital elements during and around the large impulsive maneuvers for SV3. The EKF is too slow to adapt to the larger jumps in the state. Therefore, to get a good estimate even during these impulsive burns, we attempted to increase the process noise significantly, thus making the filter more reliant on the measurements during that phase. The two choices for $Q$ were ($R$ was not changed between the two cases)
+\begin{align}
+    Q_{base} &= I_{6\times 6} \\
+    Q_{high} &= 100I_{6\times 6}
+\end{align}
+In comparison, the $Q$ value for SV2 is $Q_{SV2} = 10^{-3}I_{6\times 6}$, which allows for smooth estimates that work well because of the lack of large spikes in state.
 
-% \subsubsection{PID control for Docking}
+However, our preliminary experiment with this didn't yield any noticeable changes. Since the modification to $Q$ was only done at a single time-step, its effect was negligible. A more advanced version of this might be to apply the modified $Q$ not just at the single time-step of the impulse, but to apply it around the predicted burns. However, the definition of that is ambiguous and would require some design iterations.
 
 \newpage
 \subsection{Conclusion and Way Forward}
@@ -459,7 +486,7 @@ Finally, in Problem Set 9, we implemented the complete integrated navigation and
 
 Maneuvers are planned using the estimates from the EKF with a hybrid impulsive and continuous control architecture. Impulsive maneuvers (semi-analytical closed-form methods) were used for the large orbit reconfigurations. This is where a large, high-thrust low-ISP thruster like a chemical rocket engine could be used. Continuous control (Lyapunov-based control) was used for station keeping and reducing any drift left from the impulse maneuvers. This is where low-thrust high-Isp thrusters, such as Hall-effect thrusters, could be used. Also, continuous control is used for station-keeping due to the minimum impulse bit requirements likely being smaller than what chemical propulsion could provide, since station-keeping maneuvers are very small. The estimates of the deputy states from the EKF were used in planning and control.
 
-Measurements are generated from the ground truth by converting absolute orbital elements into absolute ECI measurements and relative RTN measurements of the deputy spacecraft, and adding representative noise. These measurements simulate measurements that could be obtained from a combination of on-board GPS, crosslink, and celestial object measurements. The measurement vector is given as ECI and RTN measurements for each deputy stacked together. 
+Measurements are generated from the ground truth by converting absolute orbital elements into absolute ECI measurements and relative RTN measurements of the deputy spacecraft, and adding representative noise. These measurements simulate measurements that could be obtained from a combination of on-board GPS, crosslink, and celestial object measurements. The measurement vector is given as ECI and RTN measurements for each deputy stacked together with some added noise. 
 \begin{align}
     y &= \begin{bmatrix}
         y_{SV2} \\
@@ -470,12 +497,21 @@ Measurements are generated from the ground truth by converting absolute orbital 
         \boldsymbol{r_{SV2}}^{ECI} \\
         \boldsymbol{r_{SV3}}^{RTN} \\
         \boldsymbol{r_{SV3}}^{ECI} \\
-    \end{bmatrix}_{12\times 1}
+    \end{bmatrix}_{12\times 1} + V_t
 \end{align}
 
-
-
-
+From here, the measurement sensitivity matrix can be defined to be used in the EKF.
+\begin{align}
+    C_t = \left.\begin{bmatrix}
+        \mathcal{J}a_1 & 0_{3\times6} \\
+         Q^\top_{eci2rtn} \mathcal{J}
+a_1 & 0_{3\times6} \\
+        0_{3\times6}  & \mathcal{J}a_1 \\
+        0_{3\times6} & Q^\top_{eci2rtn} \mathcal{J}
+a_1\\
+    \end{bmatrix} \right|_{x = \bar{x}_t}
+\end{align}
+where $\mathcal{J}$ is the matrix that converts ROEs to RTN values. 
 
 The state used in the EKF is made up of the ROEs of both deputies (SV2 and SV3) stacked together.
 \begin{equation}
@@ -502,10 +538,46 @@ The state used in the EKF is made up of the ROEs of both deputies (SV2 and SV3) 
 \end{bmatrix}
 \end{equation}
 
+The EKF uses an STM to propagate the estimated ROE state forward, which is defined as
+\begin{align}
+    \boldsymbol{\alpha_{\tau}} = \Phi^{J_2}_{\text{qns}}(\alpha_c(t_i), \tau) \boldsymbol{\alpha_{i}} \label{eq:state_transition_relation}
+\end{align}
 
+where $\Phi^{J_2}_{\text{qns}}(\alpha_c(t_i), \tau)$ is the state-transition matrix (STM) at time $\tau$, and $\boldsymbol{\alpha_{i}}$ are the initial conditions of the relative orbital elements.
 
+The state-transition matrix for quasi-nonsingular relative orbital elements is given by
+\begin{align}
+&\Phi^{J_2}_{\text{qns}}(\alpha_c(t_i), \tau) = \nonumber \\ 
+&\begin{bmatrix}
+1 & 0 & 0 & 0 & 0 & 0 \\
+-\left( \frac{3}{2}n + \frac{7}{2} \kappa E P \right)\tau & 1 & \kappa e_{x_i} F G P \tau & \kappa e_{y_i} F G P \tau & -\kappa F S \tau & 0 \\
+\frac{7}{2} \kappa e_{y_f} Q \tau & 0 & \cos(\dot{\omega} \tau) - 4\kappa e_{x_i} e_{y_f} G Q \tau & -\sin(\dot{\omega} \tau) - 4\kappa e_{y_i} e_{y_f} G Q \tau & 5\kappa e_{y_f} S \tau & 0 \\
+-\frac{7}{2} \kappa e_{x_f} Q \tau & 0 & \sin(\dot{\omega} \tau) + 4\kappa e_{x_i} e_{x_f} G Q \tau & \cos(\dot{\omega} \tau) + 4\kappa e_{y_i} e_{x_f} G Q \tau & -5\kappa e_{x_f} S \tau & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 \\
+\frac{7}{2} \kappa S \tau & 0 & -4 \kappa e_{x_i} G S \tau & -4 \kappa e_{y_i} G S \tau & 2 \kappa T \tau & 1
+\end{bmatrix} \label{eq:stm_matrix}
+\end{align}
 
-In our simulation loop, we:
+where we have the following variables
+\begin{align*}
+\eta &= \sqrt{1 - e^2} &
+\kappa &= \frac{3}{4} \frac{J_2 R_E^2 \sqrt{\mu}}{a^{7/2} \eta^4} &
+E &= 1 + \eta \\
+F &= 4 + 3\eta &
+G &= \frac{1}{\eta^2} & \\
+P &= 3\cos^2(i) - 1 &
+Q &= 5\cos^2(i) - 1 &
+R &= \cos(i) \\
+S &= \sin(2i) &
+T &= \sin^2(i) &
+U &= \sin(i) \\
+V &= \tan(i/2) &
+W &= \cos^2(i/2)
+\end{align*} 
+
+The initial estimated mean and covariance were chosen to introduce a small offset from the ground truth values. Similarly, the process noise $Q$ and measurement noise $R$ were tuned to be positive definite and diagonal matrices that represented confidence in the dynamics prediction and realistic measurement noise. 
+
+Putting this all together, our simulation loop has the following structure:
 \begin{itemize}
     \item Propagate the ground truth states for SV1, SV2, and SV3. 
     \item Plan maneuvers. 
@@ -513,8 +585,6 @@ In our simulation loop, we:
     \item Generate measurements based on the measurement model previously discussed, and the ground truth values from SV1, SV2, SV3.
     \item Use the measurements and prior states to generate an estimate of SV2 and SV3's ROEs using our Extended Kalman Filter implementation. These estimates are then used for planning.
 \end{itemize}
-
-More details on the exact formulation of the entire architecture can be found in Problem Set 9. 
 
 The full order of operations was critical to ensure that the correct values for the ground truth and the estimates were used for planning, so as to prevent any control or estimation instabilities due to a time delay. This is shown in detail in Figure \ref{fig:nav_control_arch_summary}.
 
@@ -525,15 +595,55 @@ The full order of operations was critical to ensure that the correct values for 
     \label{fig:nav_control_arch_summary}
 \end{figure}
 
-\subsubsection{Assessment of Results}
+The final results will be explored in the next section. More details on the exact formulation of the entire control and navigation architecture can be found in Problem Sets 7, 8, and 9. 
 
+\subsubsection{Assessment of Final Results}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{sim/figures/PS9/ROE_3d_all_maneuvers.png}
+    \caption{3D visualization of RTN positions of SV1, SV2, SV3.}
+    \label{fig:3d_vis_final_summary}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{sim/figures/PS9/delta_v_cumulative_timeline_modes_SV3.png}
+    \caption{$\Delta v$ over time for SV3. Note that this uses impulsive control for the maneuvers, but continuous control for station keeping.}
+    \label{fig:delta_v_cumulative_sv3_final_sumary}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{sim/figures/PS9/ROE_over_time_SV3_comparison.png}
+    \caption{True ROEs, estimate ROEs, and covariance bounds for SV3 over time.}
+    \label{fig:sv3_ekf_comparison_ps9_final_summary}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{sim/figures/PS9/ROE_error_over_time_modes_SV3.png}
+    \caption{Error between the true ROEs and the desired ROEs for SV3}
+    \label{fig:roe_error_control_sv3_summary}
+\end{figure}
 
 \subsubsection{Lessons Learned}
-- deg to radians, mean to osculating, m to km --> very important
+Over the course of this project, we have learned an immense amount about the dynamics, navigation, and control of distributed space systems. Some of the key concepts include ROEs and their geometry, the RTN frame, differences between dynamics models and their propagation methods (i.e. FODE vs. FERM vs. GVE vs. STM), the effects of J2 and other perturbations in the ROE and RTN frames, passive safety through $e$-$i$ vector separation, closed-form impulsive and continuous control schemes, the implementation of an EKF with control integration, convex optimization, reachable set theory, angles-only navigation, applications to real-world space missions, and many more. Along with awareness of all the intricate equations and methodologies that power distributed space systems, we have developed an intuitive understanding of relative orbital dynamics, navigation, and control. This intuition will be key to our future careers in engineering.
+
+We also learned a lot of specific lessons concerning best practices for implementation. First, the conversions between degrees and radians must be marked and kept track of clearly. More than a few times, our failure to do so led to a long debugging process to find the root issue. Radians should be used in all calculations and then converted to degrees during plotting. Similarly, the conversions between mean and osculating orbital elements is key. Calculations should almost always be done in osculating elements and then converted to mean elements to maintain the utmost accuracy. Also, initial conditions should be clearly marked as mean or osculating. We mishandled this distinction a few times which led to unexpected drifts due to offsets in ROEs that should not have been there. Likewise, converting between meters and kilometers should be clearly marked, along with scaled versus unscaled ROEs.
+
+Overall, this project was an incredible learning experience that provided firsthand experience on the implementation of state-of-the-art algorithms for distributed space systems. The hard-fought lessons learned while getting our project to work will hopefully transfer over well to our future careers. 
 
 \subsubsection{Potential Continuations}
-- estimating chief in EKF
-- implementing vision, bearing angle measurements
-- implementing actual GPS measurements with pseudoranges and biases
-- implementing PID control 
-- UKF
+There are many potential continuations of this project that we had hoped to do, but did not have enough time. For the EKF, it would be great to add in estimation of the chief spacecraft, since in reality, we will not know the ground truth chief values or be receiving measurements from the Target spacecraft, as it is uncooperative. We outlined the procedure for doing so in Problem Set 7, but did not get to implement it fully in later problem sets. Instead of running a single EKF, it may be possible to first estimate the chief's absolute position in a separate EKF and then use that estimate to inform estimates of the deputy in a different EKF, since the deputy estimates depend on the chief estimate. This would simplify the measurement model, sensitivity matrix, and EKF mean propagation.
+
+Another major improvement would be to improve the measurements and measurement models that we are using to simulate GPS, crosslink, and vision measurements. Currently, we assume that we can obtain RTN and ECI measurements from these sensors, which is possible, but quite a major abstraction. Instead, implementing more realistic vision would entail using bearing angles and more realistic GPS measurements would entail using psuedoranges, clock biases, and more. Vision could augment the current architecture of using GPS and crosslink to obtain relative measurements. 
+
+For control, we are interested in exploring the application of techniques like PID and LQR, especially in the docking phases where the HCW frame is sufficient. Instead of operating control in the ROE space, we could do PID or LQR in the RTN frame at close ranges. Comparing these more traditional methods to those implemented currently would provide an interesting baseline. Also, looking into reachable set theory could provide even more fuel savings. 
+
+For navigation, creating an Unscented Kalman Filter (UKF) could provide better navigation performance as it can capture non-linearities better than an EKF can. Additionally, expanding on our initial implementation of dynamic Q tuning could improve our EKF performance. 
+
+For the overall simulation, more realistic thruster and sensor modeling would add fidelity. Currently, Gaussian noise is added to our thrusters, but this is only the first step in complete thruster modeling. Additionally, as mentioned previously, we do not accurately model our sensors and instead make assumptions to abstract away those complexities. 
+
+Overall, there are many potential extensions for this project. We hope that one day a mission like SOSS could prove out the concepts that we started working on. 
